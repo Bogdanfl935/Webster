@@ -1,7 +1,4 @@
-python -m venv ../core
-cd ../core/Scripts
-powershell "& "".\Activate.ps1"""
-
-cd ..
-python -m pip install -r requirements.txt
+py -m venv ..\core\
+CALL ..\core\Scripts\activate.bat
+py -m pip install -r ..\core\requirements.txt
 pause

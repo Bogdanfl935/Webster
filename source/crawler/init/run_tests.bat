@@ -1,6 +1,4 @@
-cd ../core/Scripts
-powershell "& "".\Activate.ps1"""
-cd ..
-cd tests
+CALL ..\core\Scripts\activate.bat
+cd ..\core\tests
 python -m pytest -s
 pause
