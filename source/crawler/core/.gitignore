@@ -1,0 +1,7 @@
+.idea
+.pytest_cache
+**/*.py[co]
+Lib
+Scripts
+pyvenv.cfg
+**/__pycache__
