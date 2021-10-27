@@ -5,8 +5,9 @@ def test_in_post_link(client):
 
     assert response.status_code == 200
     assert result is not None
-    assert "nextLink" in result
-    assert result['nextLink'] == "http://www.w3.org/TR/html4/strict.dtd"
+    print(result)
+    assert "ana" in result
+    assert result['ana'] == "mere"
 
 
 def test_in_get_data(client):

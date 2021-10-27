@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, json, jsonify, request
 from flask.wrappers import Request
 import sys
 import os
@@ -13,11 +13,12 @@ app = Flask(__name__)
 @app.route("/crawler", methods=['POST'])
 def in_post_link() -> str:
     text = request.json.get("startLink", None)
-     
-    next_url = do_crawling(text)
-    resp = {"nextLink": next_url}
 
-    return jsonify(resp)
+    # in do_crawling we do a POST on /parser
+    next_url = do_crawling(text)
+    # resp = {"nextLink": next_url}
+
+    return jsonify({"ana": "mere"})
         
 @app.route("/crawler", methods=['GET'])
 def in_get_data() -> str:
