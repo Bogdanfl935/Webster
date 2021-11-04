@@ -9,8 +9,8 @@ def test_in_post_link(client):
     assert response.status_code == 200
     assert result is not None
     print(result)
-    assert "ana" in result
-    assert result['ana'] == "mere"
+    assert "error_code" in result
+    assert result['error_code'] == 404
 
 
 def test_in_get_data(client):
