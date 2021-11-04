@@ -16,7 +16,16 @@ db = SQLAlchemy(app)
 
 class NextLinks(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    url_site = db.Column(db.String(50), nullable=False)
+    url_site = db.Column(db.String(2083), nullable=False)
+
+    print(id)
+
+    def __repr__(self):
+        return '<Category %r>' % self.url_site
+
+class VisitedLinks(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    url_site = db.Column(db.String(2083), nullable=False)
 
     print(id)
 
@@ -27,13 +36,16 @@ class NextLinks(db.Model):
     
 @app.route("/storage", methods=['POST'])
 def in_get_data() -> str:
-    db.session.add(NextLinks(url_site="example.org"))
-    db.session.commit()
-    
-    nLink = NextLinks()
-    print(nLink)
+    # db.session.add(NextLinks(url_site="example.org"))
+    # db.session.commit()
+    #
+    # q = NextLinks.query.all()
+    # print(q)
+    #
+    # nLink = NextLinks()
+    # print(nLink)
 
     return jsonify({"ala": "bala"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=80, debug=True)
