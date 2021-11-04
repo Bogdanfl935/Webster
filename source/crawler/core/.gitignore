@@ -3,5 +3,6 @@
 **/*.py[co]
 Lib
 Scripts
+Include
 pyvenv.cfg
 **/__pycache__

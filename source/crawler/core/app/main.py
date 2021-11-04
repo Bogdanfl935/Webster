@@ -1,18 +1,13 @@
-from flask import Flask, json, jsonify, request
-from flask.wrappers import Request
-import sys
-import os
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
-
+from flask import Flask, jsonify, request
 from app.crawl_from_url import do_crawling
+import endpoint_constants
+import constants
 
 app = Flask(__name__)
 
-@app.route("/crawler", methods=['POST'])
+@app.route(endpoint_constants.CRAWLER, methods=['POST'])
 def in_post_link() -> str:
-    text = request.json.get("startLink", None)
+    text = request.json.get(constants.START_LINK_KEY, None)
 
     # in do_crawling we do a POST on /parser
     next_url = do_crawling(text)
@@ -20,9 +15,9 @@ def in_post_link() -> str:
 
     return jsonify({"ana": "mere"})
         
-@app.route("/crawler", methods=['GET'])
+@app.route(endpoint_constants.CRAWLER, methods=['GET'])
 def in_get_data() -> str:
     return jsonify({"ala": "bala"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)  
+    app.run(host='0.0.0.0', port=80, debug=True)
