@@ -1,0 +1,10 @@
+.idea
+.pytest_cache
+**/*.py[co]
+Lib
+Scripts
+pyvenv.cfg
+**/__pycache__
+**/postgres-data
+Include
+.env
