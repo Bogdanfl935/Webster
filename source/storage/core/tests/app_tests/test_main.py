@@ -1,5 +1,7 @@
+import endpoint_constants
+
 def test_in_get_data(client):
-    response = client.post('/storage')
+    response = client.post(endpoint_constants.STORAGE)
     result = response.get_json()
     assert result is not None
 
