@@ -1,3 +1,4 @@
+import json
 import time
 
 import requests
@@ -11,12 +12,13 @@ def do_crawling(url):
 
     send_to_parser = requests.post(url=f'http://127.0.0.1:80{endpoint_constants.PARSER}', data=dictPage)
 
-    req_next_links = requests.post(url=f'http://127.0.0.1:80{endpoint_constants.NEXT_LINK}', data=dict({'quantity': constants.CRAWLER_NEXT_LINK_LIMIT}))
+    post_to_next_link = {'quantity': constants.CRAWLER_NEXT_LINK_LIMIT}
 
+    req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}', data=json.dumps(post_to_next_link))
 
     if req_next_links.status_code != 200:
         time.sleep(2)
-        req_next_links = requests.post(url=f'http://127.0.0.1:80{endpoint_constants.NEXT_LINK}', data=dict({'quantity': constants.CRAWLER_NEXT_LINK_LIMIT}))
+        req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}', data=json.dumps(post_to_next_link))
         if req_next_links.status_code != 200:
             next_links = {'error_code': req_next_links.status_code}
         else:

@@ -21,4 +21,4 @@ def in_get_data() -> str:
     return jsonify({"ala": "bala"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='localhost', port=80, debug=True)
