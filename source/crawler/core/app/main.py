@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from app.crawl_from_url import do_crawling
 import endpoint_constants
 import constants
+import app_constants
 
 app = Flask(__name__)
 
@@ -10,14 +11,13 @@ def in_post_link() -> str:
     text = request.json.get(constants.START_LINK_KEY, None)
 
     # in do_crawling we do a POST on /parser
-    next_url = do_crawling(text)
-    # resp = {"nextLink": next_url}
+    next_urls = do_crawling(text)
 
-    return jsonify({"ana": "mere"})
+    return next_urls
         
 @app.route(endpoint_constants.CRAWLER, methods=['GET'])
 def in_get_data() -> str:
     return jsonify({"ala": "bala"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
