@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from app.crawl_from_url import do_crawling
 import endpoint_constants
 import constants
+import app_constants
 
 app = Flask(__name__)
 
@@ -19,4 +20,4 @@ def in_get_data() -> str:
     return jsonify({"ala": "bala"})
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=50003, debug=True)
+    app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
