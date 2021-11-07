@@ -64,4 +64,4 @@ def in_get_next_links() -> str:
     return dict_next_url
 
 if __name__ == '__main__':
-    app.run(host='192.168.100.215', port=80, debug=True)
+    app.run(host='localhost', port=50006, debug=True)
