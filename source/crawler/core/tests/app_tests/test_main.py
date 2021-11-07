@@ -8,9 +8,8 @@ def test_in_post_link(client):
 
     assert response.status_code == 200
     assert result is not None
-    print(result)
-    assert "error_code" in result
-    assert result['error_code'] == 404
+    assert "urls" in result
+    assert result['urls'] == ['https://apple.com/', 'https://www.google.com/']
 
 
 def test_in_get_data(client):
