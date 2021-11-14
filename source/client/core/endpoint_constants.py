@@ -1,0 +1,6 @@
+CRAWLER = "/crawler"
+PARSER = "/parser"
+NEXT_LINK = "/next-link"
+CLIENT = "/client"
+STORAGE_MS_URL= "http://localhost:50006"
+PARSER_MS_URL= "http://localhost:50005"
