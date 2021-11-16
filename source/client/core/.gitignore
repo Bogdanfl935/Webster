@@ -2,7 +2,7 @@
 .pytest_cache
 **/*.py[co]
 Lib
-Scripts
-Include
+Scripts/*
+Include/*
 pyvenv.cfg
 **/__pycache__
