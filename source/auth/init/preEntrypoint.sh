@@ -16,8 +16,4 @@ set -u
 ( : $JEDIS_DATABASE )
 ( : $JEDIS_PASS )
 
-( : $JWT_ISSUER )
-( : $JWT_EXPIRATION )
-( : $REFRESH_TOKEN_BYTE_LENGTH )
-
 exec "$@"

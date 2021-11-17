@@ -8,11 +8,11 @@
 		<version>2.5.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.motorage</groupId>
-	<artifactId>ms-auth</artifactId>
+	<groupId>com.webster</groupId>
+	<artifactId>webster-auth</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ms-auth</name>
-	<description>Authentication microservice for motorage application</description>
+	<name>webster-auth</name>
+	<description>Authentication microservice for Webster application</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>

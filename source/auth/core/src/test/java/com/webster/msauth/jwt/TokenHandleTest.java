@@ -63,8 +63,8 @@ class TokenHandleTest {
 	@BeforeEach
 	void setUpIndividually() {
 		expiration = 100000L;
-		given(tokenConfig.getTokenIssuer()).willReturn("Motorage MsAuth");
-		given(customUserDetails.getUsername()).willReturn("Valid-Email@Motorage.uk.co");
+		given(tokenConfig.getTokenIssuer()).willReturn("Webster MsAuth");
+		given(customUserDetails.getUsername()).willReturn("Valid-Email@Webster.uk.co");
 	}
 
 	@Test
