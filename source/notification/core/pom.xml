@@ -9,11 +9,11 @@
 		<version>2.5.6</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.motorage</groupId>
-	<artifactId>ms-notification</artifactId>
+	<groupId>com.webster</groupId>
+	<artifactId>webster-notification</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ms-notification</name>
-	<description>Notification microservice for Motorage application</description>
+	<name>webster-notification</name>
+	<description>Notification microservice for Webster application</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>

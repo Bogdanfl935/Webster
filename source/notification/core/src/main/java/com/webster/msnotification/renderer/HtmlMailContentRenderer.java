@@ -18,8 +18,8 @@ public class HtmlMailContentRenderer {
 	public String renderContent(String targetUrl, String contentTemplatePath) {
 		Context context = new Context();
 		context.setVariable(RenderingConstants.TARGET_URL_VARIABLE, targetUrl);
-		context.setVariable(RenderingConstants.MOTORAGE_LOGO_CID_VARIABLE,
-				"cid:" + RenderingConstants.MOTORAGE_LOGO_CID_VALUE);
+		context.setVariable(RenderingConstants.LOGO_CID_VARIABLE,
+				"cid:" + RenderingConstants.LOGO_CID_VALUE);
 
 		return templateEngine.process(contentTemplatePath, context);
 	}

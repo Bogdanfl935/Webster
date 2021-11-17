@@ -50,8 +50,8 @@ public class MailHandle {
 
 		textPart.setContent(emailContentDto.getContent(), "text/html; charset=utf-8");
 		imagePart.attachFile(String.format("%s/%s", RenderingConstants.PATH_TO_STATIC_RESOURCES,
-				RenderingConstants.MOTORAGE_LOGO_FILENAME));
-		imagePart.setContentID(String.format("<%s>", RenderingConstants.MOTORAGE_LOGO_CID_VALUE));
+				RenderingConstants.LOGO_FILENAME));
+		imagePart.setContentID(String.format("<%s>", RenderingConstants.LOGO_CID_VALUE));
 		imagePart.setDisposition(MimeBodyPart.INLINE);
 
 		multipart.addBodyPart(textPart);
