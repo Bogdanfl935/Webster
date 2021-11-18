@@ -1,5 +1,13 @@
 {% extends "./layout/layout.html" %}
 
+{% block head %}
+{{ super() }}
+
+<!-- Own include files -->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/home.css') }}">
+
+{% endblock %}
+
 {% block content %}
 <div class="page-content">
     <section class="section--center mdl-grid">
@@ -13,7 +21,7 @@
             </div>
             <div class="mdl-card__supporting-text">
                 <div class="mdl-card__supporting-text">
-                    <h3 style="text-align: right">12</h3>
+                    <h3 class="h3-right">12</h3>
                 </div>
 
             </div>
@@ -30,7 +38,7 @@
             </div>
             <div class="mdl-card__supporting-text">
                 <div class="mdl-card__supporting-text">
-                    <h3 style="text-align: right">3223</h3>
+                    <h3 class="h3-right">3223</h3>
                 </div>
             </div>
 
@@ -44,7 +52,7 @@
                 <h3 class="mdl-card__title-text"> Time taken </h3>
             </div>
             <div class="mdl-card__supporting-text">
-                <h3 style="text-align: right">21 sec</h3>
+                <h3 class="h3-right">21 sec</h3>
             </div>
 
         </div>

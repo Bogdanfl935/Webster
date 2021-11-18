@@ -14,6 +14,7 @@ a {
 
 #title {
     padding-left: 5%;
+    width: 100%;
 }
 
 #title02 {
@@ -78,4 +79,33 @@ a {
 
 .no-shadow{
     box-shadow: none !important;
+}
+
+.mdl-layout__drawer > .mdl-layout-title > a {
+    color: black;
+    text-decoration: none;
+}
+
+.mdl-layout__drawer > .mdl-layout-title > a > h3 > .mdl-layout--large-screen-only {
+    vertical-align: middle;
+
+}
+
+.mdl-layout__drawer > .mdl-navigation > .mdl-navigation__link > .material-icons {
+    padding-right: 5px;
+}
+
+/*.mdl-layout__header--fixed-header > mdl-layout__header-row >*/
+
+#small-title {
+    color: white;
+    text-decoration: none;
+}
+
+#small-title > h3 {
+    padding-left: 35px;
+}
+
+#title-large-spacer {
+    height: 5px;
 }
