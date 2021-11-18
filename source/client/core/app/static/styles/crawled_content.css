@@ -1,0 +1,9 @@
+.delete-crawled {
+    color: red;
+    text-decoration: none;
+}
+
+.download-crawled {
+    color: black;
+    text-decoration: none;
+}

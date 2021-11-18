@@ -1,0 +1,55 @@
+{% extends "./layout/layout.html" %}
+
+{% block head %}
+{{ super() }}
+
+<!-- Own include files -->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/crawled_content.css') }}">
+
+{% endblock %}
+
+{% block content %}
+<div class="page-content" id="crawled-content">
+    <section class="section--center mdl-grid">
+
+        <div
+            class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--6-col-phone ">
+            <div class="mdl-card__title">
+                <h3 class="mdl-card__title-text"> Extracted data </h3>
+            </div>
+            <div class="mdl-card__media">
+                <table class="mdl-data-table mdl-js-data-table mdl-data-table mdl-shadow--2dp" width="100%">
+                    <thead>
+                        <tr>
+                            <th class="mdl-data-table__cell--non-numeric">Page name</th>
+                            <th>Time taken</th>
+                            <th>Found</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for val in table_vals.items() %}
+                        <tr>
+                            <td class="mdl-data-table__cell--non-numeric">Resource type {{ val[0]%5 }}</td>
+                            <td>{{ val[0] }}s</td>
+                            <td>{{ val[1] }}</td>
+                            <td>
+                                <a class="download-crawled mr-2" href="" ><i class="fas fa-download"></i></a>
+                                <a class="delete-crawled " href="" ><i class="fas fa-trash-alt"></i></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mdl-card__supporting-text">
+
+            </div>
+        </div>
+
+
+    </section>
+</div>
+{% endblock %}

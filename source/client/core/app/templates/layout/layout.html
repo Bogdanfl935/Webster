@@ -21,7 +21,7 @@
             <div id="title" class="mdl-layout__header-row mdl-color--primary">
 
                 <span class="mdl-layout--small-screen-only mdl-layout-title">
-                    <a href="" target="_self" id="small-title">
+                    <a href="{{ url_for(home_endpoint) }}" target="_self" id="small-title">
                         <h3>Webster</h3>
                     </a>
                 </span>
@@ -44,10 +44,20 @@
                 </a>
             </span>
             <nav class="mdl-navigation">
-                <a class="mdl-navigation__link" href="">
+                <a class="mdl-navigation__link" href="{{ url_for(home_endpoint) }}">
                     <div class="icon material-icons " role="presentation">home</div>
                     Dashboard
                 </a>
+
+                {% if logged_in %}
+                    <a class="mdl-navigation__link" href="{{ url_for(crawled_content_endpoint) }}">
+                {% else %}
+                    <a class="mdl-navigation__link" data-toggle="modal" data-target="#login-modal" href="">
+                {% endif %}
+                    <div class="icon material-icons " role="presentation">list</div>
+                    Crawled content
+                </a>
+
                 {% if logged_in %}
                     <a class="mdl-navigation__link" href="{{ url_for(home_endpoint) }}">
                 {% else %}
