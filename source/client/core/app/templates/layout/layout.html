@@ -18,15 +18,14 @@
 <div class="mdl-color--grey-100 mdl-color--text--grey-800 mdl-base">
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header  mdl-layout--fixed-drawer">
         <header class="mdl-layout__header mdl-layout__header--fixed-header">
-            <div id="title" class="mdl-layout__header-row mdl-color--primary" style="width: 100%;">
+            <div id="title" class="mdl-layout__header-row mdl-color--primary">
 
                 <span class="mdl-layout--small-screen-only mdl-layout-title">
-                    <a href="" target="_self" style="color: white; text-decoration: none;">
-                        <h3 style="padding-left: 35px">Webster</h3>
+                    <a href="" target="_self" id="small-title">
+                        <h3>Webster</h3>
                     </a>
                 </span>
-                <div style="height: 5px"
-                    class="mdl-layout--large-screen-only mdl-layout__header-row mdl-color--primary">
+                <div class="mdl-layout--large-screen-only mdl-layout__header-row mdl-color--primary" id="title-large-spacer">
 
                 </div>
                 <div class="mdl-layout-spacer"></div>
@@ -36,18 +35,18 @@
         <div class="mdl-layout__drawer">
 
             <span class="mdl-layout-title">
-                <a href="" target="_self" style="color: black; text-decoration: none;">
+                <a href="" target="_self">
 
                     <h3>
                         <img class="mdl-layout--large-screen-only"
                             src="{{ url_for('static', filename='images/favicon.png') }}" width="auto" height="auto"
-                            border="0" style="vertical-align: middle">Webster
+                            border="0">Webster
                     </h3>
                 </a>
             </span>
             <nav class="mdl-navigation">
                 <a class="mdl-navigation__link" href="">
-                    <div class="icon material-icons" role="presentation" style="padding-right: 5px">home</div>
+                    <div class="icon material-icons " role="presentation">home</div>
                     Dashboard
                 </a>
                 {% if logged_in %}
@@ -55,7 +54,7 @@
                 {% else %}
                     <a class="mdl-navigation__link" data-toggle="modal" data-target="#login-modal" href="">
                 {% endif %}
-                    <div class="icon material-icons" role="presentation" style="padding-right: 5px">person</div>
+                    <div class="icon material-icons" role="presentation">person</div>
                     Profile
                 </a>
             </nav>
