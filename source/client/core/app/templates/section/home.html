@@ -1,5 +1,13 @@
 {% extends "./layout/layout.html" %}
 
+{% block head %}
+{{ super() }}
+
+<!-- Own include files -->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/home.css') }}">
+
+{% endblock %}
+
 {% block content %}
 <div class="page-content">
     <section class="section--center mdl-grid">
