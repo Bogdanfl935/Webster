@@ -5,9 +5,16 @@ import app_constants
 
 app = Flask(__name__)
 
-@app.route("/login", methods=['GET'])
-def login():
-  return render_template('./modal/login.html')
+@app.context_processor
+def inject_endpoint_constants():
+    return dict(
+      home_endpoint = in_post_link.__name__
+    )
+
+@app.route("/error", methods=['GET'])
+def handle_error():
+  error_dict = {'error_status': 404, 'error_message': 'Page not found'}
+  return render_template('./error/error.html', error=error_dict)
 
 @app.route(endpoint_constants.CLIENT, methods=['GET'])
 def in_post_link() -> str:

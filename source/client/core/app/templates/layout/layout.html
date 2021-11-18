@@ -1,16 +1,21 @@
-<!DOCTYPE html>
-<html>
+{% extends "./layout/base.html" %}
 
-<head>
+{% block head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title> Webster </title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <title> Webster </title>
+<!-- Foreign include files -->
+{% include './include/material-design-includes.html' %}
+{% include './include/bootstrap-includes.html' %}
 
-    {% include './include/layout-includes.html' %}
-</head>
+<!-- Own include files -->
+<link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/layout.css') }}">
+{% endblock %}
 
-<body class="mdl-color--grey-100 mdl-color--text--grey-800 mdl-base">
+{% block body %}
+<div class="mdl-color--grey-100 mdl-color--text--grey-800 mdl-base">
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header  mdl-layout--fixed-drawer">
         <header class="mdl-layout__header mdl-layout__header--fixed-header">
             <div id="title" class="mdl-layout__header-row mdl-color--primary" style="width: 100%;">
@@ -46,13 +51,13 @@
                     Dashboard
                 </a>
                 {% if logged_in %}
-                <a class="mdl-navigation__link" href="{{ url_for('login') }}">
-                    {% else %}
+                    <a class="mdl-navigation__link" href="{{ url_for(home_endpoint) }}">
+                {% else %}
                     <a class="mdl-navigation__link" data-toggle="modal" data-target="#login-modal" href="">
-                        {% endif %}
-                        <div class="icon material-icons" role="presentation" style="padding-right: 5px">person</div>
-                        Profile
-                    </a>
+                {% endif %}
+                    <div class="icon material-icons" role="presentation" style="padding-right: 5px">person</div>
+                    Profile
+                </a>
             </nav>
         </div>
         <main class="mdl-layout__content">
@@ -68,7 +73,5 @@
     {% if not logged_in %}
     {% include './modal/login.html' %}
     {% endif %}
-
-</body>
-
-</html>
+</div>
+{% endblock %}
