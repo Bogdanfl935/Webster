@@ -1,4 +1,4 @@
-{% extends "./layout/base.html" %}
+{% extends template_constants.LAYOUT_BASE_PATH %}
 
 {% block head %}
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6,12 +6,14 @@
 <title> Webster </title>
 
 <!-- Foreign include files -->
-{% include './include/material-design-includes.html' %}
-{% include './include/bootstrap-includes.html' %}
+{% include template_constants.INCLUDE_MATERIAL_DESIGN_INCLUDES_PATH %}
+{% include template_constants.INCLUDE_BOOTSTRAP_INCLUDES_PATH %}
 
 <!-- Own include files -->
-<link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/layout.css') }}">
+<link rel="shortcut icon"
+      href="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.IMAGES_FAVICON_PATH) }}">
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.STYLES_LAYOUT_PATH) }}">
 {% endblock %}
 
 {% block body %}
@@ -20,12 +22,13 @@
         <header class="mdl-layout__header mdl-layout__header--fixed-header">
             <div id="title" class="mdl-layout__header-row mdl-color--primary">
 
-                <span class="mdl-layout--small-screen-only mdl-layout-title">
+                <span class="mdl-layout--small-screen-only mdl-layout-title mt-2">
                     <a href="{{ url_for(home_endpoint) }}" target="_self" id="small-title">
                         <h3>Webster</h3>
                     </a>
                 </span>
-                <div class="mdl-layout--large-screen-only mdl-layout__header-row mdl-color--primary" id="title-large-spacer">
+                <div class="mdl-layout--large-screen-only mdl-layout__header-row mdl-color--primary"
+                     id="title-large-spacer">
 
                 </div>
                 <div class="mdl-layout-spacer"></div>
@@ -34,7 +37,7 @@
         </header>
         <div class="mdl-layout__drawer">
 
-            <span class="mdl-layout-title">
+            <span class="mdl-layout-title mt-4">
                 <a href="" target="_self">
 
                     <h3>
@@ -50,22 +53,22 @@
                 </a>
 
                 {% if logged_in %}
-                    <a class="mdl-navigation__link" href="{{ url_for(crawled_content_endpoint) }}">
-                {% else %}
+                <a class="mdl-navigation__link" href="{{ url_for(data_crawled_endpoint) }}">
+                    {% else %}
                     <a class="mdl-navigation__link" data-toggle="modal" data-target="#login-modal" href="">
-                {% endif %}
-                    <div class="icon material-icons " role="presentation">list</div>
-                    Crawled content
-                </a>
+                        {% endif %}
+                        <div class="icon material-icons " role="presentation">list</div>
+                        Data crawled
+                    </a>
 
-                {% if logged_in %}
+                    {% if logged_in %}
                     <a class="mdl-navigation__link" href="{{ url_for(home_endpoint) }}">
-                {% else %}
-                    <a class="mdl-navigation__link" data-toggle="modal" data-target="#login-modal" href="">
-                {% endif %}
-                    <div class="icon material-icons" role="presentation">person</div>
-                    Profile
-                </a>
+                        {% else %}
+                        <a class="mdl-navigation__link" data-toggle="modal" data-target="#login-modal" href="">
+                            {% endif %}
+                            <div class="icon material-icons" role="presentation">person</div>
+                            Profile
+                        </a>
             </nav>
         </div>
         <main class="mdl-layout__content">
@@ -79,7 +82,7 @@
         </main>
     </div>
     {% if not logged_in %}
-    {% include './modal/login.html' %}
+    {% include template_constants.MODAL_LOGIN_PATH %}
     {% endif %}
 </div>
 {% endblock %}

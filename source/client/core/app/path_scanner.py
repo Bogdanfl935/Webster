@@ -17,6 +17,7 @@ def map_directory_into_constants(start_dir: str):
     file_output_buffer = "# Scanned file names\n"
     file_path_output_buffer = "# Scanned file paths\n"
 
+    directory_output_buffer += f"ROOT_DIR = '{start_dir}'\n"
     for root, dirs, files in os.walk(os.path.join(os.curdir, start_dir)):
         directory_names = set()
         for file in files:

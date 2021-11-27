@@ -2,6 +2,7 @@ import os
 
 
 # Scanned directory names
+ROOT_DIR = 'static'
 STATIC_IMAGES_DIR = 'images'
 STATIC_SCRIPTS_DIR = 'scripts'
 STATIC_STYLES_DIR = 'styles'

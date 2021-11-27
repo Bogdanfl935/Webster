@@ -1,10 +1,11 @@
-{% extends "./layout/layout.html" %}
+{% extends template_constants.LAYOUT_LAYOUT_PATH %}
 
 {% block head %}
 {{ super() }}
 
 <!-- Own include files -->
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/crawled_content.css') }}">
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.STYLES_CRAWLED_CONTENT_PATH) }}">
 
 {% endblock %}
 
@@ -13,31 +14,31 @@
     <section class="section--center mdl-grid">
 
         <div
-            class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--6-col-phone ">
+                class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--6-col-phone ">
             <div class="mdl-card__title">
                 <h3 class="mdl-card__title-text"> Extracted data </h3>
             </div>
             <div class="mdl-card__media">
                 <table class="mdl-data-table mdl-js-data-table mdl-data-table mdl-shadow--2dp" width="100%">
                     <thead>
-                        <tr>
-                            <th class="mdl-data-table__cell--non-numeric">Page name</th>
-                            <th>Time taken</th>
-                            <th>Found</th>
-                            <th>Actions</th>
-                        </tr>
+                    <tr>
+                        <th class="mdl-data-table__cell--non-numeric">Page name</th>
+                        <th>Time taken</th>
+                        <th>Found</th>
+                        <th>Actions</th>
+                    </tr>
                     </thead>
                     <tbody>
-                    {% for val in table_vals.items() %}
-                        <tr>
-                            <td class="mdl-data-table__cell--non-numeric">Resource type {{ val[0]%5 }}</td>
-                            <td>{{ val[0] }}s</td>
-                            <td>{{ val[1] }}</td>
-                            <td>
-                                <a class="download-crawled mr-2" href="" ><i class="fas fa-download"></i></a>
-                                <a class="delete-crawled " href="" ><i class="fas fa-trash-alt"></i></a>
-                            </td>
-                        </tr>
+                    {% for crawled_content in crawled_content_list %}
+                    <tr>
+                        <td class="mdl-data-table__cell--non-numeric">{{ crawled_content.page_host }}</td>
+                        <td>{{ crawled_content.time_taken }}s</td>
+                        <td>{{ crawled_content.quantity_found }}</td>
+                        <td>
+                            <a class="download-crawled mr-2" href=""><i class="fas fa-download"></i></a>
+                            <a class="delete-crawled " href=""><i class="fas fa-trash-alt"></i></a>
+                        </td>
+                    </tr>
                     {% endfor %}
 
                     </tbody>

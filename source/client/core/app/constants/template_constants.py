@@ -2,6 +2,7 @@ import os
 
 
 # Scanned directory names
+ROOT_DIR = 'templates'
 TEMPLATES_ERROR_DIR = 'error'
 TEMPLATES_INCLUDE_DIR = 'include'
 TEMPLATES_LAYOUT_DIR = 'layout'
