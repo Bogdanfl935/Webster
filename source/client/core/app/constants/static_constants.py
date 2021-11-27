@@ -1,0 +1,26 @@
+import os
+
+
+# Scanned directory names
+STATIC_IMAGES_DIR = 'images'
+STATIC_SCRIPTS_DIR = 'scripts'
+STATIC_STYLES_DIR = 'styles'
+
+# Scanned file names
+IMAGES_FAVICON_FILE = 'favicon.png'
+IMAGES_GRAPH_FILE = 'graph.jpg'
+SCRIPTS_MODAL_FILE = 'modal.js'
+STYLES_CRAWLED_CONTENT_FILE = 'crawled_content.css'
+STYLES_ERROR_PAGE_FILE = 'error-page.css'
+STYLES_HOME_FILE = 'home.css'
+STYLES_LAYOUT_FILE = 'layout.css'
+
+# Scanned file paths
+IMAGES_FAVICON_PATH = '/'.join((os.curdir, STATIC_IMAGES_DIR, IMAGES_FAVICON_FILE))
+IMAGES_GRAPH_PATH = '/'.join((os.curdir, STATIC_IMAGES_DIR, IMAGES_GRAPH_FILE))
+SCRIPTS_MODAL_PATH = '/'.join((os.curdir, STATIC_SCRIPTS_DIR, SCRIPTS_MODAL_FILE))
+STYLES_CRAWLED_CONTENT_PATH = '/'.join((os.curdir, STATIC_STYLES_DIR, STYLES_CRAWLED_CONTENT_FILE))
+STYLES_ERROR_PAGE_PATH = '/'.join((os.curdir, STATIC_STYLES_DIR, STYLES_ERROR_PAGE_FILE))
+STYLES_HOME_PATH = '/'.join((os.curdir, STATIC_STYLES_DIR, STYLES_HOME_FILE))
+STYLES_LAYOUT_PATH = '/'.join((os.curdir, STATIC_STYLES_DIR, STYLES_LAYOUT_FILE))
+
