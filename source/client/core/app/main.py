@@ -1,39 +1,42 @@
-from flask import Flask, jsonify, render_template
-from app.constants import app_constants, endpoint_constants, rendering_constants, template_constants, static_constants
+from flask import Flask, render_template
+from app.constants import app_constants, endpoint_constants, template_constants, static_constants
 from werkzeug.exceptions import HTTPException
+from app.auth_controller import auth_controller
 import random
+import secrets
 
 app = Flask(__name__)
-
+app.register_blueprint(auth_controller)
+app.secret_key = secrets.token_urlsafe(32)
 
 @app.context_processor
-def inject_constants():
+def inject_constants() -> dict:
     return dict(
         static_constants=static_constants,
         template_constants=template_constants,
-        home_endpoint=in_post_link.__name__,
-        data_crawled_endpoint=handle_data_crawled.__name__
+        home_endpoint=handle_home_get.__name__,
+        data_crawled_endpoint=handle_data_crawled_get.__name__
     )
 
 
 @app.errorhandler(Exception)
-def handle_error(exception):
+def handle_error(exception) -> str:
     error_code = exception.code if isinstance(exception, HTTPException) else 500
     error_dict = dict(
         error_status=error_code,
         error_message=str(exception)
     )
-    return render_template(template_constants.ERROR_ERROR_PATH, error=error_dict)
+    return render_template(template_constants.ERROR_ERROR_PATH, error=error_dict), error_code
 
 
 @app.route(endpoint_constants.DEFAULT, methods=['GET'])
 @app.route(endpoint_constants.HOME, methods=['GET'])
-def in_post_link() -> str:
+def handle_home_get() -> str:
     return render_template(template_constants.SECTION_HOME_PATH, logged_in=True)
 
 
 @app.route(endpoint_constants.CRAWLED_CONTENT, methods=['GET'])
-def handle_data_crawled() -> str:
+def handle_data_crawled_get() -> str:
     content_list = list()
     hosts = ("Github", "Google", "Wikipedia", "Youtube", "Jira", "Facebook", "Instagram")
     for i in range(0, 15):
@@ -45,6 +48,8 @@ def handle_data_crawled() -> str:
 
     return render_template(template_constants.SECTION_CRAWLED_CONTENT_PATH, logged_in=False,
                            crawled_content_list=content_list)
+
+
 
 
 if __name__ == '__main__':
