@@ -1,5 +1,6 @@
 import json
 import time
+import re
 
 import requests
 import constants
@@ -8,9 +9,22 @@ import endpoint_constants
 def do_crawling(url):
     page = requests.get(url)
 
-    # dictPage = dict({'url': page.url, 'header': page.headers, 'html': page.content})
+    # url_escaped = re.escape(page.url.encode('latin1'))
 
-    # send_to_parser = requests.post(url=f'{endpoint_constants.PARSER_MS_URL}{endpoint_constants.PARSER}', data=dictPage)
+    dictPage = dict()
+    dictPage["url"] = page.url
+    dictPage["html"] = page.content.decode('utf-8')
+
+    dictPage = json.dumps(dictPage)
+
+    # print(dictPage)
+
+    # dictPage = json.dumps(dict({"url": page.url, "header": headers_escaped, "html": page.content}))
+
+    parser_url = endpoint_constants.PARSER_MS_URL + endpoint_constants.PARSER
+
+    send_to_parser = requests.post(url=parser_url, data=dictPage, headers={'Content-type': 'application/json'})
+    print(send_to_parser.content.decode())
 
     post_to_next_link = {'quantity': constants.CRAWLER_NEXT_LINK_LIMIT}
 
