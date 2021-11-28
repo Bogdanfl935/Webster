@@ -11,14 +11,15 @@ CRAWLED_CONTENT = "/crawled-content"
 
 # POST Endpoints
 REGISTRATION = "/registration"
-SUCCESS = "/success"
 AUTHENTICATION = "/authentication"
 
 AUTHORIZATION = "/authorization"
 REFRESHMENT = "/refreshment"
 
 CONFIRMATION = "/confirmation"
-PASSWORD_RESET = "/password-reset"
+CONFIRMATION_RESENDING = "/confirmation-resending"
+PASSWORD_RESETTING = "/password-resetting"
+PASSWORD_FORGOTTEN = "/password-forgotten"
 
 AUTH_MS_URL="http://localhost:5550"
 STORAGE_MS_URL= "http://localhost:50006"

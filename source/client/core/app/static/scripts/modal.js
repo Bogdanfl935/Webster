@@ -7,7 +7,7 @@ $(document).ready(() => {
 function initHandlers() {
     bindShowHideClickHandler();
     bindModalContentToggleHandler();
-    bindFormErrorHandler();
+    bindFormSubmitHandler();
 }
 
 function bindShowHideClickHandler() {
@@ -25,8 +25,8 @@ function bindShowHideClickHandler() {
 }
 
 function bindModalContentToggleHandler() {
-    let loginButtonMap = { buttonId: '#login-toggler', modalContentId: '#login-modal-content' };
-    let registerButtonMap = { buttonId: '#register-toggler', modalContentId: '#register-modal-content' };
+    let loginButtonMap = { buttonId: '#login-toggler', modalContentId: '#login-modal-content', target: null};
+    let registerButtonMap = { buttonId: '#register-toggler', modalContentId: '#register-modal-content', target: null };
     loginButtonMap.target = registerButtonMap;
     registerButtonMap.target = loginButtonMap;
 
@@ -60,31 +60,43 @@ function toggleModalContent(modalButtonMap, setActive) {
     }
 }
 
-function bindFormErrorHandler() {
+function bindFormSubmitHandler() {
     $('form').each((index, form) => {
         $(form).on('submit', (event) => {
             event.preventDefault();
-            $.ajax({
-                type: $(form).attr('method'),
-                url: $(form).attr('action'),
-                data: $(form).serialize(),
-                success: function (data){
-                    if(data.redirect === true){
-                        window.location.replace(data.url);
-                    }
-                },
-                error: function (data) {
-                    if(data.status == 400 || data.status == 409){
-                        let prevSibling = $(form).find("button").prev();
-                        if(prevSibling.length == 0){
-                            prevSibling = document.createElement("span");
-                            $(form).find("button").before(prevSibling);
-                        }
-
-                        prevSibling.innerText = data.responseJSON.error;
-                    }
-                }
-            });
+            makeFormAjaxCall(form);
         });
     });
+}
+
+function makeFormAjaxCall(form) {
+    $.ajax({
+        type: $(form).attr('method'),
+        url: $(form).attr('action'),
+        data: $(form).serialize(),
+        success: (data) => { handleFormSubmitSuccessResponse(form, data); },
+        error: (data) => { handleFormSubmitErrorResponse(form, data); }
+    });
+}
+
+function handleFormSubmitSuccessResponse(form, response) {
+    form.reset();
+    if (response.redirect === true) {
+        window.location.replace(response.url);
+    }
+}
+
+function handleFormSubmitErrorResponse(form, response) {
+    if (response.responseJSON.redirect === true) {
+        window.location.replace(response.responseJSON.url);
+    }
+    else if ([400, 401, 409].includes(response.status)) {
+        let prevSibling = $(form).find("button").prev();
+        if (prevSibling.length == 0) {
+            prevSibling = document.createElement("span");
+            $(form).find("button").before(prevSibling);
+        }
+
+        prevSibling.innerText = response.responseJSON.error;
+    }
 }
