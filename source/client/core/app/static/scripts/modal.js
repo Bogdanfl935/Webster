@@ -7,6 +7,7 @@ $(document).ready(() => {
 function initHandlers() {
     bindShowHideClickHandler();
     bindModalContentToggleHandler();
+    bindFormErrorHandler();
 }
 
 function bindShowHideClickHandler() {
@@ -57,4 +58,33 @@ function toggleModalContent(modalButtonMap, setActive) {
         $(modalButtonMap.buttonId).removeClass("btn-light");
         $(modalButtonMap.buttonId).addClass("btn-dark");
     }
+}
+
+function bindFormErrorHandler() {
+    $('form').each((index, form) => {
+        $(form).on('submit', (event) => {
+            event.preventDefault();
+            $.ajax({
+                type: $(form).attr('method'),
+                url: $(form).attr('action'),
+                data: $(form).serialize(),
+                success: function (data){
+                    if(data.redirect === true){
+                        window.location.replace(data.url);
+                    }
+                },
+                error: function (data) {
+                    if(data.status == 400 || data.status == 409){
+                        let prevSibling = $(form).find("button").prev();
+                        if(prevSibling.length == 0){
+                            prevSibling = document.createElement("span");
+                            $(form).find("button").before(prevSibling);
+                        }
+
+                        prevSibling.innerText = data.responseJSON.error;
+                    }
+                }
+            });
+        });
+    });
 }

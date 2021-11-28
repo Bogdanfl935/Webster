@@ -21,13 +21,13 @@
             -->
             <div id="login-modal-content" class="modal-body d-block">
                 <div>
-                    <form>
+                    <form method="post" action="{{ url_for(authentication_endpoint) }}">
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text px-3"><i class="fa fa-at" aria-hidden="true"></i></div>
                                 </div>
-                                <input type="text" class="form-control" id="inline-form-username"
+                                <input type="text" class="form-control" name="username"
                                        placeholder="Username">
                             </div>
                         </div>
@@ -37,20 +37,20 @@
                                     <div class="input-group-text px-3 pointer-cursor"><i class="fa fa-eye-slash"
                                                                                          aria-hidden="true"></i></div>
                                 </div>
-                                <input type="password" class="form-control" id="inline-form-password"
+                                <input type="password" class="form-control" name="password"
                                        placeholder="Password">
                             </div>
                         </div>
                         <div class="col-auto">
                             <div class="form-check ml-4">
-                                <input class="form-check-input" type="checkbox" value="" id="remember-me-checkbox"
+                                <input class="form-check-input" type="checkbox" value="" name="rememberMe"
                                        checked>
                                 <label class="form-check-label" for="remember-me-checkbox">
                                     Remember me
                                 </label>
                             </div>
                         </div>
-                        <div class="my-4 row d-flex justify-content-center">
+                        <div class="my-4 row d-flex text-center justify-content-center">
                             <button class="btn btn-secondary">Authenticate</button>
                         </div>
                     </form>
@@ -61,13 +61,13 @@
             -->
             <div id="register-modal-content" class="modal-body d-none">
                 <div>
-                    <form>
+                    <form method="post" action="{{ url_for(registration_endpoint) }}">
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text px-3"><i class="fa fa-at" aria-hidden="true"></i></div>
                                 </div>
-                                <input type="text" class="form-control" id="inline-form-username"
+                                <input type="text" class="form-control" name="username"
                                        placeholder="Username">
                             </div>
                         </div>
@@ -77,7 +77,7 @@
                                     <div class="input-group-text px-3 pointer-cursor"><i class="fa fa-eye-slash"
                                                                                          aria-hidden="true"></i></div>
                                 </div>
-                                <input type="password" class="form-control" id="inline-form-password"
+                                <input type="password" class="form-control" name="password"
                                        placeholder="Password">
                             </div>
                         </div>
@@ -87,11 +87,11 @@
                                     <div class="input-group-text px-3 pointer-cursor"><i class="fa fa-eye-slash"
                                                                                          aria-hidden="true"></i></div>
                                 </div>
-                                <input type="password" class="form-control" id="inline-form-password"
+                                <input type="password" class="form-control" name="confirmPassword"
                                        placeholder="Confirm Password">
                             </div>
                         </div>
-                        <div class="my-3 row d-flex justify-content-center">
+                        <div class="my-3 row d-flex text-center justify-content-center">
                             <button class="btn btn-secondary px-4">Register</button>
                         </div>
                     </form>
