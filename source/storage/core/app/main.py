@@ -63,6 +63,10 @@ def handle_next_link_post() -> str:
     dict_next_url["urls"] = []
     for el in next_link_db_resp:
         dict_next_url["urls"].append(el.url_site)
+        db.session.add(VisitedLinks(url_site=el.url_site))
+        db.session.delete(el)
+
+    db.session.commit()
 
     return dict_next_url
 
