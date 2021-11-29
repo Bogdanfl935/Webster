@@ -10,7 +10,8 @@ auth_controller = Blueprint('auth_controller', __name__)
 def inject_context_constants() -> dict:
     return dict(
         registration_endpoint=f"{auth_controller.name}.{handle_registration_post.__name__}",
-        authentication_endpoint=f"{auth_controller.name}.{handle_authentication_post.__name__}"
+        authentication_endpoint=f"{auth_controller.name}.{handle_authentication_post.__name__}",
+        password_forgotten_endpoint=f"{auth_controller.name}.{handle_password_forgotten_get.__name__}"
     )
 
 @auth_controller.route(endpoint_constants.CONFIRMATION_RESENDING, methods=['GET'])

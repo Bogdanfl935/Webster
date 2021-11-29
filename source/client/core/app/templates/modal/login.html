@@ -21,14 +21,14 @@
             -->
             <div id="login-modal-content" class="modal-body d-block">
                 <div>
-                    <form method="post" action="{{ url_for(authentication_endpoint) }}">
+                    <form class="needs-validation" method="post" action="{{ url_for(authentication_endpoint) }}" novalidate>
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text px-3"><i class="fa fa-at" aria-hidden="true"></i></div>
                                 </div>
-                                <input type="text" class="form-control" name="username"
-                                       placeholder="Username">
+                                <input type="email" class="form-control" name="username"
+                                       placeholder="Username" required>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -37,8 +37,8 @@
                                     <div class="input-group-text px-3 pointer-cursor"><i class="fa fa-eye-slash"
                                                                                          aria-hidden="true"></i></div>
                                 </div>
-                                <input type="password" class="form-control" name="password"
-                                       placeholder="Password">
+                                <input type="password" class="form-control" name="password" maxlength=30
+                                       placeholder="Password" required>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -61,14 +61,14 @@
             -->
             <div id="register-modal-content" class="modal-body d-none">
                 <div>
-                    <form method="post" action="{{ url_for(registration_endpoint) }}">
+                    <form method="post" action="{{ url_for(registration_endpoint) }}" novalidate>
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text px-3"><i class="fa fa-at" aria-hidden="true"></i></div>
                                 </div>
-                                <input type="text" class="form-control" name="username"
-                                       placeholder="Username">
+                                <input type="email" class="form-control" name="username"
+                                       placeholder="Username" required>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -77,8 +77,8 @@
                                     <div class="input-group-text px-3 pointer-cursor"><i class="fa fa-eye-slash"
                                                                                          aria-hidden="true"></i></div>
                                 </div>
-                                <input type="password" class="form-control" name="password"
-                                       placeholder="Password">
+                                <input type="password" class="form-control" name="password" maxlength=30
+                                       id="registerPassword" placeholder="Password" required>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -87,7 +87,7 @@
                                     <div class="input-group-text px-3 pointer-cursor"><i class="fa fa-eye-slash"
                                                                                          aria-hidden="true"></i></div>
                                 </div>
-                                <input type="password" class="form-control" name="confirmPassword"
+                                <input type="password" class="form-control" name="confirmPassword" required maxlength=30
                                        placeholder="Confirm Password">
                             </div>
                         </div>
@@ -98,7 +98,7 @@
                 </div>
             </div>
             <div class="modal-footer d-flex justify-content-center">
-                <div class="signup-section">Forgot your password? <a href="#a" class="text-info">Reset password</a>.
+                <div class="signup-section">Forgot your password? <a href="{{ url_for(password_forgotten_endpoint) }}" class="text-info">Reset password</a>.
                 </div>
             </div>
         </div>
