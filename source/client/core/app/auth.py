@@ -19,6 +19,10 @@ def inject_context_constants() -> dict:
 def handle_confirmation_resending_get() -> str:
     return render_template_string("Not implemented")
 
+@auth.route(endpoint_constants.CONFIRMATION+"/<token>", methods=['GET'])
+def handle_confirmation_get(token) -> str:
+    return render_template_string(token)
+
 @auth.route(endpoint_constants.PASSWORD_FORGOTTEN, methods=['GET'])
 def handle_password_forgotten_get() -> str:
     return render_template_string("Not implemented")
@@ -31,3 +35,7 @@ def handle_registration_post():
 @auth.route(endpoint_constants.AUTHENTICATION, methods=['POST'])
 def handle_authentication_post() -> str:
     return authentication_service.make_authentication_post()
+
+@auth.route(endpoint_constants.CONFIRMATION, methods=['POST'])
+def handle_confirmation_post() -> str:
+    return render_template_string("Not implemented")
