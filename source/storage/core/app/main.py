@@ -42,20 +42,19 @@ class VisitedLinks(db.Model):
 # users = User.query.all()
     
 @app.route(endpoint_constants.STORAGE, methods=['POST'])
-def in_get_data() -> str:
-    # db.session.add(NextLinks(url_site="example.org"))
-    # db.session.commit()
-    #
-    # q = NextLinks.query.all()
-    # print(q)
-    #
-    # nLink = NextLinks()
-    # print(nLink)
+def handle_storage_post() -> str:
+    links = request.get_json()
+    json_links = links["links"]
 
-    return jsonify({"ala": "bala"})
+    for link in json_links:
+        db.session.add(NextLinks(url_site=link))
+
+    db.session.commit()
+
+    return jsonify({"success": "True"})
 
 @app.route(endpoint_constants.NEXT_LINK, methods=['POST'])
-def in_get_next_links() -> str:
+def handle_next_link_post() -> str:
     json_resp = request.get_json('json_resp')
 
     next_link_db_resp = NextLinks.query.limit(int(json_resp["quantity"])).all()
@@ -64,6 +63,10 @@ def in_get_next_links() -> str:
     dict_next_url["urls"] = []
     for el in next_link_db_resp:
         dict_next_url["urls"].append(el.url_site)
+        db.session.add(VisitedLinks(url_site=el.url_site))
+        db.session.delete(el)
+
+    db.session.commit()
 
     return dict_next_url
 
