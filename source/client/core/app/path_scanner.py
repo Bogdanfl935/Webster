@@ -33,7 +33,7 @@ def map_directory_into_constants(start_dir: str):
             file_output_buffer += f"{file_constant_name} = '{file}'\n"
 
             file_path_constant_name = sanitize_identifier(f"{parent_basename.upper()}_{file_name.upper()}_PATH")
-            file_path_output_buffer += f"{file_path_constant_name} = '/'.join((os.curdir, " \
+            file_path_output_buffer += f"{file_path_constant_name} = '/'.join((" \
                                        f"{dir_constant_name}, {file_constant_name}))\n"
 
     return f"{import_output_buffer}\n\n{directory_output_buffer}\n{file_output_buffer}\n{file_path_output_buffer}\n"
