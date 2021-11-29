@@ -44,12 +44,12 @@ public class ConfirmationService {
 		/*
 		 * Check whether the user had already used the token to activate their account
 		 */
-		if (user.isEnabled()) {
+		if (user.isCredentialsNonExpired()) {
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.ACCOUNT_ALREADY_CONFIRMED;
 			throw new AccountAlreadyConfirmedException(exceptionMessage.getErrorMessage());
 		}
 		
-		user.setEnabled(true);
+		user.setCredentialsNonExpired(true);
 		userRepository.save(user);
 	}
 

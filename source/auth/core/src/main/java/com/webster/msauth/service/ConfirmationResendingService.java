@@ -36,7 +36,7 @@ public class ConfirmationResendingService {
 
 		User user = locatedUser.get();
 
-		if (user.isEnabled()) {
+		if (user.isCredentialsNonExpired()) {
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.ACCOUNT_ALREADY_CONFIRMED;
 			exceptionMessage.setErrorParameter(accountNameDTO.getUsername());
 			throw new AccountAlreadyConfirmedException(exceptionMessage.getErrorMessage());
