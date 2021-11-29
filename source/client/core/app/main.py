@@ -1,21 +1,16 @@
-from flask import Flask, render_template
-from app.constants import app_constants, endpoint_constants, template_constants, static_constants
+from flask import render_template
+from app.constants import app_constants, endpoint_constants, template_constants, static_constants, main_endpoint_handler_constants
 from werkzeug.exceptions import HTTPException
-from app.auth_controller import auth_controller
+from app.config.app_config import app
 import random
-import secrets
-
-app = Flask(__name__)
-app.register_blueprint(auth_controller)
-app.secret_key = secrets.token_urlsafe(32)
 
 @app.context_processor
 def inject_constants() -> dict:
     return dict(
         static_constants=static_constants,
         template_constants=template_constants,
-        home_endpoint=handle_home_get.__name__,
-        data_crawled_endpoint=handle_data_crawled_get.__name__
+        home_endpoint=main_endpoint_handler_constants.HANDLE_HOME_GET,
+        data_crawled_endpoint=main_endpoint_handler_constants.HANDLE_DATA_CRAWLED_GET
     )
 
 
