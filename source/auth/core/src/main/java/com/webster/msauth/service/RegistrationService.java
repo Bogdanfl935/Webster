@@ -1,10 +1,9 @@
 package com.webster.msauth.service;
 
-import java.util.Optional;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.webster.msauth.constants.JwtExpirationConstants;
@@ -27,18 +26,18 @@ public class RegistrationService {
 	private JwtHandle tokenHandle;
 
 	public ConfirmationTokenResponse register(@Valid RegisterUserDTO registerUserDTO) {
-		Optional<User> locatedUser = userRepository.findByUsername(registerUserDTO.getUsername());
-
-		if (locatedUser.isPresent()) {
+		User unconfirmedUser = userDtoToEntityMapperService.mapToUser(registerUserDTO);
+		unconfirmedUser.setCredentialsNonExpired(false);
+		unconfirmedUser.setEnabled(true);
+		
+		try {
+			userRepository.save(unconfirmedUser);
+		} catch (DataIntegrityViolationException exception) {
+			/* To-do: Check if constraint == app_user_username_key */
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.USERNAME_ALREADY_TAKEN;
 			exceptionMessage.setErrorParameter(registerUserDTO.getUsername());
 			throw new UsernameAlreadyTakenException(exceptionMessage.getErrorMessage());
 		}
-
-		User unconfirmedUser = userDtoToEntityMapperService.mapToUser(registerUserDTO);
-		unconfirmedUser.setCredentialsNonExpired(true);
-		unconfirmedUser.setEnabled(false);
-		userRepository.save(unconfirmedUser);
 		
 		String confirmationToken = tokenHandle.createJsonWebToken(new CustomUserDetails(unconfirmedUser),
 				JwtExpirationConstants.EMAIL_CONFIRMATION_TOKEN_EXPIRATION_MILLISEC);

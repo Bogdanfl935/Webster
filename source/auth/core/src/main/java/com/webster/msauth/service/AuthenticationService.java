@@ -4,7 +4,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,11 +40,17 @@ public class AuthenticationService {
 		try {
 			authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(loginUserDto.getUsername(), loginUserDto.getPassword()));
-		} catch (DisabledException exception) {
+		}
+		catch (BadCredentialsException exception) {
+			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.INVALID_USERNAME_OR_PASSWORD;
+			throw new InvalidUsernameOrPasswordException(exceptionMessage.getErrorMessage());
+		}
+		catch (CredentialsExpiredException exception) {
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.ACCOUNT_NOT_CONFIRMED;
 			exceptionMessage.setErrorParameter(loginUserDto.getUsername());
 			throw new AccountNotConfirmedException(exceptionMessage.getErrorMessage());
-		} catch (AuthenticationException exception) {
+		}
+		catch (AuthenticationException exception) {
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.INVALID_USERNAME_OR_PASSWORD;
 			throw new InvalidUsernameOrPasswordException(exceptionMessage.getErrorMessage());
 		}
