@@ -1,7 +1,7 @@
 import json
 
-import endpoint_constants
-import constants
+from app.constants import constants, endpoint_constants
+
 
 def test_handle_storage_post(client):
     response = client.post(endpoint_constants.STORAGE, json={"links": []})
@@ -21,5 +21,25 @@ def test_handle_next_link_post(client):
     assert response.status_code == 200
     assert result is not None
     assert "urls" in result
+
+def test_handle_store_config_post(client):
+    response = client.post(endpoint_constants.STORE_CONFIGURATION, data=json.dumps({
+    "specific-tag": ["a", "div"],
+    "same-page": "True",
+    "storage-limit": "10"
+}))
+    result = response.get_json()
+    assert result is not None
+
+    assert response.status_code == 200
+    assert result is not None
+
+def test_handle_retr_config_post(client):
+    response = client.post(endpoint_constants.RETR_CONFIGURATION, data=json.dumps({}))
+    result = response.get_json()
+    assert result is not None
+
+    assert response.status_code == 200
+    assert result is not None
 
 
