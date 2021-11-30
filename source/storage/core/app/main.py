@@ -100,5 +100,14 @@ def handle_store_config_post() -> str:
 
     return jsonify({"success": "True"})
 
+@app.route(endpoint_constants.RETR_CONFIGURATION, methods=['POST'])
+def handle_retr_config_post() -> str:
+    json_resp = request.get_json()
+
+    config_db_resp = Configurations.query.all()
+
+    return config_db_resp
+
+
 if __name__ == '__main__':
     app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
