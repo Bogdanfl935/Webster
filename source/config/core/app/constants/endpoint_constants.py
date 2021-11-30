@@ -1,0 +1,8 @@
+CRAWLER = "/crawler"
+PARSER = "/parser"
+CONFIGURATION = "/config"
+STORE_CONFIGURATION = "/save-config"
+RETRIEVE_CONFIGURATION_DB = "/retr-config-db"
+RETRIEVE_CONFIGURATION_CONFIG = "/retr-config-config"
+PARSER_MS_URL= "http://localhost:50005"
+STORAGE_MS_URL = "http://localhost:50006"
