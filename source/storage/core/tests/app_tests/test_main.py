@@ -22,4 +22,16 @@ def test_handle_next_link_post(client):
     assert result is not None
     assert "urls" in result
 
+def test_handle_store_config_post(client):
+    response = client.post(endpoint_constants.STORE_CONFIGURATION, data=json.dumps({
+    "specific-tag": ["a", "div"],
+    "same-page": "True",
+    "storage-limit": "10"
+}))
+    result = response.get_json()
+    assert result is not None
+
+    assert response.status_code == 200
+    assert result is not None
+
 

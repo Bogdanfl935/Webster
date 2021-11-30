@@ -83,14 +83,18 @@ def handle_next_link_post() -> str:
 
 @app.route(endpoint_constants.STORE_CONFIGURATION, methods=['POST'])
 def handle_store_config_post() -> str:
-    config_json = request.get_json()
+    config_json = request.get_json(force=True)
 
-    for key_json in config_json.keys():
-        if type(config_json[key_json]) == list:
-            for el in config_json[key_json]:
-                db.session.add(Configurations(key=key_json, value=el))
-        else:
-            db.session.add(Configurations(key=key_json, value=config_json[key_json]))
+    specific_tag = config_json["specific-tag"]
+    same_page = config_json["same-page"]
+    storage_limit = config_json["storage-limit"]
+
+
+    for el in specific_tag:
+        db.session.add(Configurations(key="specific-tag", value=el))
+
+    db.session.add(Configurations(key="same-page", value=same_page))
+    db.session.add(Configurations(key="storage-limit", value=storage_limit))
 
     db.session.commit()
 
