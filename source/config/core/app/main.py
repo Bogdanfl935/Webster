@@ -11,22 +11,16 @@ app = Flask(__name__)
 def handle_config_post() -> str:
     text = request.get_json()
 
-    specific_tag = "a"
-    stay_on_same_page = "False"
-    storage_limit = "100"
+    specific_tag = ["a"]
+    stay_on_same_page = False if "same-page" not in text else text["same-page"]
+    storage_limit = 100 if "storage-limit" not in text else text["storage-limit"]
 
     if "specific-tag" in text.keys():
-        specific_tag = text["specific-tag"]
-
-    if "same-page" in text.keys():
-        stay_on_same_page = text["same-page"]
-
-    if "storage-limit" in text.keys():
-        storage_limit = text["storage-limit"]
+        specific_tag.append(text["specific-tag"])
 
     config_json = jsonify({"specific-tag": specific_tag, "same-page": stay_on_same_page, "storage-limit": storage_limit})
 
-    post_to_db = requests.post(url = f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.STORE_CONFIGURATION}', data=config_json, headers={'Content-type': 'application/json'})
+    # post_to_db = requests.post(url = f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.STORE_CONFIGURATION}', data=config_json, headers={'Content-type': 'application/json'})
 
     return config_json
 
