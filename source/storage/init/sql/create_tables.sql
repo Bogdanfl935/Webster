@@ -10,8 +10,8 @@ CREATE TABLE visited_links (
   url_site varchar(2083) NOT NULL
 );
 
--- Creation of configs table
-CREATE TABLE configs (
+-- Creation of config table
+CREATE TABLE config (
   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   key varchar(16) NOT NULL,
   value varchar(16) NOT NULL
