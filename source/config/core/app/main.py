@@ -1,3 +1,5 @@
+import json
+
 import requests
 from flask import Flask, jsonify, request
 import endpoint_constants
@@ -16,20 +18,21 @@ def handle_config_post() -> str:
     storage_limit = 100 if "storage-limit" not in text else text["storage-limit"]
 
     if "specific-tag" in text.keys():
-        specific_tag.append(text["specific-tag"])
+        specific_tag.extend(text["specific-tag"])
 
-    config_json = jsonify({"specific-tag": specific_tag, "same-page": stay_on_same_page, "storage-limit": storage_limit})
+    config_json = json.dumps({"specific-tag": specific_tag, "same-page": stay_on_same_page, "storage-limit": storage_limit})
 
-    # post_to_db = requests.post(url = f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.STORE_CONFIGURATION}', data=config_json, headers={'Content-type': 'application/json'})
+    post_to_db = requests.post(url = f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.STORE_CONFIGURATION}', data=config_json, headers={'Content-type': 'application/json'})
 
     return config_json
 
 @app.route(endpoint_constants.RETRIEVE_CONFIGURATION_CONFIG, methods=['POST'])
 def handle_config_get() -> str:
-    retr_config_req = jsonify(user="george")
+    recv_data_json = request.get_json()
+
+    retr_config_req = json.dumps({"user": "george"})
 
     from_db_resp = requests.post(url = f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.RETRIEVE_CONFIGURATION_DB}', data=retr_config_req, headers={'Content-type': 'application/json'})
-
     from_db_resp_json = from_db_resp.json()
 
     return from_db_resp_json
