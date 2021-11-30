@@ -84,5 +84,8 @@
     {% if not logged_in %}
     {% include template_constants.MODAL_LOGIN_PATH %}
     {% endif %}
+    {% if include_confirmation_modal %}
+    {% include template_constants.MODAL_CONFIRM_PATH %}
+    {% endif %}
 </div>
 {% endblock %}

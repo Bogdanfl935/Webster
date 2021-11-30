@@ -21,13 +21,13 @@ def handle_error(exception) -> str:
         error_status=error_code,
         error_message=str(exception)
     )
-    return render_template(template_constants.ERROR_ERROR_PATH, error=error_dict), error_code
+    return render_template(template_constants.INDIVIDUAL_ERROR_PATH, error=error_dict), error_code
 
 
 @app.route(endpoint_constants.DEFAULT, methods=['GET'])
 @app.route(endpoint_constants.HOME, methods=['GET'])
 def handle_home_get() -> str:
-    return render_template(template_constants.SECTION_HOME_PATH, logged_in=True)
+    return render_template(template_constants.SECTION_HOME_PATH, logged_in=True, include_confirmation_modal=True)
 
 
 @app.route(endpoint_constants.CRAWLED_CONTENT, methods=['GET'])
