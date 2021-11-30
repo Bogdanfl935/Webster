@@ -1,0 +1,44 @@
+<div class="modal fade show" id="confirmationModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content overflow-hidden">
+            <div class="modal-header border-bottom-0">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body d-block">
+                <div class="text-center">
+                    <h1>Activate account</h1>
+                </div>
+            </div>
+            <div class="modal-footer row text-center justify-content-center">
+                <div class="col-auto d-flex flex-column">
+                    <span class="lead">We are glad to see you joining Webster!</span>
+                    <span class="lead">You are one click away from activating your account.</span>
+                </div>
+                <div class="col-auto my-5">
+                    <img class="w-25 rounded mx-auto"
+                        src="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.IMAGES_LOGO_PATH) }}"
+                        border="0">
+                </div>
+                <div class="col-auto">
+                    <span class="lead"><strong>Press the button below to confirm your email address.</strong></span>
+                </div>
+                <div class="col-auto">
+                    <form action="{{ url_for(confirmation_endpoint) }}" method="POST">
+                        <button class="btn btn-dark mt-3" type="submit">Confirm address</button>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <div>Button does not work? <a href="{{ url_for(confirmation_resending_endpoint) }}" class="text-info">Resend
+                        confirmation</a>.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block javascript %}
+<script type="text/javascript"
+        src="{{ url_for(static_constants.ROOT_DIR, filename = static_constants.SCRIPTS_CONFIRM_PATH) }}"></script>
+{% endblock %}

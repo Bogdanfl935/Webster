@@ -1,6 +1,6 @@
-from app.constants import auth_endpoint_handler_constants
+from app.constants import auth_endpoint_handler_constants, template_constants
 from app.service import registration_service, authentication_service
-from flask import render_template_string
+from flask import render_template_string, render_template
 from app.constants import endpoint_constants
 from app.utilities.api_response_parser import *
 from flask import Blueprint
@@ -12,7 +12,9 @@ def inject_context_constants() -> dict:
     return dict(
         registration_endpoint=auth_endpoint_handler_constants.HANDLE_REGISTRATION_POST,
         authentication_endpoint=auth_endpoint_handler_constants.HANDLE_AUTHENTICATION_POST,
-        password_forgotten_endpoint=auth_endpoint_handler_constants.HANDLE_PASSWORD_FORGOTTEN_GET
+        password_forgotten_endpoint=auth_endpoint_handler_constants.HANDLE_PASSWORD_FORGOTTEN_GET,
+        confirmation_resending_endpoint=auth_endpoint_handler_constants.HANDLE_CONFIRMATION_RESENDING_GET,
+        confirmation_endpoint=auth_endpoint_handler_constants.HANDLE_CONFIRMATION_POST
     )
 
 @auth.route(endpoint_constants.CONFIRMATION_RESENDING, methods=['GET'])
@@ -21,7 +23,7 @@ def handle_confirmation_resending_get() -> str:
 
 @auth.route(endpoint_constants.CONFIRMATION+"/<token>", methods=['GET'])
 def handle_confirmation_get(token) -> str:
-    return render_template_string(token)
+    return render_template(template_constants.MODAL_CONFIRM_PATH)
 
 @auth.route(endpoint_constants.PASSWORD_FORGOTTEN, methods=['GET'])
 def handle_password_forgotten_get() -> str:
