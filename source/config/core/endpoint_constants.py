@@ -1,4 +1,6 @@
 CRAWLER = "/crawler"
 PARSER = "/parser"
 CONFIGURATION = "/config"
+STORE_CONFIGURATION = "/save-config"
 PARSER_MS_URL= "http://localhost:50005"
+STORAGE_MS_URL = "http://localhost:50006"

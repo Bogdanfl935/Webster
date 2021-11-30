@@ -1,7 +1,9 @@
+import requests
 from flask import Flask, jsonify, request
 import endpoint_constants
 import constants
 import app_constants
+from werkzeug.utils import environ_property
 
 app = Flask(__name__)
 
@@ -22,7 +24,11 @@ def handle_config_post() -> str:
     if "storage-limit" in text.keys():
         storage_limit = text["storage-limit"]
 
-    return jsonify({"specific-tag": specific_tag, "same-page": stay_on_same_page, "storage-limit": storage_limit})
+    config_json = jsonify({"specific-tag": specific_tag, "same-page": stay_on_same_page, "storage-limit": storage_limit})
+
+    post_to_db = requests.post(url = f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.STORE_CONFIGURATION}', data=config_json, headers={'Content-type': 'application/json'})
+
+    return config_json
 
 if __name__ == '__main__':
     app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
