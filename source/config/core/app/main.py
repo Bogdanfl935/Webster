@@ -30,5 +30,14 @@ def handle_config_post() -> str:
 
     return config_json
 
+@app.route(endpoint_constants.RETRIEVE_CONFIGURATION_CONFIG, methods=['POST'])
+def handle_config_get() -> str:
+    retr_config_req = jsonify(user="george")
+    from_db_resp = requests.post(url = f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.RETRIEVE_CONFIGURATION_DB}', data=retr_config_req, headers={'Content-type': 'application/json'}
+
+    from_db_resp = from_db_resp.get_json()
+
+    return from_db_resp
+
 if __name__ == '__main__':
     app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
