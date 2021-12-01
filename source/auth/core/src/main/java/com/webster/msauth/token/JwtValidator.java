@@ -28,12 +28,14 @@ public class JwtValidator {
 		return rawToken.replace(tokenPrefix, "");
 	}
 	
-	public void validate(String token) {
+	public String validate(String token) {
 		String validationErrorMessage = attemptValidation(token);
 
 		if (validationErrorMessage != null) {
 			throw new InvalidAccessTokenProvidedException(validationErrorMessage);
 		}
+		
+		return tokenHandle.getJwtSubject(token);
 	}
 
 	private String attemptValidation(String token) {
