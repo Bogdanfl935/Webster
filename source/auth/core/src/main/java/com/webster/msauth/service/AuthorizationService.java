@@ -21,11 +21,11 @@ public class AuthorizationService {
 	public AuthorizationResponse validate(@NotNull String rawToken) {
 		String token = tokenValidator.stripTokenPrefix(rawToken);
 		/* If token is invalid, an exception will be thrown */
-		tokenValidator.validate(token);
+		String subject = tokenValidator.validate(token);
 
 		Long accessTokenExpiration = TimeUnit.MILLISECONDS
 				.toSeconds(tokenHandle.getJwtExpiration(token).getTime() - System.currentTimeMillis());
-		return new AuthorizationResponse(accessTokenExpiration);
+		return new AuthorizationResponse(accessTokenExpiration, subject);
 	}
 
 }

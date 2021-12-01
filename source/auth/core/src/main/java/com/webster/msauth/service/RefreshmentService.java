@@ -38,6 +38,11 @@ public class RefreshmentService {
 		UserDetails userDetails = userDetailsService.loadUserByUsername(foundToken.getUsername());
 		String accessToken = tokenHandle.createJsonWebToken(userDetails, JwtExpirationConstants.GENERAL_ACCESS_TOKEN_EXPIRATION_MILLISEC);
 
-		return new RefreshmentResponse(accessToken, foundToken.getTimeout());
+		return RefreshmentResponse.builder()
+				.accessToken(accessToken)
+				.type(JwtHandle.DEFAULT_TOKEN_TYPE)
+				.subject(userDetails.getUsername())
+				.refreshTokenExpiration(foundToken.getTimeout())
+				.build();
 	}
 }

@@ -10,4 +10,7 @@ public class AuthorizationResponse {
 	@Getter
 	@NotNull
 	private Long accessTokenExpiration; /* In seconds */
+	@Getter
+	@NotNull
+	private String subject;
 }
