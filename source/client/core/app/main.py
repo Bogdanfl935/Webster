@@ -1,7 +1,8 @@
-from flask import render_template
+from flask import render_template, Response, redirect, url_for
 from app.constants import app_constants, endpoint_constants, template_constants, static_constants, main_endpoint_handler_constants
 from werkzeug.exceptions import HTTPException
 from app.config.app_config import app
+from app.service.authorization_service import require_access_token
 import random
 
 @app.context_processor
@@ -14,8 +15,13 @@ def inject_constants() -> dict:
     )
 
 
+@app.errorhandler(401)
+def handle_unauthorized_error(exception) -> str:
+    return redirect(url_for(main_endpoint_handler_constants.HANDLE_HOME_GET))
+
+
 @app.errorhandler(Exception)
-def handle_error(exception) -> str:
+def handle_generic_error(exception) -> str:
     error_code = exception.code if isinstance(exception, HTTPException) else 500
     error_dict = dict(
         error_status=error_code,
@@ -27,11 +33,12 @@ def handle_error(exception) -> str:
 @app.route(endpoint_constants.DEFAULT, methods=['GET'])
 @app.route(endpoint_constants.HOME, methods=['GET'])
 def handle_home_get() -> str:
-    return render_template(template_constants.SECTION_HOME_PATH, logged_in=True, include_confirmation_modal=True)
+    return render_template(template_constants.SECTION_HOME_PATH, logged_in=True, include_confirmation_modal=False)
 
 
 @app.route(endpoint_constants.CRAWLED_CONTENT, methods=['GET'])
-def handle_data_crawled_get() -> str:
+@require_access_token
+def handle_data_crawled_get(response_object: Response, user) -> str:
     content_list = list()
     hosts = ("Github", "Google", "Wikipedia", "Youtube", "Jira", "Facebook", "Instagram")
     for i in range(0, 15):
@@ -40,9 +47,9 @@ def handle_data_crawled_get() -> str:
             "time_taken": random.randint(1, 30),
             "quantity_found": random.randint(1, 100),
         })
-
-    return render_template(template_constants.SECTION_CRAWLED_CONTENT_PATH, logged_in=False,
-                           crawled_content_list=content_list)
+    response_object.set_data(render_template(template_constants.SECTION_CRAWLED_CONTENT_PATH, logged_in=False,
+                           crawled_content_list=content_list))
+    return response_object
 
 
 

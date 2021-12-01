@@ -7,3 +7,12 @@ def extract_message_response(response: dict) -> str:
 
 def extract_confirmation_token_response(response: dict) -> str:
     return response["confirmationToken"]
+
+def extract_access_token_response(response: dict) -> tuple:
+    return response["accessToken"], response["refreshToken"], response["type"]
+
+def extract_refreshment_response(response: dict) -> tuple:
+    return response["accessToken"], response["type"], response["subject"]
+
+def extract_subject_response(response: dict) -> str:
+    return response["subject"]
