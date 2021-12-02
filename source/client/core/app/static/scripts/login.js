@@ -62,7 +62,7 @@ function toggleModalContent(modalButtonMap, setActive) {
 }
 
 function bindFormSubmitHandler() {
-    $('form').each((index, form) => {
+    $('form[class*="ajax-handled"]').each((index, form) => {
         $(form).on('submit', (event) => { formSubmitHandler(event, form) });
     });
 }

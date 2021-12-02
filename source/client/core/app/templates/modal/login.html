@@ -21,7 +21,7 @@
             -->
             <div id="login-modal-content" class="modal-body d-block">
                 <div>
-                    <form class="needs-validation" method="post" action="{{ url_for(authentication_endpoint) }}" novalidate>
+                    <form class="ajax-handled" method="post" action="{{ url_for(authentication_endpoint) }}" novalidate>
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">
@@ -61,7 +61,7 @@
             -->
             <div id="register-modal-content" class="modal-body d-none">
                 <div>
-                    <form method="post" action="{{ url_for(registration_endpoint) }}" novalidate>
+                    <form class="ajax-handled" method="post" action="{{ url_for(registration_endpoint) }}" novalidate>
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">

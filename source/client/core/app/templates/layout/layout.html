@@ -83,11 +83,8 @@
             </section>
         </main>
     </div>
-    {% if not authenticated_user %}
-    {% include template_constants.MODAL_LOGIN_PATH %}
-    {% endif %}
-    {% if include_confirmation_modal %}
-    {% include template_constants.MODAL_CONFIRM_PATH %}
-    {% endif %}
+    {% for modal_path in include_modals %}
+        {% include modal_path %}
+    {% endfor %}
 </div>
 {% endblock %}

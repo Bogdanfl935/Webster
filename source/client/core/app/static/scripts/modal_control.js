@@ -1,5 +1,5 @@
 "use strict";
 
 $(document).ready(() => {
-    $("#confirmationModal").modal("show");
+    $(".popup-on-launch").modal("show");
 });
