@@ -15,8 +15,8 @@ def collect_handler_names(file_path: str, keep_prefix: bool) -> str:
     found_handler_names = re.findall(handler_match_pattern, file_text_buffer)
 
     for handler in found_handler_names:
-        prefix = file_name if keep_prefix is True else str()
-        file_output_buffer += f"{handler.upper()} = '{prefix}.{handler}'\n" 
+        prefix = file_name+"." if keep_prefix is True else str()
+        file_output_buffer += f"{handler.upper()} = '{prefix}{handler}'\n" 
 
     return file_output_buffer
 

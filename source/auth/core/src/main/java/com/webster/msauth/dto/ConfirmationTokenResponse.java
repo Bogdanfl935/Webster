@@ -7,4 +7,6 @@ import lombok.Getter;
 public class ConfirmationTokenResponse {
 	@Getter
 	private String confirmationToken;
+	@Getter
+	private String type;
 }
