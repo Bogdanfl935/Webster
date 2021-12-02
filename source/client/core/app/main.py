@@ -17,8 +17,12 @@ def inject_constants() -> dict:
 
 
 @app.errorhandler(401)
-def handle_unauthorized_error(exception) -> str:
-    return render_template(template_constants.SECTION_HOME_PATH)
+def handle_unauthorized_error(exception: HTTPException) -> str:
+    rendered_template = render_template(
+        template_constants.SECTION_HOME_PATH,
+        include_modals=(template_constants.MODAL_LOGIN_PATH,)
+    )
+    return rendered_template, exception.code
 
 
 @app.errorhandler(Exception)

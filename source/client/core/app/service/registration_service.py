@@ -13,8 +13,8 @@ def make_registration_post():
     match response.status_code:
         case 201:
             # Registration successful
-            confirmation_token = extract_confirmation_token_response(response.json())
-            return_content, _ = make_email_confirmation_post(confirmation_token)
+            confirmation_token, token_type = extract_confirmation_token_response(response.json())
+            return_content, _ = make_email_confirmation_post(confirmation_token, token_type)
         case 400:
             # Bad form data transmitted
             errors = extract_errors_response(response.json())
@@ -30,9 +30,10 @@ def make_registration_post():
     
     return return_content, response.status_code
 
-def make_email_confirmation_post(confirmation_token):
+def make_email_confirmation_post(confirmation_token, token_type):
     form_details = request.form
-    target_url = urljoin(request.url_root, endpoint_constants.CONFIRMATION, confirmation_token)
+    endpoint_parameters = f"{endpoint_constants.CONFIRMATION}?token={confirmation_token}&type={token_type}%20"
+    target_url = urljoin(request.url_root, endpoint_parameters)
     request_body = dict(targetUrl=target_url, recipient=form_details["username"])
     response = requests.post(endpoint_constants.NOTIFICATION_MS_URL+endpoint_constants.EMAIL_CONFIRMATION, json=request_body)
     return_content = None
