@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from app.find_links import parse_urls
+from app.find_links import parsing_service
 import endpoint_constants
 import constants
 import app_constants
@@ -13,7 +13,7 @@ def in_post_link() -> str:
     # text = request.data.decode()
 
     # get links from the webpage
-    next_urls = parse_urls(text, url)
+    next_urls = parsing_service(text, url)
 
     return next_urls;
 

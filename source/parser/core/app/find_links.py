@@ -7,52 +7,44 @@ import endpoint_constants
 from lxml import html
 from bs4 import BeautifulSoup
 
-
-def parse_urls(text, url):
-    # TODO add gen on config MS
-
-    soup = BeautifulSoup(text, "lxml")
-
+def get_config():
     req_parser_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.PARSER_CONFIG}',
-                                        data=json.dumps({}))
-
-    parsed_content = dict()
+                                      data=json.dumps({}))
 
     config_json = req_parser_config.json()
-    el_list = config_json["specific-tag"]
 
-    a_href_list = []
+    return config_json
 
-    for link in soup.find_all("a"):
-        if link.get("href"):
-            a_href_list.append(link.get("href").encode('latin1').decode('unicode-escape').replace('"', ''))
+def parse_a_img(el_list, soup, url):
+    parsed_content = dict()
+    for tag in ["a", "img"]:
+        link_list=[]
+        if tag in el_list:
+            for link in soup.find_all(tag):
+                if link.get("href"):
+                    link_list.append(link.get("href").encode('latin1').decode('unicode-escape').replace('"', ''))
+                elif link.get("src"):
+                    link_list.append(link.get("src").encode('latin1').decode('unicode-escape').replace('"', ''))
 
-    for link in a_href_list:
-        if link[0] == '.' or link[0] == '/':
-            index = a_href_list.index(link)
-            link2 = str(url) + link[1:]
-            a_href_list.remove(link)
-            a_href_list.insert(index, link2)
+            for link in link_list:
+                if link[0] == '.' or link[0] == '/':
+                    index = link_list.index(link)
+                    link2 = str(url) + link[1:]
+                    link_list.remove(link)
+                    link_list.insert(index, link2)
 
-    parsed_content['a'] = a_href_list
-    el_list = list(filter(lambda a: a != 'a', el_list))
+            if tag == "a":
+                parsed_content['a'] = link_list
+                el_list = list(filter(lambda a: a != 'a', el_list))
+            elif tag == "img":
+                parsed_content['img'] = link_list
+                el_list = list(filter(lambda a: a != 'img', el_list))
 
-    if "img" in el_list:
-        img_list = []
-        for img in soup.find_all("img"):
-            img_list.append(img.get("src").encode('latin1').decode('unicode-escape').replace('"', ''))
+    return el_list, parsed_content
 
-        for img in img_list:
-            if img[0] == '.':
-                index = img_list.index(img)
-                img2 = str(url) + img[1:]
-                img_list.remove(img)
-                img_list.insert(img, img2)
-
-        parsed_content['img'] = img_list
-        el_list = list(filter(lambda a: a != 'img', el_list))
-
+def parse_all(el_list, soup):
     tags = dict()
+    parsed_content = dict()
 
     for el in el_list:
         tags[el] = []
@@ -61,4 +53,21 @@ def parse_urls(text, url):
 
         parsed_content[el] = tags[el]
 
-    return parsed_content
+    return el_list, parsed_content
+
+def parsing_service(text, url):
+    soup = BeautifulSoup(text, "lxml")
+
+    config_json = get_config()
+    el_list = config_json["specific-tag"]
+
+    parsed_content_all = dict()
+    parsed_content_links = dict()
+
+    el_list, parsed_content_links = parse_a_img(el_list, soup, url)
+
+    el_list, parsed_content_all = parse_all(el_list, soup)
+
+    parsed_content_all.update(parsed_content_links)
+
+    return parsed_content_all
