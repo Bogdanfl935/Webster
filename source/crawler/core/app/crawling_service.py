@@ -26,6 +26,11 @@ def do_crawling(url):
     send_to_parser = requests.post(url=parser_url, data=dictPage, headers={'Content-type': 'application/json'})
 
 def get_next_link():
+    req_crawling_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIG}', data=json.dumps({}))
+    json_config = req_crawling_config.json()
+    if 'True' in json_config["same-page"]:
+        return json.dumps({"urls": []})
+    
     post_to_next_link = {'quantity': constants.CRAWLER_NEXT_LINK_LIMIT}
 
     req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}', data=json.dumps(post_to_next_link))
