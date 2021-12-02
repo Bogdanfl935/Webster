@@ -44,6 +44,6 @@ public class ConfirmationResendingService {
 
 		String confirmationToken = tokenHandle.createJsonWebToken(new CustomUserDetails(user),
 				JwtExpirationConstants.EMAIL_CONFIRMATION_TOKEN_EXPIRATION_MILLISEC);
-		return new ConfirmationTokenResponse(confirmationToken);
+		return new ConfirmationTokenResponse(confirmationToken, JwtHandle.DEFAULT_TOKEN_TYPE);
 	}
 }
