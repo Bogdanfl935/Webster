@@ -24,8 +24,8 @@ def do_crawling(url):
     parser_url = endpoint_constants.PARSER_MS_URL + endpoint_constants.PARSER
 
     send_to_parser = requests.post(url=parser_url, data=dictPage, headers={'Content-type': 'application/json'})
-    print(send_to_parser.content.decode())
 
+def get_next_link():
     post_to_next_link = {'quantity': constants.CRAWLER_NEXT_LINK_LIMIT}
 
     req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}', data=json.dumps(post_to_next_link))

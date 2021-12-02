@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from app.crawl_from_url import do_crawling
+from app.crawling_service import do_crawling, get_next_link
 import endpoint_constants
 import constants
 import app_constants
@@ -11,7 +11,8 @@ def in_post_link() -> str:
     text = request.json.get(constants.START_LINK_KEY, None)
 
     # in do_crawling we do a POST on /parser
-    next_urls = do_crawling(text)
+    crawled = do_crawling(text)
+    next_urls = get_next_link()
 
     return next_urls
         
