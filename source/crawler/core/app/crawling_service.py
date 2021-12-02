@@ -1,4 +1,5 @@
 import json
+import sys
 import time
 import re
 
@@ -31,8 +32,18 @@ def do_crawling(url):
     parser_url = endpoint_constants.PARSER_MS_URL + endpoint_constants.PARSER
 
     send_to_parser = requests.post(url=parser_url, data=dictPage, headers={'Content-type': 'application/json'})
+    parser_resp_json = send_to_parser.json()
 
     json_config = get_config()
+
+    max_size = int(json_config["storage-limit"][0])
+    max_size = max_size * 10**6
+
+    if sys.getsizeof(parser_resp_json) > max_size:
+        return False
+
+    return True
+
 
 def get_next_link():
     json_config = get_config()

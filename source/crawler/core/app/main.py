@@ -12,7 +12,10 @@ def in_post_link() -> str:
 
     # in do_crawling we do a POST on /parser
     crawled = do_crawling(text)
-    next_urls = get_next_link()
+    if crawled:
+        next_urls = get_next_link()
+    else:
+        next_urls = jsonify({"urls": []})
 
     return next_urls
         
