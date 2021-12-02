@@ -6,6 +6,13 @@ import requests
 import constants
 import endpoint_constants
 
+def get_config():
+    req_crawling_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIG}',
+                                        data=json.dumps({}))
+    json_config = req_crawling_config.json()
+
+    return json_config
+
 def do_crawling(url):
     page = requests.get(url)
 
@@ -25,9 +32,11 @@ def do_crawling(url):
 
     send_to_parser = requests.post(url=parser_url, data=dictPage, headers={'Content-type': 'application/json'})
 
+    json_config = get_config()
+
 def get_next_link():
-    req_crawling_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIG}', data=json.dumps({}))
-    json_config = req_crawling_config.json()
+    json_config = get_config()
+
     if 'True' in json_config["same-page"]:
         return json.dumps({"urls": []})
     
