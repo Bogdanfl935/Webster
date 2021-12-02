@@ -1,0 +1,77 @@
+<div class="modal fade popup-on-launch" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content overflow-hidden">
+            <div class="modal-header border-bottom-0">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div>
+                    <h1 class="py-2 display-4">I would like to...</h1>
+                </div>
+                <div class="col-auto my-5">
+                    <img class="w-25 rounded mx-auto"
+                        src="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.IMAGES_LOGO_PATH) }}"
+                        border="0">
+                </div>
+                <div class="px-5 row">
+                    <button class="btn btn-light no-shadow py-3 standout-text col text-center"
+                    data-toggler="reset-togglee" data-toggle-group="reset-confirmation">
+                        Reset password
+                    </button>
+                    <button class="btn btn-dark no-shadow py-3 standout-text col text-center"
+                    data-toggler="confirmation-togglee" data-toggle-group="reset-confirmation">
+                        Activate account
+                    </button>
+                </div>
+            </div>
+            <!--
+               PASSWORD RESET MODAL
+            -->
+            <div class="modal-body d-none" data-togglee="reset-togglee" data-toggle-group="reset-confirmation">
+                <div>
+                    <form class="ajax-handled" method="post" action="{{ url_for(registration_endpoint) }}" novalidate>
+                        <div class="col-auto">
+                            <div class="input-group my-4">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text px-3"><i class="fa fa-at" aria-hidden="true"></i></div>
+                                </div>
+                                <input type="email" class="form-control" name="username"
+                                       placeholder="Username" required>
+                            </div>
+                        </div>
+                        <div class="my-3 row d-flex text-center justify-content-center">
+                            <button class="btn btn-secondary px-4">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!--
+                CONFIRMATION RESENDING MODAL
+            -->
+            <div class="modal-body d-none" data-togglee="confirmation-togglee" data-toggle-group="reset-confirmation">
+                <div>
+                    <form class="ajax-handled" method="post" action="{{ url_for(registration_endpoint) }}" novalidate>
+                        <div class="col-auto">
+                            <div class="input-group my-4">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text px-3"><i class="fa fa-at" aria-hidden="true"></i></div>
+                                </div>
+                                <input type="email" class="form-control" name="username"
+                                       placeholder="Username" required>
+                            </div>
+                        </div>
+                        <div class="my-3 row d-flex text-center justify-content-center">
+                            <button class="btn btn-secondary px-4">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center py-3">
+            </div>
+        </div>
+    </div>
+</div>
+{% block javascript %}
+{% endblock %}
