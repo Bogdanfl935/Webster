@@ -17,17 +17,11 @@ def get_config():
 def do_crawling(url):
     page = requests.get(url)
 
-    # url_escaped = re.escape(page.url.encode('latin1'))
-
     dictPage = dict()
     dictPage["url"] = page.url
     dictPage["html"] = page.content.decode('utf-8')
 
     dictPage = json.dumps(dictPage)
-
-    # print(dictPage)
-
-    # dictPage = json.dumps(dict({"url": page.url, "header": headers_escaped, "html": page.content}))
 
     parser_url = endpoint_constants.PARSER_MS_URL + endpoint_constants.PARSER
 
@@ -41,6 +35,8 @@ def do_crawling(url):
 
     if sys.getsizeof(parser_resp_json) > max_size:
         return False
+
+    
 
     return True
 

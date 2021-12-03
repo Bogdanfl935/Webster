@@ -66,8 +66,18 @@ def parsing_service(text, url):
 
     el_list, parsed_content_links = parse_a_img(el_list, soup, url)
 
+    post_link_db(parsed_content_links)
+
     el_list, parsed_content_all = parse_all(el_list, soup)
 
     parsed_content_all.update(parsed_content_links)
 
     return parsed_content_all
+
+def post_link_db(links_list):
+    links_list = links_list["a"]
+
+    post_req = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.STORAGE}',
+                                      data=json.dumps({"links": links_list}))
+
+    # config_json = req_parser_config.json()

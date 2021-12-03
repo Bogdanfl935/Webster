@@ -1,6 +1,6 @@
 CRAWLER = "/crawler"
 PARSER = "/parser"
-NEXT_LINK = "/next-link"
+STORAGE = "/storage"
 PARSER_CONFIG = "/parser-config"
 STORAGE_MS_URL= "http://localhost:50006"
 PARSER_MS_URL= "http://localhost:50005"

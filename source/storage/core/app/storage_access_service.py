@@ -19,7 +19,7 @@ def get_next_links(request):
 
 
 def add_link_to_db(request):
-    links = request.get_json()
+    links = request.get_json(force=True)
     json_links = links["links"]
 
     for link in json_links:
