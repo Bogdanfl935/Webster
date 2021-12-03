@@ -9,28 +9,9 @@ app = Flask(__name__)
 @app.route(endpoint_constants.CRAWLER, methods=['POST'])
 def in_post_link() -> str:
     text = request.json.get(constants.START_LINK_KEY, None)
+    crawled_response = do_crawling(text)
 
-    json_config = get_config()
-
-    max_total_size = int(json_config["storage-limit"][0])
-    max_total_size = max_total_size * 10 ** 6
-
-    next_urls = jsonify({"urls": []})
-
-    # in do_crawling we do a POST on /parser
-    crawled_size = do_crawling(text)
-    while crawled_size < max_total_size:
-        if crawled_size == -1:
-            next_urls = get_next_link()
-            for el in next_urls["urls"]:
-                crawled_size = do_crawling(el)
-        else:
-            max_total_size = max_total_size - crawled_size
-            next_urls = get_next_link()
-            for el in next_urls["urls"]:
-                crawled_size = do_crawling(el)
-
-    return next_urls
+    return crawled_response
         
 @app.route(endpoint_constants.CRAWLER, methods=['GET'])
 def in_get_data() -> str:

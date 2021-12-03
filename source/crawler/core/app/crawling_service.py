@@ -15,7 +15,6 @@ def get_config():
     return json_config
 
 def start_crawling(url):
-    print(url)
     parsed_url = urlparse(url)
     if parsed_url.scheme == '' or parsed_url.netloc == '':
         return -1
@@ -38,7 +37,24 @@ def start_crawling(url):
     return resp_size
 
 def do_crawling(url):
-    return start_crawling(url)
+    json_config = get_config()
+
+    max_total_size = int(json_config["storage-limit"][0])
+    max_total_size = max_total_size * 10 ** 6
+
+    crawled_size = start_crawling(url)
+    while crawled_size < max_total_size:
+        if crawled_size == -1:
+            next_urls = get_next_link()
+            for el in next_urls["urls"]:
+                crawled_size = start_crawling(el)
+        else:
+            max_total_size = max_total_size - crawled_size
+            next_urls = get_next_link()
+            for el in next_urls["urls"]:
+                crawled_size = start_crawling(el)
+
+    return ('', 200)
 
 def get_next_link():
     json_config = get_config()
@@ -58,6 +74,5 @@ def get_next_link():
             next_links = {'error_code': req_next_links.status_code}
         else:
             next_links = req_next_links.json()
-            print(next_links)
 
     return next_links
