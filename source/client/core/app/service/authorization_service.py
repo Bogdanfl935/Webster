@@ -1,8 +1,8 @@
 from functools import wraps
-from app.constants import endpoint_constants, browser_constants
+from app.constants import endpoint_constants, browser_constants, template_constants
 from app.utilities.api_response_parser import *
 from app.service import cookie_service
-from flask import request, make_response, abort
+from flask import request, make_response, abort, render_template
 import requests
 
 def require_access_token(f):
@@ -58,4 +58,31 @@ def unpack_access_token(access_token: str):
 
     return response_object, authenticated_user
             
+def validate_token(target_modal_path: str) -> tuple:
+    token = request.args.get('token')
+    type = request.args.get('type')
+    response, status = make_authorization_post(f"{type}{token}")
+    return_content = None
+
+    if status == 200:
+        return_content = render_template(template_constants.SECTION_HOME_PATH, 
+            include_modals = (
+                target_modal_path,
+                template_constants.MODAL_LOGIN_PATH
+            ),
+            confirmation_email = extract_subject_response(response),
+            token = token,
+            token_type = type
+        )
+    elif status == 401:
+        return_content = render_template(template_constants.SECTION_HOME_PATH,
+            include_modals = (
+                template_constants.MODAL_BAD_TOKEN_PATH,
+                template_constants.MODAL_LOGIN_PATH
+            )
+        )
+    else:
+        abort(status)
+
+    return return_content, status
     
