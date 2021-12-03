@@ -6,6 +6,8 @@ import constants
 import endpoint_constants
 from lxml import html
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse
+
 
 def get_config():
     req_parser_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.PARSER_CONFIG}',
@@ -22,7 +24,11 @@ def parse_a_img(el_list, soup, url):
         if tag in el_list:
             for link in soup.find_all(tag):
                 if link.get("href"):
-                    link_list.append(link.get("href").encode(encoding='UTF-8').decode('unicode-escape').replace('"', ''))
+                    href_link = link.get("href")
+                    parsed_url = urlparse(href_link)
+                    if parsed_url.scheme != '' and parsed_url.netloc != '':
+                        link_list.append(href_link.encode(encoding='UTF-8').decode('unicode-escape').replace('"', ''))
+
                 elif link.get("src"):
                     link_list.append(link.get("src").encode(encoding='UTF-8').decode('unicode-escape').replace('"', ''))
 
