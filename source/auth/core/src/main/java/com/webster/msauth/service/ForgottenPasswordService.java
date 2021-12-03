@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.webster.msauth.constants.JwtExpirationConstants;
 import com.webster.msauth.dto.AccountNameDTO;
-import com.webster.msauth.dto.ForgottenPasswordResponse;
+import com.webster.msauth.dto.ConfirmationTokenResponse;
 import com.webster.msauth.exception.AuthExceptionMessage;
 import com.webster.msauth.exception.InvalidUsernameException;
 import com.webster.msauth.models.CustomUserDetails;
@@ -24,7 +24,7 @@ public class ForgottenPasswordService {
 	@Autowired
 	private JwtHandle tokenHandle;
 
-	public ForgottenPasswordResponse createResetToken(@Valid AccountNameDTO accountNameDTO) {
+	public ConfirmationTokenResponse createResetToken(@Valid AccountNameDTO accountNameDTO) {
 		Optional<User> locatedUser = userRepository.findByUsername(accountNameDTO.getUsername());
 
 		if (locatedUser.isEmpty()) {
@@ -37,7 +37,7 @@ public class ForgottenPasswordService {
 
 		String resetPassToken = tokenHandle.createJsonWebToken(new CustomUserDetails(user),
 				JwtExpirationConstants.RESET_PASSWORD_TOKEN_EXPIRATION_MILLISEC);
-		return new ForgottenPasswordResponse(resetPassToken);
+		return new ConfirmationTokenResponse(resetPassToken, JwtHandle.DEFAULT_TOKEN_TYPE);
 	}
 
 }

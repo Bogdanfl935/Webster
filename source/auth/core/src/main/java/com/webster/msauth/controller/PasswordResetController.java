@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.webster.msauth.constants.EndpointConstants;
 import com.webster.msauth.dto.AccountNameDTO;
-import com.webster.msauth.dto.ForgottenPasswordResponse;
+import com.webster.msauth.dto.ConfirmationTokenResponse;
 import com.webster.msauth.dto.PasswordResetDTO;
 import com.webster.msauth.service.ForgottenPasswordService;
 import com.webster.msauth.service.PasswordResetService;
@@ -25,7 +25,7 @@ public class PasswordResetController {
 	private PasswordResetService passwordResetService;
 
 	@PostMapping(EndpointConstants.PASSWORD_RESETTING)
-	public ResponseEntity<ForgottenPasswordResponse> handlePasswordResetting(
+	public ResponseEntity<Object> handlePasswordResetting(
 			@Valid @RequestBody PasswordResetDTO passwordResetDTO,
 			@RequestHeader(value = EndpointConstants.AUTHORIZATION_HEADER) String resetToken) {
 		passwordResetService.reset(passwordResetDTO, resetToken);
@@ -33,9 +33,9 @@ public class PasswordResetController {
 	}
 
 	@PostMapping(EndpointConstants.PASSWORD_FORGOTTEN)
-	public ResponseEntity<ForgottenPasswordResponse> handleForgottenPassword(
+	public ResponseEntity<ConfirmationTokenResponse> handleForgottenPassword(
 			@Valid @RequestBody AccountNameDTO accountNameDTO) {
-		ForgottenPasswordResponse forgottenPasswordResponse = forgottenPasswordService.createResetToken(accountNameDTO);
+		ConfirmationTokenResponse forgottenPasswordResponse = forgottenPasswordService.createResetToken(accountNameDTO);
 		return ResponseEntity.status(HttpStatus.OK).body(forgottenPasswordResponse);
 	}
 }

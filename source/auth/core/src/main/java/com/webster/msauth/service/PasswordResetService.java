@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.webster.msauth.dto.PasswordResetDTO;
 import com.webster.msauth.exception.AuthExceptionMessage;
 import com.webster.msauth.exception.InvalidAccessTokenProvidedException;
+import com.webster.msauth.exception.InvalidUsernameException;
 import com.webster.msauth.models.User;
 import com.webster.msauth.repository.UserRepository;
 import com.webster.msauth.token.JwtHandle;
@@ -40,8 +41,8 @@ public class PasswordResetService {
 		 * deleted after confirmation had been sent out)
 		 */
 		if (locatedUser.isEmpty()) {
-			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.INVALID_ACCESS_TOKEN_PROVIDED;
-			throw new InvalidAccessTokenProvidedException(exceptionMessage.getErrorMessage());
+			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.USERNAME_NOT_FOUND;
+			throw new InvalidUsernameException(exceptionMessage.getErrorMessage());
 		}
 
 		User user = locatedUser.get();
