@@ -29,11 +29,11 @@ def handle_confirmation_resending_get() -> tuple:
 
 @auth.route(endpoint_constants.CONFIRMATION, methods=['GET'])
 def handle_confirmation_get() -> tuple:
-    return confirmation_service.validate_confirmation_token()
+    return confirmation_service.do_prerender_validation()
 
 @auth.route(endpoint_constants.PASSWORD_RESETTING, methods=['GET'])
 def handle_password_resetting_get() -> tuple:
-    return render_template_string("Not implemented")
+    return password_reset_service.do_prerender_validation()
 
 # POST ENDPOINTS
 
@@ -63,5 +63,5 @@ def handle_password_forgotten_post() -> tuple:
 
 @auth.route(endpoint_constants.PASSWORD_RESETTING, methods=['POST'])
 def handle_password_resetting_post() -> tuple:
-    return render_template_string("Not implemented")
+    return password_reset_service.make_password_resetting_post()
 
