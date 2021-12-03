@@ -2,7 +2,6 @@ import json
 import sys
 import time
 import re
-
 import requests
 import constants
 import endpoint_constants
@@ -14,10 +13,8 @@ def get_config():
 
     return json_config
 
-def do_crawling(url):
+def start_crawling(url):
     page = requests.get(url)
-
-    # url_escaped = re.escape(page.url.encode('latin1'))
 
     dictPage = dict()
     dictPage["url"] = page.url
@@ -25,25 +22,34 @@ def do_crawling(url):
 
     dictPage = json.dumps(dictPage)
 
-    # print(dictPage)
-
-    # dictPage = json.dumps(dict({"url": page.url, "header": headers_escaped, "html": page.content}))
-
     parser_url = endpoint_constants.PARSER_MS_URL + endpoint_constants.PARSER
 
     send_to_parser = requests.post(url=parser_url, data=dictPage, headers={'Content-type': 'application/json'})
     parser_resp_json = send_to_parser.json()
 
+    resp_size = sys.getsizeof(parser_resp_json)
+
+    return resp_size
+
+def do_crawling(url):
     json_config = get_config()
 
-    max_size = int(json_config["storage-limit"][0])
-    max_size = max_size * 10**6
+    max_total_size = int(json_config["storage-limit"][0])
+    max_total_size = max_total_size * 10 ** 6
 
-    if sys.getsizeof(parser_resp_json) > max_size:
-        return False
+    crawled_size = start_crawling(url)
+    while crawled_size < max_total_size:
+        if crawled_size == -1:
+            next_urls = get_next_link()
+            for el in next_urls["urls"]:
+                crawled_size = start_crawling(el)
+        else:
+            max_total_size = max_total_size - crawled_size
+            next_urls = get_next_link()
+            for el in next_urls["urls"]:
+                crawled_size = start_crawling(el)
 
-    return True
-
+    return ('', 200)
 
 def get_next_link():
     json_config = get_config()
@@ -54,7 +60,6 @@ def get_next_link():
     post_to_next_link = {'quantity': constants.CRAWLER_NEXT_LINK_LIMIT}
 
     req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}', data=json.dumps(post_to_next_link))
-    # print(req_next_links)
     if req_next_links.status_code == 200:
         next_links = req_next_links.json()
     elif req_next_links.status_code != 200:
@@ -64,6 +69,5 @@ def get_next_link():
             next_links = {'error_code': req_next_links.status_code}
         else:
             next_links = req_next_links.json()
-            print(next_links)
 
     return next_links
