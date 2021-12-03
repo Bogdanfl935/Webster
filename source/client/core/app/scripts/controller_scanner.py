@@ -11,7 +11,7 @@ def collect_handler_names(file_path: str, keep_prefix: bool) -> str:
     file_output_buffer = f"# Scanned bound route handlers for {file_name}:\n"
 
     # Matches all handler names annotated with @<controller>.route
-    handler_match_pattern = "@.+?\.route\(.*?\)\ndef (.+?)\(.*?\).*?:"
+    handler_match_pattern = "@.+?\.route\(.*?\)\n(?:.|\n)*?def (.+?)\(.*?\).*?:"
     found_handler_names = re.findall(handler_match_pattern, file_text_buffer)
 
     for handler in found_handler_names:
