@@ -3,7 +3,7 @@ from app.constants import app_constants, endpoint_constants, template_constants,
 from werkzeug.exceptions import HTTPException
 from app.config.app_config import app
 from app.service.authorization_service import require_access_token
-import random
+import random, logging
 
 
 @app.context_processor
@@ -33,6 +33,10 @@ def handle_generic_error(exception) -> str:
         error_status=error_code,
         error_message=str(exception)
     )
+
+    if error_code == 500:
+        logging.exception(exception)
+
     return render_template(template_constants.INDIVIDUAL_ERROR_PATH, error=error_dict), error_code
 
 @app.route(endpoint_constants.DEFAULT, methods=['GET'])

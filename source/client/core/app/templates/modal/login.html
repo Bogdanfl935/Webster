@@ -8,10 +8,12 @@
             </div>
             <div class="modal-body">
                 <div class="px-5 row">
-                    <button id="login-toggler" class="btn btn-light no-shadow py-3 standout-text col text-center">
+                    <button class="btn btn-light no-shadow py-3 standout-text col text-center"
+                    data-toggler="authentication-togglee" data-toggle-group="authentication-registration">
                         Login
                     </button>
-                    <button id="register-toggler" class="btn btn-dark no-shadow py-3 standout-text col text-center">
+                    <button class="btn btn-dark no-shadow py-3 standout-text col text-center"
+                    data-toggler="registration-togglee" data-toggle-group="authentication-registration">
                         Register
                     </button>
                 </div>
@@ -19,7 +21,8 @@
             <!--
                LOGIN MODAL BODY
             -->
-            <div id="login-modal-content" class="modal-body d-block">
+            <div class="modal-body d-block"
+            data-togglee="authentication-togglee" data-toggle-group="authentication-registration">
                 <div>
                     <form class="ajax-handled" method="post" action="{{ url_for(authentication_endpoint) }}" novalidate>
                         <div class="col-auto">
@@ -46,7 +49,7 @@
                                 <input class="form-check-input" type="checkbox" value="" name="rememberMe"
                                        checked>
                                 <label class="form-check-label" for="remember-me-checkbox">
-                                    Remember me
+                                    Keep me signed in
                                 </label>
                             </div>
                         </div>
@@ -59,7 +62,8 @@
             <!--
                 REGISTER MODAL BODY
             -->
-            <div id="register-modal-content" class="modal-body d-none">
+            <div class="modal-body d-none"
+            data-togglee="registration-togglee" data-toggle-group="authentication-registration">
                 <div>
                     <form class="ajax-handled" method="post" action="{{ url_for(registration_endpoint) }}" novalidate>
                         <div class="col-auto">
@@ -98,13 +102,15 @@
                 </div>
             </div>
             <div class="modal-footer d-flex justify-content-center">
-                <div class="signup-section">Forgot your password? <a href="{{ url_for(password_forgotten_endpoint) }}" class="text-info">Reset password</a>.
+                <div class="signup-section">Forgot your password? <a href="{{ url_for(confirmation_resending_get_endpoint) }}" class="text-info">Reset password</a>.
                 </div>
             </div>
         </div>
     </div>
 </div>
 {% block javascript %}
+<script type="text/javascript"
+        src="{{ url_for(static_constants.ROOT_DIR, filename = static_constants.SCRIPTS_MODAL_CONTROL_PATH) }}"></script>
 <script type="text/javascript"
         src="{{ url_for(static_constants.ROOT_DIR, filename = static_constants.SCRIPTS_LOGIN_PATH) }}"></script>
 {% endblock %}
