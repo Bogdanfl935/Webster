@@ -14,7 +14,7 @@ def get_config():
 
     return json_config
 
-def do_crawling(url):
+def start_crawling(url):
     page = requests.get(url)
 
     dictPage = dict()
@@ -28,18 +28,12 @@ def do_crawling(url):
     send_to_parser = requests.post(url=parser_url, data=dictPage, headers={'Content-type': 'application/json'})
     parser_resp_json = send_to_parser.json()
 
-    json_config = get_config()
+    resp_size = sys.getsizeof(parser_resp_json)
 
-    max_size = int(json_config["storage-limit"][0])
-    max_size = max_size * 10**6
+    return resp_size
 
-    if sys.getsizeof(parser_resp_json) > max_size:
-        return False
-
-    
-
-    return True
-
+def do_crawling(url):
+    return start_crawling(url)
 
 def get_next_link():
     json_config = get_config()
@@ -50,7 +44,6 @@ def get_next_link():
     post_to_next_link = {'quantity': constants.CRAWLER_NEXT_LINK_LIMIT}
 
     req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}', data=json.dumps(post_to_next_link))
-    # print(req_next_links)
     if req_next_links.status_code == 200:
         next_links = req_next_links.json()
     elif req_next_links.status_code != 200:
