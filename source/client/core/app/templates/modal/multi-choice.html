@@ -31,7 +31,7 @@
             -->
             <div class="modal-body d-none" data-togglee="reset-togglee" data-toggle-group="reset-confirmation">
                 <div>
-                    <form class="ajax-handled" method="post" action="{{ url_for(registration_endpoint) }}" novalidate>
+                    <form class="ajax-handled" method="post" action="{{ url_for(password_change_endpoint) }}" novalidate>
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">
@@ -52,7 +52,7 @@
             -->
             <div class="modal-body d-none" data-togglee="confirmation-togglee" data-toggle-group="reset-confirmation">
                 <div>
-                    <form class="ajax-handled" method="post" action="{{ url_for(registration_endpoint) }}" novalidate>
+                    <form class="ajax-handled" method="post" action="{{ url_for(confirmation_resending_post_endpoint) }}" novalidate>
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">
