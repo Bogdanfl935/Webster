@@ -5,33 +5,8 @@ from app.utilities.api_response_parser import *
 from flask.templating import render_template_string
 import requests
 
-def validate_confirmation_token() -> tuple:
-    token = request.args.get('token')
-    type = request.args.get('type')
-    response, status = authorization_service.make_authorization_post(f"{type}{token}")
-    return_content = None
-
-    if status == 200:
-        return_content = render_template(template_constants.SECTION_HOME_PATH, 
-            include_modals = (
-                template_constants.MODAL_CONFIRM_PATH,
-                template_constants.MODAL_LOGIN_PATH
-            ),
-            confirmation_email = extract_subject_response(response),
-            confirmation_token = token,
-            token_type = type
-        )
-    elif status == 401:
-        return_content = render_template(template_constants.SECTION_HOME_PATH,
-            include_modals = (
-                template_constants.MODAL_BAD_TOKEN_PATH,
-                template_constants.MODAL_LOGIN_PATH
-            )
-        )
-    else:
-        abort(status)
-
-    return return_content, status
+def do_prerender_validation() -> tuple:
+    return authorization_service.validate_token(template_constants.MODAL_CONFIRM_PATH)
 
 def make_confirmation_post() -> tuple:
     confirmation_token = f"{request.form['type']}{request.form['token']}"

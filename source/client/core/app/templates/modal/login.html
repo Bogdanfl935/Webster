@@ -24,7 +24,8 @@
             <div class="modal-body d-block"
             data-togglee="authentication-togglee" data-toggle-group="authentication-registration">
                 <div>
-                    <form class="ajax-handled" method="post" action="{{ url_for(authentication_endpoint) }}" novalidate>
+                    <form class="ajax-handled" method="post" action="{{ url_for(authentication_endpoint) }}" novalidate
+                    data-form-type="authentication">
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">
@@ -65,7 +66,8 @@
             <div class="modal-body d-none"
             data-togglee="registration-togglee" data-toggle-group="authentication-registration">
                 <div>
-                    <form class="ajax-handled" method="post" action="{{ url_for(registration_endpoint) }}" novalidate>
+                    <form class="ajax-handled" method="post" action="{{ url_for(registration_endpoint) }}" novalidate
+                    data-form-type="registration">
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">
