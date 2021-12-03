@@ -18,7 +18,6 @@ function bind_togglers() {
         let data_toggle_group_condition = "[data-toggle-group=" + $(div_element).attr("data-toggle-group") + "]"
         let data_toggler_condition = "[data-toggler=" + $(div_element).attr("data-togglee") + "]"
         $("button" + data_toggle_group_condition + data_toggler_condition).each((_button_index, button_element)=>{
-            console.log("Binding for: ", div_element, button_element, data_toggle_group_condition);
             $(button_element).on("click", ()=>{
                 toggle_target(button_element, div_element, data_toggle_group_condition);
             });
