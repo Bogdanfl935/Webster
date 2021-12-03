@@ -20,7 +20,7 @@ def add_config_to_db(request):
 
     return config_json
 
-def retr_config_from_db(request):
+def retr_config_from_db(request, type_conf):
     recv_data_json = request.get_json()
 
     retr_config_req = json.dumps({"user": "george"})
@@ -30,4 +30,12 @@ def retr_config_from_db(request):
         headers={'Content-type': 'application/json'})
     from_db_resp_json = from_db_resp.json()
 
-    return from_db_resp_json
+    resp_json = dict()
+
+    if type_conf == "crawler":
+        resp_json["storage-limit"] = from_db_resp_json["storage-limit"]
+        resp_json["same-page"] = from_db_resp_json["same-page"]
+    elif type_conf == "parser":
+        resp_json["specific-tag"] = from_db_resp_json["specific-tag"]
+
+    return resp_json

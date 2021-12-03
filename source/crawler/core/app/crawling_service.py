@@ -48,7 +48,7 @@ def do_crawling(url):
 def get_next_link():
     json_config = get_config()
 
-    if 'True' in json_config["same-page"]:
+    if 'True' not in json_config["same-page"]:
         return json.dumps({"urls": []})
     
     post_to_next_link = {'quantity': constants.CRAWLER_NEXT_LINK_LIMIT}
