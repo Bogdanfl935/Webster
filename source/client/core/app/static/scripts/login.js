@@ -6,7 +6,8 @@ $(document).ready(() => {
 
 function initAuthenticationModalHandlers() {
     bindShowHideClickHandler();
-    bindFormValidationHandler();
+    bindAuthenticationFormConstraints();
+    bindRegistrationFormConstraints();
     bindFormSubmitHandler();
 }
 
@@ -62,11 +63,11 @@ function handleFormSubmitErrorResponse(form, response) {
         window.location.href = response.responseJSON.url;
     }
     else if ([400, 401, 409].includes(response.status)) {
-        let prevSibling = $(form).find("button").prev();
+        let prevSibling = $(form).find("button").prev("div[class*='error-feedback']");
         if (prevSibling.length == 0) {
             let invalidSpan = document.createElement("span");
             prevSibling = document.createElement("div");
-            $(prevSibling).addClass("col-12 mb-3");
+            $(prevSibling).addClass("col-12 mb-3 error-feedback");
             $(invalidSpan).addClass("invalid-feedback d-block");
             prevSibling.appendChild(invalidSpan);
             $(form).find("button").before(prevSibling);
@@ -76,53 +77,57 @@ function handleFormSubmitErrorResponse(form, response) {
     }
 }
 
-function bindFormValidationHandler() {
-    createStrongPasswordRule();
-    let rules_list = [
-        {
-            username: { required: true, email: true },
-            password: { required: true }
+function bindFormValidationHandler(form, rules, messages) {
+    $(form).validate({
+        rules: rules,
+        messages: messages,
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.input-group').append(error);
         },
-        {
-            username: { required: true, email: true },
-            password: {required: true, minlength: 8, maxlength: 30, strongPassword: true},
-            confirmPassword: { required: true, minlength: 8, maxlength: 30, equalTo: "#registerPassword" }
-        }
-    ]
-    let messages_list = [
-        {
-            username: "Please enter a valid email address",
-            password: "Please provide a password"
+        highlight: function (element) {
+            $(element).addClass('is-invalid');
+            element.setCustomValidity('Invalid');
         },
-        {
-            username: "Please enter a valid email address",
-            password: {
-                required: "Please provide a password"
-            },
-            confirmPassword: {
-                required: "Please provide a password",
-                equalTo: "Passwords do not match"
-            }
+        unhighlight: function (element) {
+            $(element).removeClass('is-invalid');
+            element.setCustomValidity('');
         },
-    ]
+    });
+}
 
-    $("form").each((index, form) => {
-        $(form).validate({
-            rules: rules_list[index],
-            messages: messages_list[index],
-            errorPlacement: function (error, element) {
-                error.addClass('invalid-feedback');
-                element.closest('.input-group').append(error);
-            },
-            highlight: function (element) {
-                $(element).addClass('is-invalid');
-                element.setCustomValidity('Invalid');
-            },
-            unhighlight: function (element) {
-                $(element).removeClass('is-invalid');
-                element.setCustomValidity('');
-            },
-        });
+function bindRegistrationFormConstraints(){
+    createStrongPasswordRule();
+    let registration_rules = {
+            username: { required: true, email: true },
+            password: { required: true, minlength: 8, maxlength: 30, strongPassword: true },
+            confirmPassword: { required: true, minlength: 8, maxlength: 30}
+    };
+    let registration_messages = {
+        username: "Please enter a valid email address",
+        password: { required: "Please provide a password" },
+        confirmPassword: {
+            required: "Please provide a password",
+            equalTo: "Passwords do not match"
+        }
+    };
+    $("form[data-form-type=registration]").each((_index, form)=>{
+        registration_rules.confirmPassword.equalTo = $(form).find("input[name=password]");
+        bindFormValidationHandler(form, registration_rules, registration_messages);
+    });
+}
+
+function bindAuthenticationFormConstraints(){
+    let authentication_rules = {
+        username: { required: true, email: true },
+        password: { required: true }
+    };
+    let authentication_messages = {
+        username: "Please enter a valid email address",
+        password: "Please provide a password"
+    };
+    $("form[data-form-type=authentication]").each((_index, form)=>{
+        bindFormValidationHandler(form, authentication_rules, authentication_messages);
     });
 }
 

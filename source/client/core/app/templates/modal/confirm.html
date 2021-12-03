@@ -27,7 +27,7 @@
                 </div>
                 <div class="col-auto">
                     <form action="{{ url_for(confirmation_endpoint) }}" method="POST">
-                        <input type="hidden" name="token" value="{{ confirmation_token }}">
+                        <input type="hidden" name="token" value="{{ token }}">
                         <input type="hidden" name="type" value="{{ token_type }}">
                         <button class="btn btn-dark mt-3" type="submit">Confirm address</button>
                     </form>
@@ -43,6 +43,4 @@
     </div>
 </div>
 {% block javascript %}
-<script type="text/javascript"
-    src="{{ url_for(static_constants.ROOT_DIR, filename = static_constants.SCRIPTS_MODAL_CONTROL_PATH) }}"></script>
 {% endblock %}
