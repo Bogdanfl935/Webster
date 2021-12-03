@@ -13,22 +13,25 @@ def inject_context_constants() -> dict:
     return dict(
         registration_endpoint=auth_endpoint_handler_constants.HANDLE_REGISTRATION_POST,
         authentication_endpoint=auth_endpoint_handler_constants.HANDLE_AUTHENTICATION_POST,
-        password_forgotten_endpoint=auth_endpoint_handler_constants.HANDLE_PASSWORD_FORGOTTEN_GET,
-        confirmation_resending_endpoint=auth_endpoint_handler_constants.HANDLE_CONFIRMATION_RESENDING_GET,
+        password_resetting_endpoint=auth_endpoint_handler_constants.HANDLE_PASSWORD_RESETTING_POST,
+        password_change_endpoint=auth_endpoint_handler_constants.HANDLE_EMAIL_PASSWORD_RESET_POST,
+        confirmation_resending_get_endpoint=auth_endpoint_handler_constants.HANDLE_CONFIRMATION_RESENDING_GET,
+        confirmation_resending_post_endpoint=auth_endpoint_handler_constants.HANDLE_CONFIRMATION_RESENDING_POST,
         confirmation_endpoint=auth_endpoint_handler_constants.HANDLE_CONFIRMATION_POST
     )
 
+# GET ENDPOINTS
+
 @auth.route(endpoint_constants.CONFIRMATION_RESENDING, methods=['GET'])
 def handle_confirmation_resending_get() -> str:
-    return render_template_string("Not implemented")
+    return confirmation_service.render_multichoice_page()
 
 @auth.route(endpoint_constants.CONFIRMATION, methods=['GET'])
 def handle_confirmation_get() -> tuple:
     return confirmation_service.validate_confirmation_token()
 
-@auth.route(endpoint_constants.PASSWORD_FORGOTTEN, methods=['GET'])
-def handle_password_forgotten_get() -> str:
-    return render_template_string("Not implemented")
+
+# POST ENDPOINTS
 
 @auth.route(endpoint_constants.REGISTRATION, methods=['POST'])
 def handle_registration_post() -> tuple:
@@ -45,3 +48,16 @@ def handle_refreshment_post() -> tuple:
 @auth.route(endpoint_constants.CONFIRMATION, methods=['POST'])
 def handle_confirmation_post() -> tuple:
     return confirmation_service.make_confirmation_post()
+
+@auth.route(endpoint_constants.EMAIL_PASSWORD_RESET, methods=['POST'])
+def handle_email_password_reset_post() -> tuple:
+    return render_template_string("Not implemented")
+
+@auth.route(endpoint_constants.CONFIRMATION_RESENDING, methods=['POST'])
+def handle_confirmation_resending_post() -> tuple:
+    return render_template_string("Not implemented")
+
+@auth.route(endpoint_constants.PASSWORD_RESETTING, methods=['POST'])
+def handle_password_resetting_post() -> tuple:
+    return render_template_string("Not implemented")
+

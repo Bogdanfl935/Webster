@@ -54,3 +54,14 @@ def make_confirmation_post():
             abort(response.status_code)
 
     return return_content, response.status_code
+
+def render_multichoice_page():
+    status = 200
+    return_content = render_template(template_constants.SECTION_HOME_PATH,
+            include_modals = (
+                template_constants.MODAL_MULTI_CHOICE_PATH,
+                template_constants.MODAL_LOGIN_PATH
+            )
+    )
+
+    return return_content, status
