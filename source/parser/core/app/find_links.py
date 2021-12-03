@@ -22,9 +22,9 @@ def parse_a_img(el_list, soup, url):
         if tag in el_list:
             for link in soup.find_all(tag):
                 if link.get("href"):
-                    link_list.append(link.get("href").encode('latin1').decode('unicode-escape').replace('"', ''))
+                    link_list.append(link.get("href").encode(encoding='UTF-8').decode('unicode-escape').replace('"', ''))
                 elif link.get("src"):
-                    link_list.append(link.get("src").encode('latin1').decode('unicode-escape').replace('"', ''))
+                    link_list.append(link.get("src").encode(encoding='UTF-8').decode('unicode-escape').replace('"', ''))
 
             for link in link_list:
                 if link[0] == '.' or link[0] == '/':

@@ -2,7 +2,7 @@ import json
 import sys
 import time
 import re
-
+from urllib.parse import urlparse
 import requests
 import constants
 import endpoint_constants
@@ -15,6 +15,11 @@ def get_config():
     return json_config
 
 def start_crawling(url):
+    print(url)
+    parsed_url = urlparse(url)
+    if parsed_url.scheme == '' or parsed_url.netloc == '':
+        return -1
+
     page = requests.get(url)
 
     dictPage = dict()
