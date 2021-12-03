@@ -1,10 +1,18 @@
 import json
+import sys
 import time
 import re
 
 import requests
 import constants
 import endpoint_constants
+
+def get_config():
+    req_crawling_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIG}',
+                                        data=json.dumps({}))
+    json_config = req_crawling_config.json()
+
+    return json_config
 
 def do_crawling(url):
     page = requests.get(url)
@@ -24,8 +32,25 @@ def do_crawling(url):
     parser_url = endpoint_constants.PARSER_MS_URL + endpoint_constants.PARSER
 
     send_to_parser = requests.post(url=parser_url, data=dictPage, headers={'Content-type': 'application/json'})
-    print(send_to_parser.content.decode())
+    parser_resp_json = send_to_parser.json()
 
+    json_config = get_config()
+
+    max_size = int(json_config["storage-limit"][0])
+    max_size = max_size * 10**6
+
+    if sys.getsizeof(parser_resp_json) > max_size:
+        return False
+
+    return True
+
+
+def get_next_link():
+    json_config = get_config()
+
+    if 'True' in json_config["same-page"]:
+        return json.dumps({"urls": []})
+    
     post_to_next_link = {'quantity': constants.CRAWLER_NEXT_LINK_LIMIT}
 
     req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}', data=json.dumps(post_to_next_link))
