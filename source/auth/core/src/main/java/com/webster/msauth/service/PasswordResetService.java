@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.webster.msauth.dto.PasswordResetDTO;
 import com.webster.msauth.exception.AuthExceptionMessage;
-import com.webster.msauth.exception.InvalidAccessTokenProvidedException;
 import com.webster.msauth.exception.InvalidUsernameException;
 import com.webster.msauth.models.User;
 import com.webster.msauth.repository.UserRepository;
@@ -47,15 +46,6 @@ public class PasswordResetService {
 
 		User user = locatedUser.get();
 
-		/*
-		 * Check whether the user had already used the token to reset their password
-		 */
-		if (user.isCredentialsNonExpired()) {
-			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.INVALID_ACCESS_TOKEN_PROVIDED;
-			throw new InvalidAccessTokenProvidedException(exceptionMessage.getErrorMessage());
-		}
-
-		user.setCredentialsNonExpired(true);
 		user.setPassword(passwordEncoder.encode(passwordResetDTO.getPassword()));
 		userRepository.save(user);
 	}
