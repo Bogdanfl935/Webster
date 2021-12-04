@@ -13,6 +13,17 @@ function launchPopupModals(){
     $(".popup-on-launch").modal("show");
 }
 
+function hideActiveModals(){
+    $(".modal").modal("hide");
+}
+
+function renderFeedbackModalTemplate(html_content){
+    hideActiveModals();
+    $(".intrusive-modal, .modal-backdrop").remove();
+    $(document.body).append(html_content);
+    launchPopupModals();
+}
+
 function bind_togglers() {
     $("div[data-toggle-group]").each((_div_index, div_element)=>{
         let data_toggle_group_condition = "[data-toggle-group=" + $(div_element).attr("data-toggle-group") + "]"
