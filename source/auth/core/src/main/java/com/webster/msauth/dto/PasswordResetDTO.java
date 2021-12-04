@@ -15,6 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PasswordResetDTO implements PasswordCarrierDTO{
 	@EnforcedStrongPassword
+	@NotNull
 	@Getter
 	@Setter
 	private String password;

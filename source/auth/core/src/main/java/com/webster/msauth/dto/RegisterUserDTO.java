@@ -27,6 +27,7 @@ public class RegisterUserDTO implements PasswordCarrierDTO{
 
 	
 	@EnforcedStrongPassword
+	@NotNull
 	@Getter
 	@Setter
 	private String password;

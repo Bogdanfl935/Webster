@@ -26,9 +26,9 @@ public class StrongPasswordValidator implements ConstraintValidator<EnforcedStro
 
 	@Override
 	public boolean isValid(String password, ConstraintValidatorContext context) {
-		boolean isValidPassword = password != null;
+		boolean isValidPassword = true;
 
-		if (isValidPassword) {
+		if (password != null) {
 			PasswordValidator validator = new PasswordValidator(List.of(
 					new LengthRule(ValidationConstants.PASSWORD_MIN_LENGTH, ValidationConstants.PASSWORD_MAX_LENGTH),
 					new CharacterCharacteristicsRule(3,
@@ -44,13 +44,12 @@ public class StrongPasswordValidator implements ConstraintValidator<EnforcedStro
 
 			if (!result.isValid()) {
 				isValidPassword = false;
-				String messageTemplate = String.join(" ", validator.getMessages(result));
 				context.disableDefaultConstraintViolation();
-				context.buildConstraintViolationWithTemplate(messageTemplate).addConstraintViolation();
+				for (String errorMessage : validator.getMessages(result)) {
+					context.buildConstraintViolationWithTemplate(
+							ValidationConstants.CUSTOM_CONSTRAINT_PREFIX + errorMessage).addConstraintViolation();
+				}
 			}
-		} else {
-			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate("Field cannot be null").addConstraintViolation();
 		}
 
 		return isValidPassword;
