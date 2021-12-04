@@ -1,12 +1,12 @@
 from app.service import authorization_service, email_notification_service
-from app.constants import template_constants, endpoint_constants, main_endpoint_handler_constants
-from flask import request, abort, render_template, redirect, url_for
+from app.constants import template_constants, endpoint_constants
+from app.constants.token_scope import TokenScope
+from flask import request, abort, render_template
 from app.utilities.api_response_parser import *
-from flask.templating import render_template_string
 import requests
 
 def do_prerender_validation() -> tuple:
-    return authorization_service.validate_token(template_constants.MODAL_CONFIRM_PATH)
+    return authorization_service.validate_token(template_constants.MODAL_CONFIRM_PATH, TokenScope.CONFIRM)
 
 def make_confirmation_post() -> tuple:
     confirmation_token = f"{request.form['type']}{request.form['token']}"

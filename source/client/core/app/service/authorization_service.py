@@ -1,6 +1,8 @@
 from functools import wraps
 from app.constants import endpoint_constants, browser_constants, template_constants
+from app.constants.token_scope import TokenScope
 from app.utilities.api_response_parser import *
+from app.utilities.url_joiner import urljoin
 from app.service import cookie_service
 from flask import request, make_response, abort, render_template
 import requests
@@ -13,13 +15,14 @@ def require_access_token(f):
         return f(response_object, authenticated_user, *args, **kwargs)            
     return decorated_function
 
-def make_authorization_post(access_token: str):
-    headers = dict(Authorization=access_token)
-    response = requests.post(endpoint_constants.AUTH_MS_URL + endpoint_constants.AUTHORIZATION, headers=headers)
+def make_authorization_post(token: str, token_scope: TokenScope):
+    headers = dict(Authorization=token)
+    request_url = urljoin(endpoint_constants.AUTH_MS_URL, endpoint_constants.AUTHORIZATION, token_scope.value)
+    response = requests.post(request_url, headers=headers)
     return_content = None
 
     if response.status_code == 200:
-        # Access token is valid
+        # Token is valid
         subject = extract_subject_response(response.json())
         return_content = dict(subject=subject)
 
@@ -42,7 +45,7 @@ def make_refreshment_post():
 
 def unpack_access_token(access_token: str):
     # Anticipate bad request to avoid additional HTTP requests if not needed
-    response, status = make_authorization_post(access_token) if access_token is not None else (None, 401)
+    response, status = make_authorization_post(access_token, TokenScope.ACCESS) if access_token is not None else (None, 401)
     authenticated_user = None
     response_object = make_response()
 
@@ -58,10 +61,10 @@ def unpack_access_token(access_token: str):
 
     return response_object, authenticated_user
             
-def validate_token(target_modal_path: str) -> tuple:
+def validate_token(target_modal_path: str, token_scope: TokenScope) -> tuple:
     token = request.args.get('token')
     type = request.args.get('type')
-    response, status = make_authorization_post(f"{type}{token}")
+    response, status = make_authorization_post(f"{type}{token}", token_scope)
     return_content = None
 
     if status == 200:
