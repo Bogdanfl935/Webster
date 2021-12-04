@@ -1,3 +1,4 @@
+import functools
 import json
 import sys
 import time
@@ -5,6 +6,15 @@ import re
 import requests
 import constants
 import endpoint_constants
+import asyncio
+import urllib
+import aiofiles
+import aiohttp
+from aiohttp import ClientSession
+from typing import IO
+
+HREF_RE = re.compile(r'href="(.*?)"')
+
 
 def get_config():
     req_crawling_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIG}',
@@ -31,23 +41,100 @@ def start_crawling(url):
 
     return resp_size
 
-def do_crawling(url):
-    json_config = get_config()
+# this can stay
+async def fetch_html(url: str, session: ClientSession, **kwargs) -> str:
+    """GET request wrapper to fetch page HTML.
 
-    max_total_size = int(json_config["storage-limit"][0])
-    max_total_size = max_total_size * 10 ** 6
+    kwargs are passed to `session.request()`.
+    """
 
-    crawled_size = start_crawling(url)
-    while crawled_size < max_total_size:
-        if crawled_size == -1:
-            next_urls = get_next_link()
-            for el in next_urls["urls"]:
-                crawled_size = start_crawling(el)
-        else:
-            max_total_size = max_total_size - crawled_size
-            next_urls = get_next_link()
-            for el in next_urls["urls"]:
-                crawled_size = start_crawling(el)
+    resp = await session.request(method="GET", url=url, **kwargs)
+    resp.raise_for_status()
+    html = await resp.text()
+    return html
+
+# do parsing here?
+async def parse(url: str, session: ClientSession, **kwargs) -> set:
+    """Find HREFs in the HTML of `url`."""
+    found = set()
+    try:
+        html = await fetch_html(url=url, session=session, **kwargs)
+    except (
+        aiohttp.ClientError,
+        aiohttp.http_exceptions.HttpProcessingError,
+    ) as e:
+        return found
+    except Exception as e:
+        return found
+    else:
+        # this bit is not async
+        # put our bit here++
+        for link in HREF_RE.findall(html):
+            try:
+                abslink = urllib.parse.urljoin(url, link)
+            except (urllib.error.URLError, ValueError):
+                pass
+            else:
+                found.add(abslink)
+        return found
+
+
+async def write_one(file: IO, url: str, **kwargs) -> None:
+    """Write the found HREFs from `url` to `file`."""
+    res = await parse(url=url, **kwargs)
+    if not res:
+        return None
+    async with aiofiles.open(file, "a") as f:
+        for p in res:
+            await f.write(f"{url}\t{p}\n")
+
+async def wrap(url):
+    await asyncio.run(do_crawling(url))
+
+async def do_crawling(url):
+    urls=[url]
+    file = "output.txt"
+
+    async with ClientSession() as session:
+        tasks = []
+        # we would need all the urls at once, make the no of pulled urls from DB inf
+        # or put a double loop, segment the async bit
+        # run on urls from db as prev++
+        while len(urls) > 0:
+            for url in urls:
+                tasks.append(
+                    functools.partial(write_one, file=file, url=url, session=session)
+                )
+                urls.remove(url)
+                print(urls)
+            if len(urls) < 1:
+                next_links_from_db = get_next_link()
+                urls = next_links_from_db["urls"]
+                print(urls)
+            # await asyncio.gather(*tasks)
+            await asyncio.gather(*[func() for func in tasks])
+            # try:
+            #     await asyncio.gather(*tasks)
+            # except Exception:
+            #     pass
+
+
+    # json_config = get_config()
+    #
+    # max_total_size = int(json_config["storage-limit"][0])
+    # max_total_size = max_total_size * 10 ** 6
+    #
+    # crawled_size = start_crawling(url)
+    # while crawled_size < max_total_size:
+    #     if crawled_size == -1:
+    #         next_urls = get_next_link()
+    #         for el in next_urls["urls"]:
+    #             crawled_size = await start_crawling(el)
+    #     else:
+    #         max_total_size = max_total_size - crawled_size
+    #         next_urls = get_next_link()
+    #         for el in next_urls["urls"]:
+    #             crawled_size = await start_crawling(el)
 
     return ('', 200)
 

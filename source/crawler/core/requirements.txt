@@ -6,3 +6,5 @@ twisted
 requests
 chardet2
 urllib3
+aiohttp
+aiofiles
