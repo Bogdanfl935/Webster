@@ -21,6 +21,7 @@ import com.webster.msauth.exception.InvalidUsernameOrPasswordException;
 import com.webster.msauth.models.RefreshToken;
 import com.webster.msauth.repository.RefreshTokenRepository;
 import com.webster.msauth.token.JwtHandle;
+import com.webster.msauth.token.JwtScopeClaim;
 import com.webster.msauth.token.OpaqueTokenHandle;
 
 @Service
@@ -57,7 +58,7 @@ public class AuthenticationService {
 		UserDetails userDetails = userDetailsService.loadUserByUsername(loginUserDto.getUsername());
 
 		String accessToken = jwtHandle.createJsonWebToken(userDetails,
-				JwtExpirationConstants.GENERAL_ACCESS_TOKEN_EXPIRATION_MILLISEC);
+				JwtExpirationConstants.GENERAL_ACCESS_TOKEN_EXPIRATION_MILLISEC, JwtScopeClaim.ACCESS);
 		String refreshToken = refHandle.createRefreshToken();
 
 		/* Save user-refreshToken pair in Redis cache */

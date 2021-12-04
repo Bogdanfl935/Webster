@@ -17,6 +17,7 @@ import com.webster.msauth.exception.InvalidRefreshTokenProvidedException;
 import com.webster.msauth.models.RefreshToken;
 import com.webster.msauth.repository.RefreshTokenRepository;
 import com.webster.msauth.token.JwtHandle;
+import com.webster.msauth.token.JwtScopeClaim;
 
 @Service
 public class RefreshmentService {
@@ -36,13 +37,10 @@ public class RefreshmentService {
 
 		RefreshToken foundToken = locatedToken.get();
 		UserDetails userDetails = userDetailsService.loadUserByUsername(foundToken.getUsername());
-		String accessToken = tokenHandle.createJsonWebToken(userDetails, JwtExpirationConstants.GENERAL_ACCESS_TOKEN_EXPIRATION_MILLISEC);
+		String accessToken = tokenHandle.createJsonWebToken(userDetails,
+				JwtExpirationConstants.GENERAL_ACCESS_TOKEN_EXPIRATION_MILLISEC, JwtScopeClaim.ACCESS);
 
-		return RefreshmentResponse.builder()
-				.accessToken(accessToken)
-				.type(JwtHandle.DEFAULT_TOKEN_TYPE)
-				.subject(userDetails.getUsername())
-				.refreshTokenExpiration(foundToken.getTimeout())
-				.build();
+		return RefreshmentResponse.builder().accessToken(accessToken).type(JwtHandle.DEFAULT_TOKEN_TYPE)
+				.subject(userDetails.getUsername()).refreshTokenExpiration(foundToken.getTimeout()).build();
 	}
 }

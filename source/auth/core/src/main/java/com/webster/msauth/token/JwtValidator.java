@@ -29,21 +29,19 @@ public class JwtValidator {
 		return rawToken.replace(tokenPrefix, "");
 	}
 
-	public String validate(String token) {
-		String validationErrorMessage = attemptValidation(token);
+	public void validate(String token, JwtScopeClaim scopeClaim) {
+		String validationErrorMessage = attemptValidation(token, scopeClaim);
 
 		if (validationErrorMessage != null) {
 			throw new InvalidAccessTokenProvidedException(validationErrorMessage);
 		}
-
-		return tokenHandle.getJwtSubject(token);
 	}
 
-	private String attemptValidation(String token) {
+	private String attemptValidation(String token, JwtScopeClaim scopeClaim) {
 		String exceptionMessage = null;
 
 		try {
-			if (!tokenHandle.isValidJwt(token)) {
+			if (!tokenHandle.isValidJwt(token, scopeClaim)) {
 				exceptionMessage = AuthExceptionMessage.INVALID_ACCESS_TOKEN_PROVIDED.getErrorMessage();
 			}
 		} catch (ExpiredJwtException exception) {

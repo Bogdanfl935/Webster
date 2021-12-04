@@ -1,6 +1,7 @@
 package com.webster.msauth.token;
 
 import java.util.Date;
+import java.util.NoSuchElementException;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -13,6 +14,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtParserBuilder;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.RequiredTypeException;
 
 @Service
 public class JwtHandle {
@@ -23,19 +25,30 @@ public class JwtHandle {
 	@Autowired
 	private JwtSecurity tokenSecurity;
 
-	public String createJsonWebToken(@NotNull UserDetails userDetails, @Positive Long expirationInMilisec) {
+	public String createJsonWebToken(@NotNull UserDetails userDetails, @Positive Long expirationInMilisec,
+			JwtScopeClaim scopeClaim) {
 		Date issuedAt = new Date();
 		JwtBuilder builtToken = Jwts.builder().setSubject(userDetails.getUsername()).setIssuedAt(issuedAt)
 				.setIssuer(tokenConfig.getTokenIssuer())
-				.setExpiration(new Date(issuedAt.getTime() + expirationInMilisec));
+				.setExpiration(new Date(issuedAt.getTime() + expirationInMilisec))
+				.claim(JwtScopeClaim.SCOPE_CLAIM, scopeClaim.getScope());
 		return tokenSecurity.signBuiltToken(builtToken).compact();
 	}
 
-	public boolean isValidJwt(String token) {
-		/* If token is ill formated or invalid, parsing of the JWT will throw an exception */
+	public boolean isValidJwt(@NotNull String token, @NotNull JwtScopeClaim scopeClaim) {
+		/*
+		 * If token is ill formated or invalid, parsing of the JWT will throw an
+		 * exception
+		 */
 		String issuer = getJwtIssuer(token);
+		JwtScopeClaim parsedClaim = null;
+		try {
+			parsedClaim = JwtScopeClaim.getAssociatedScope(getJwtClaim(token, JwtScopeClaim.SCOPE_CLAIM));
+		} catch (NoSuchElementException | RequiredTypeException exception) {
+			// Parsed claim remains null
+		}
 
-		return issuer.equals(tokenConfig.getTokenIssuer());
+		return scopeClaim.equals(parsedClaim) && issuer.equals(tokenConfig.getTokenIssuer());
 	}
 
 	public String getJwtSubject(String token) {
@@ -56,6 +69,11 @@ public class JwtHandle {
 	public String getJwtIssuer(String token) {
 		Claims extractedClaims = extractJwtClaims(token);
 		return extractedClaims.getIssuer();
+	}
+
+	public String getJwtClaim(String token, String claim) {
+		Claims extractedClaims = extractJwtClaims(token);
+		return extractedClaims.get(claim, String.class);
 	}
 
 	private Claims extractJwtClaims(@NotNull String token) {
