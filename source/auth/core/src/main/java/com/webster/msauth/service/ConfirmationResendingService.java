@@ -30,7 +30,6 @@ public class ConfirmationResendingService {
 
 		if (locatedUser.isEmpty()) {
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.USERNAME_NOT_FOUND;
-			exceptionMessage.setErrorParameter(accountNameDTO.getUsername());
 			throw new InvalidUsernameException(exceptionMessage.getErrorMessage());
 		}
 
@@ -38,7 +37,6 @@ public class ConfirmationResendingService {
 
 		if (user.isCredentialsNonExpired()) {
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.ACCOUNT_ALREADY_CONFIRMED;
-			exceptionMessage.setErrorParameter(accountNameDTO.getUsername());
 			throw new AccountAlreadyConfirmedException(exceptionMessage.getErrorMessage());
 		}
 

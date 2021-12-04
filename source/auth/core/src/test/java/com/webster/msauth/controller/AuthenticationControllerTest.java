@@ -36,7 +36,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.webster.msauth.constants.EndpointConstants;
-import com.webster.msauth.constants.ExternConfigValidationConstants;
 import com.webster.msauth.constants.ValidationConstants;
 import com.webster.msauth.dto.LoginUserDTO;
 import com.webster.msauth.dto.RefreshTokenDTO;

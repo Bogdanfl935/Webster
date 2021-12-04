@@ -29,7 +29,6 @@ public class ForgottenPasswordService {
 
 		if (locatedUser.isEmpty()) {
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.USERNAME_NOT_FOUND;
-			exceptionMessage.setErrorParameter(accountNameDTO.getUsername());
 			throw new InvalidUsernameException(exceptionMessage.getErrorMessage());
 		}
 

@@ -35,7 +35,6 @@ public class RegistrationService {
 		} catch (DataIntegrityViolationException exception) {
 			/* To-do: Check if constraint == app_user_username_key */
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.USERNAME_ALREADY_TAKEN;
-			exceptionMessage.setErrorParameter(registerUserDTO.getUsername());
 			throw new UsernameAlreadyTakenException(exceptionMessage.getErrorMessage());
 		}
 		
