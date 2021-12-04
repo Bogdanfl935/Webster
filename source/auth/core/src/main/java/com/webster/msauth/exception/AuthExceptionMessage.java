@@ -7,8 +7,8 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum AuthExceptionMessage {
-	USERNAME_NOT_FOUND("Username does not exist"), 
-	USERNAME_ALREADY_TAKEN("Username is already taken"),
+	USERNAME_NOT_FOUND("No account associated with username exists"), 
+	USERNAME_ALREADY_TAKEN("Username has already been taken"),
 	ACCOUNT_NOT_CONFIRMED("Email address has not yet been confirmed"),
 	ACCOUNT_ALREADY_CONFIRMED("Email address has already been confirmed"),
 	INVALID_USERNAME_OR_PASSWORD("Invalid username or password provided"),
