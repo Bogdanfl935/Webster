@@ -50,10 +50,7 @@ def make_confirmation_resending_post() -> tuple:
 def render_multichoice_page() -> tuple:
     status = 200
     return_content = render_template(template_constants.SECTION_HOME_PATH,
-            include_modals = (
-                template_constants.MODAL_MULTI_CHOICE_PATH,
-                template_constants.MODAL_LOGIN_PATH
-            )
+            include_modals = (template_constants.MODAL_MULTI_CHOICE_PATH,)
     )
 
     return return_content, status

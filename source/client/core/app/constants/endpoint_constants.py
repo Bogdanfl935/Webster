@@ -12,6 +12,7 @@ CRAWLED_CONTENT = "/crawled-content"
 # POST Endpoints
 REGISTRATION = "/registration"
 AUTHENTICATION = "/authentication"
+UNAUTHENTICATION = "/unauthentication"
 
 AUTHORIZATION = "/authorization"
 REFRESHMENT = "/refreshment"

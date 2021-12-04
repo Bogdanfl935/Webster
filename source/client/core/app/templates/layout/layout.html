@@ -21,7 +21,6 @@
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header  mdl-layout--fixed-drawer">
         <header class="mdl-layout__header mdl-layout__header--fixed-header">
             <div id="title" class="mdl-layout__header-row mdl-color--primary">
-
                 <span class="mdl-layout--small-screen-only mdl-layout-title mt-2">
                     <a href="{{ url_for(home_endpoint) }}" target="_self" id="small-title">
                         <h3>Webster</h3>
@@ -29,49 +28,24 @@
                 </span>
                 <div class="mdl-layout--large-screen-only mdl-layout__header-row mdl-color--primary"
                      id="title-large-spacer">
-
                 </div>
                 <div class="mdl-layout-spacer"></div>
             </div>
-
         </header>
         <div class="mdl-layout__drawer">
-
             <span class="mdl-layout-title mt-4">
                 <a href="" target="_self">
-
                     <h3>
                         <i class="fas fa-spider"></i>
                         Webster
                     </h3>
                 </a>
             </span>
-            <nav class="mdl-navigation">
-                <a class="mdl-navigation__link" href="{{ url_for(home_endpoint) }}">
-                    <div class="icon material-icons " role="presentation">home</div>
-                    Dashboard
-                </a>
-
                 {% if authenticated_user %}
-                <a class="mdl-navigation__link" href="{{ url_for(data_crawled_endpoint) }}">
-                    {% else %}
-                    <a class="mdl-navigation__link" data-toggle="modal" data-target="#login-modal" href="">
-                        {% endif %}
-                        <div class="icon material-icons " role="presentation">list</div>
-                        Data crawled
-                    </a>
-
-                    {% if authenticated_user %}
-                    <a class="mdl-navigation__link" href="{{ url_for(home_endpoint) }}">
-                        <div class="icon material-icons" role="presentation">person</div>
-                            Profile
-                        {% else %}
-                        <a class="mdl-navigation__link" data-toggle="modal" data-target="#login-modal" href="">
-                            <div class="icon material-icons" role="presentation">person</div>
-                            Log in
-                            {% endif %}
-                        </a>
-            </nav>
+                    {% include template_constants.LAYOUT_AUTH_TOOLBAR_PATH %}
+                {% else %}
+                    {% include template_constants.LAYOUT_NOAUTH_TOOLBAR_PATH %}
+                {% endif %}
         </div>
         <main class="mdl-layout__content">
             <section class="mdl-layout__tab-panel is-active" id="scroll-tab-1">
@@ -83,6 +57,13 @@
             </section>
         </main>
     </div>
+    <!--Mandatory modals-->
+    {% if authenticated_user %}
+        {% include template_constants.MODAL_LOGOUT_PATH %}
+    {% else %}
+        {% include template_constants.MODAL_LOGIN_PATH %}
+    {% endif %}
+    <!--Optional modals-->
     {% for modal_path in include_modals %}
         {% include modal_path %}
     {% endfor %}
