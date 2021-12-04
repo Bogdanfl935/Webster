@@ -1,7 +1,8 @@
-from app.constants import endpoint_constants, main_endpoint_handler_constants
-from flask import request, url_for
+from app.constants import endpoint_constants, template_constants
+from flask import request
 from app.utilities.url_joiner import urljoin
 from app.utilities.api_response_parser import *
+from flask.templating import render_template
 import requests
 
 def make_password_forgotten_confirmation_post(confirmation_token: str, token_type: str) -> tuple:
@@ -19,16 +20,10 @@ def send_notification_request(notification_endpoint: str, request_body: dict) ->
     match response.status_code:
         case 200:
             # Email confirmation has been sent successfully
-            return_content = dict(
-                url=url_for(main_endpoint_handler_constants.HANDLE_HOME_GET),
-                redirect=True
-            )
+            return_content = dict(renderModalTemplate = render_template(template_constants.MODAL_NOTIFICATION_SENT_PATH))
         case _:
             # Email delivery failure
-            return_content = dict(
-                url=request.referrer,
-                redirect=True
-            )
+            return_content = dict(url = request.referrer)
             print("Error occured: " + str(response.json()))
             pass
 

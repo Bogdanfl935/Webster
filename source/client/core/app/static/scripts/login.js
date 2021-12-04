@@ -46,35 +46,76 @@ function makeFormAjaxCall(form) {
         url: $(form).attr('action'),
         data: $(form).serialize(),
         success: (data) => { handleFormSubmitSuccessResponse(form, data); },
-        error: (data) => { handleFormSubmitErrorResponse(form, data); }
+        error: (data) => { 
+            if (data.responseJSON) {
+                handleFormSubmitErrorResponse(form, data); 
+            }
+        }
     });
 }
 
 function handleFormSubmitSuccessResponse(form, response) {
     form.reset();
     $(form).find("input[required]").removeClass('was-validated');
-    if (response.redirect === true) {
+    if (response.url != null) {
         window.location.replace(response.url);
+    }
+    else if(response.renderModalTemplate != null){
+        renderFeedbackModalTemplate(response.renderModalTemplate);
     }
 }
 
 function handleFormSubmitErrorResponse(form, response) {
-    if (response.responseJSON.redirect === true) {
+    if (response.responseJSON.url != null) {
         window.location.href = response.responseJSON.url;
     }
-    else if ([400, 401, 409].includes(response.status)) {
-        let prevSibling = $(form).find("button").prev("div[class*='error-feedback']");
-        if (prevSibling.length == 0) {
-            let invalidSpan = document.createElement("span");
-            prevSibling = document.createElement("div");
-            $(prevSibling).addClass("col-12 mb-3 error-feedback");
-            $(invalidSpan).addClass("invalid-feedback d-block");
-            prevSibling.appendChild(invalidSpan);
-            $(form).find("button").before(prevSibling);
-        }
-
-        $(prevSibling).children().first().text(response.responseJSON.error);
+    else if(response.responseJSON.renderModalTemplate != null){
+        renderFeedbackModalTemplate(response.responseJSON.renderModalTemplate);
     }
+    else {
+        switch (response.status) {
+            case 400:
+                ajaxHandle400Response(form, response.responseJSON.error);
+                break;
+            case 401:
+                // Intentional fall-through
+            case 403:
+                // Intentional fall-through
+            case 409:
+                ajaxHandle401_403_409Response(form, response.responseJSON.error);
+                break;
+            default:
+                break;
+        }   
+    }
+}
+
+function ajaxHandle400Response(form, error_list){
+    $(error_list).each((_index, error_json) => {
+        $(form).find("input[name=" + error_json.fieldName + "]").each((_index, input_field) => {
+            let feedback_label = $(input_field).next("label[class*='invalid-feedback']");
+            if (feedback_label.length == 0) {
+                let feedback_label = document.createElement("label");
+                $(feedback_label).addClass("invalid-feedback");
+                $(input_field).after(feedback_label);
+            }
+            $(feedback_label).text(error_json.errorMessage);
+        });
+    });
+    $(form).addClass("is-invalid");
+}
+
+function ajaxHandle401_403_409Response(form, error_message){
+    let prevSibling = $(form).find("button").prev("div[class*='error-feedback']");
+    if (prevSibling.length == 0) {
+        let invalidSpan = document.createElement("span");
+        prevSibling = document.createElement("div");
+        $(prevSibling).addClass("col-12 mb-3 error-feedback");
+        $(invalidSpan).addClass("invalid-feedback d-block");
+        prevSibling.appendChild(invalidSpan);
+        $(form).find("button").before(prevSibling);
+    }
+    $(prevSibling).children().first().text(error_message);
 }
 
 function bindFormValidationHandler(form, rules, messages) {

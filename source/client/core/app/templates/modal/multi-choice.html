@@ -1,4 +1,4 @@
-<div class="modal fade popup-on-launch" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade popup-on-launch intrusive-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content overflow-hidden">
             <div class="modal-header border-bottom-0">
@@ -31,7 +31,8 @@
             -->
             <div class="modal-body d-none" data-togglee="reset-togglee" data-toggle-group="reset-confirmation">
                 <div>
-                    <form class="ajax-handled" method="post" action="{{ url_for(password_change_endpoint) }}" novalidate>
+                    <form class="ajax-handled" method="post" action="{{ url_for(password_change_endpoint) }}" novalidate
+                    data-form-type="authentication">
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">
@@ -52,7 +53,8 @@
             -->
             <div class="modal-body d-none" data-togglee="confirmation-togglee" data-toggle-group="reset-confirmation">
                 <div>
-                    <form class="ajax-handled" method="post" action="{{ url_for(confirmation_resending_post_endpoint) }}" novalidate>
+                    <form class="ajax-handled" method="post" action="{{ url_for(confirmation_resending_post_endpoint) }}" novalidate
+                    data-form-type="authentication">
                         <div class="col-auto">
                             <div class="input-group my-4">
                                 <div class="input-group-prepend">

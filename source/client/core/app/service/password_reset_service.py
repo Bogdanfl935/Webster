@@ -1,6 +1,6 @@
 from app.service import authorization_service, email_notification_service
-from app.constants import template_constants, endpoint_constants, main_endpoint_handler_constants
-from flask import request, abort, url_for, render_template
+from app.constants import template_constants, endpoint_constants
+from flask import request, abort, render_template
 from app.utilities.api_response_parser import *
 import requests
 
@@ -37,23 +37,16 @@ def make_password_resetting_post():
     headers = dict(Authorization=reset_token)
     response = requests.post(endpoint_constants.AUTH_MS_URL + endpoint_constants.PASSWORD_RESETTING, headers=headers, json=request_body)
     return_content = None
-
     match response.status_code:
         case 200:
-            return_content = dict(
-                url=url_for(main_endpoint_handler_constants.HANDLE_HOME_GET),
-                redirect=True
-            )
+            return_content = dict(renderModalTemplate = render_template(template_constants.MODAL_ACCOUNT_UPDATED_PATH))
         case 400:
             # Bad form data transmitted
             errors = extract_errors_response(response.json())
             # Return errors as JSON for client-side processing
             return_content = dict(error=errors)
         case 401:
-            # Unauthorized
-            message = extract_message_response(response.json())
-            # Return errors as JSON for client-side processing
-            return_content = dict(error=message)
+            return_content = dict(renderModalTemplate = render_template(template_constants.MODAL_BAD_TOKEN_PATH))
         case _:
             abort(response.status_code)
 

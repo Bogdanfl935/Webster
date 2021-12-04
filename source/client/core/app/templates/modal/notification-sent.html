@@ -8,33 +8,24 @@
             </div>
             <div class="modal-body d-block">
                 <div class="text-center">
-                    <h1>Activate account</h1>
+                    <h1>Notification Sent</h1>
                 </div>
             </div>
             <div class="modal-footer row text-center justify-content-center">
                 <div class="col-auto d-flex flex-column">
-                    <span class="lead">We are glad to see you joining Webster!</span>
-                    <span class="lead">You are one click away from activating your account.</span>
+                    <span class="lead">A notification has been sent to your email address</span>
                 </div>
                 <div class="col-auto my-5">
                     <img class="w-25 rounded mx-auto"
                         src="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.IMAGES_LOGO_PATH) }}"
                         border="0">
                 </div>
-                <div class="col-auto">
-                    <span class="lead"><strong>Press the button below to confirm your email address for 
-                        your account <em>{{ confirmation_email }}</em>.</strong></span>
-                </div>
-                <div class="col-auto">
-                    <form class="ajax-handled" action="{{ url_for(confirmation_endpoint) }}" method="POST">
-                        <input type="hidden" name="token" value="{{ token }}">
-                        <input type="hidden" name="type" value="{{ token_type }}">
-                        <button class="btn btn-dark mt-3" type="submit">Confirm address</button>
-                    </form>
+                <div class="col-auto d-flex flex-column">
+                    <span class="lead">Follow the instructions within the email to proceed</span>
                 </div>
             </div>
             <div class="modal-footer d-flex justify-content-center">
-                <div>Button does not work? <a href="{{ url_for(confirmation_resending_get_endpoint) }}"
+                <div>Confirmation not received? <a href="{{ url_for(confirmation_resending_get_endpoint) }}"
                         class="text-info">Resend
                         confirmation</a>.
                 </div>
