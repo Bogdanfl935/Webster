@@ -23,12 +23,11 @@ def get_config():
 
     return json_config
 
-def start_crawling(url):
-    page = requests.get(url)
-
+def start_crawling(url, html):
     dictPage = dict()
-    dictPage["url"] = page.url
-    dictPage["html"] = page.content.decode('utf-8')
+
+    dictPage["url"] = url
+    dictPage["html"] = html
 
     dictPage = json.dumps(dictPage)
 
@@ -41,7 +40,6 @@ def start_crawling(url):
 
     return resp_size
 
-# this can stay
 async def fetch_html(url: str, session: ClientSession, **kwargs) -> str:
     """GET request wrapper to fetch page HTML.
 
@@ -53,7 +51,6 @@ async def fetch_html(url: str, session: ClientSession, **kwargs) -> str:
     html = await resp.text()
     return html
 
-# do parsing here?
 async def parse(url: str, session: ClientSession, **kwargs) -> set:
     """Find HREFs in the HTML of `url`."""
     found = set()
@@ -67,15 +64,7 @@ async def parse(url: str, session: ClientSession, **kwargs) -> set:
     except Exception as e:
         return found
     else:
-        # this bit is not async
-        # put our bit here++
-        for link in HREF_RE.findall(html):
-            try:
-                abslink = urllib.parse.urljoin(url, link)
-            except (urllib.error.URLError, ValueError):
-                pass
-            else:
-                found.add(abslink)
+        found.add(start_crawling(url, html))
         return found
 
 
@@ -95,34 +84,24 @@ async def do_crawling(url):
     urls=[url]
     file = "output.txt"
 
+    # json_config = get_config()
+    #
+    # max_total_size = int(json_config["storage-limit"][0])
+    # max_total_size = max_total_size * 10 ** 6
+
     async with ClientSession() as session:
         tasks = []
-        # we would need all the urls at once, make the no of pulled urls from DB inf
-        # or put a double loop, segment the async bit
-        # run on urls from db as prev++
         while len(urls) > 0:
             for url in urls:
                 tasks.append(
                     functools.partial(write_one, file=file, url=url, session=session)
                 )
                 urls.remove(url)
-                print(urls)
             if len(urls) < 1:
                 next_links_from_db = get_next_link()
                 urls = next_links_from_db["urls"]
-                print(urls)
-            # await asyncio.gather(*tasks)
             await asyncio.gather(*[func() for func in tasks])
-            # try:
-            #     await asyncio.gather(*tasks)
-            # except Exception:
-            #     pass
 
-
-    # json_config = get_config()
-    #
-    # max_total_size = int(json_config["storage-limit"][0])
-    # max_total_size = max_total_size * 10 ** 6
     #
     # crawled_size = start_crawling(url)
     # while crawled_size < max_total_size:
