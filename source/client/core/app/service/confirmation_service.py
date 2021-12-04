@@ -17,14 +17,9 @@ def make_confirmation_post() -> tuple:
 
     match response.status_code:
         case 200:
-            return_content = redirect(url_for(main_endpoint_handler_constants.HANDLE_HOME_GET))
+            return_content = dict(renderModalTemplate = render_template(template_constants.MODAL_ACCOUNT_UPDATED_PATH))
         case 400 | 401 | 403:
-            return_content = render_template(template_constants.SECTION_HOME_PATH,
-                include_modals = (
-                    template_constants.MODAL_BAD_TOKEN_PATH,
-                    template_constants.MODAL_LOGIN_PATH
-                )
-            )
+            return_content = dict(renderModalTemplate = render_template(template_constants.MODAL_BAD_TOKEN_PATH))
         case _:
             abort(response.status_code)
 

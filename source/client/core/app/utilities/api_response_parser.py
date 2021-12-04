@@ -1,6 +1,5 @@
 def extract_errors_response(response: dict) -> str:
-    formatted_errors_list = [error_dict["defaultMessage"] for error_dict in response["errors"]]
-    return "\n".join(formatted_errors_list)
+    return response["errors"]
 
 def extract_message_response(response: dict) -> str:
     return response["message"]

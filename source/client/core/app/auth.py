@@ -2,7 +2,6 @@ from app.constants import auth_endpoint_handler_constants
 from app.service import registration_service, authentication_service,\
 authorization_service, confirmation_service, password_reset_service
 from app.service.authorization_service import require_access_token
-from flask import render_template_string
 from app.constants import endpoint_constants
 from app.utilities.api_response_parser import *
 from flask import Blueprint
