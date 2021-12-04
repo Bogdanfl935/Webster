@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.webster.msauth.dto.AuthorizationResponse;
 import com.webster.msauth.token.JwtHandle;
+import com.webster.msauth.token.JwtScopeClaim;
 import com.webster.msauth.token.JwtValidator;
 
 @Service
@@ -18,14 +19,14 @@ public class AuthorizationService {
 	@Autowired
 	private JwtValidator tokenValidator;
 
-	public AuthorizationResponse validate(@NotNull String rawToken) {
+	public AuthorizationResponse validate(@NotNull String rawToken, JwtScopeClaim scopeClaim) {
 		String token = tokenValidator.stripTokenPrefix(rawToken);
 		/* If token is invalid, an exception will be thrown */
-		String subject = tokenValidator.validate(token);
+		tokenValidator.validate(token, scopeClaim);
 
 		Long accessTokenExpiration = TimeUnit.MILLISECONDS
 				.toSeconds(tokenHandle.getJwtExpiration(token).getTime() - System.currentTimeMillis());
-		return new AuthorizationResponse(accessTokenExpiration, subject);
+		return new AuthorizationResponse(accessTokenExpiration, tokenHandle.getJwtSubject(token));
 	}
 
 }

@@ -11,6 +11,7 @@ import com.webster.msauth.exception.InvalidUsernameException;
 import com.webster.msauth.models.User;
 import com.webster.msauth.repository.UserRepository;
 import com.webster.msauth.token.JwtHandle;
+import com.webster.msauth.token.JwtScopeClaim;
 import com.webster.msauth.token.JwtValidator;
 
 @Service
@@ -25,7 +26,7 @@ public class ConfirmationService {
 	public void confirm(String rawToken) {
 		String token = tokenValidator.stripTokenPrefix(rawToken);
 		/* If token is invalid, an exception will be thrown */
-		tokenValidator.validate(token);
+		tokenValidator.validate(token, JwtScopeClaim.CONFIRM);
 
 		String username = tokenHandle.getJwtSubject(token);
 		Optional<User> locatedUser = userRepository.findByUsername(username);

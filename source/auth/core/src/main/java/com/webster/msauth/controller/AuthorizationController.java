@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -16,6 +17,7 @@ import com.webster.msauth.dto.RefreshTokenDTO;
 import com.webster.msauth.dto.RefreshmentResponse;
 import com.webster.msauth.service.AuthorizationService;
 import com.webster.msauth.service.RefreshmentService;
+import com.webster.msauth.token.JwtScopeClaim;
 
 @RestController
 public class AuthorizationController {
@@ -24,10 +26,11 @@ public class AuthorizationController {
 	@Autowired
 	private RefreshmentService refreshmentService;
 
-	@PostMapping(EndpointConstants.AUTHORIZATION)
+	@PostMapping(EndpointConstants.AUTHORIZATION + "/{" + JwtScopeClaim.SCOPE_CLAIM + "}")
 	public ResponseEntity<AuthorizationResponse> handleAuthorization(
+			@PathVariable(JwtScopeClaim.SCOPE_CLAIM) JwtScopeClaim scope,
 			@RequestHeader(value = EndpointConstants.AUTHORIZATION_HEADER) String authToken) {
-		AuthorizationResponse authorizationResponse = authorizationService.validate(authToken);
+		AuthorizationResponse authorizationResponse = authorizationService.validate(authToken, scope);
 		return ResponseEntity.status(HttpStatus.OK).body(authorizationResponse);
 	}
 

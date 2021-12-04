@@ -17,6 +17,7 @@ import com.webster.msauth.models.CustomUserDetails;
 import com.webster.msauth.models.User;
 import com.webster.msauth.repository.UserRepository;
 import com.webster.msauth.token.JwtHandle;
+import com.webster.msauth.token.JwtScopeClaim;
 
 @Service
 public class ConfirmationResendingService {
@@ -41,7 +42,8 @@ public class ConfirmationResendingService {
 		}
 
 		String confirmationToken = tokenHandle.createJsonWebToken(new CustomUserDetails(user),
-				JwtExpirationConstants.EMAIL_CONFIRMATION_TOKEN_EXPIRATION_MILLISEC);
+				JwtExpirationConstants.EMAIL_CONFIRMATION_TOKEN_EXPIRATION_MILLISEC, JwtScopeClaim.CONFIRM);
+
 		return new ConfirmationTokenResponse(confirmationToken, JwtHandle.DEFAULT_TOKEN_TYPE);
 	}
 }

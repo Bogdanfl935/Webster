@@ -1,3 +1,4 @@
+from app.constants.token_scope import TokenScope
 from app.service import authorization_service, email_notification_service
 from app.constants import template_constants, endpoint_constants
 from flask import request, abort, render_template
@@ -53,4 +54,4 @@ def make_password_resetting_post():
     return return_content, response.status_code
 
 def do_prerender_validation():
-    return authorization_service.validate_token(template_constants.MODAL_PASSWORD_RESET_PATH)
+    return authorization_service.validate_token(template_constants.MODAL_PASSWORD_RESET_PATH, TokenScope.RESET)

@@ -15,6 +15,7 @@ import com.webster.msauth.models.CustomUserDetails;
 import com.webster.msauth.models.User;
 import com.webster.msauth.repository.UserRepository;
 import com.webster.msauth.token.JwtHandle;
+import com.webster.msauth.token.JwtScopeClaim;
 
 @Service
 public class RegistrationService {
@@ -29,7 +30,7 @@ public class RegistrationService {
 		User unconfirmedUser = userDtoToEntityMapperService.mapToUser(registerUserDTO);
 		unconfirmedUser.setCredentialsNonExpired(false);
 		unconfirmedUser.setEnabled(true);
-		
+
 		try {
 			userRepository.save(unconfirmedUser);
 		} catch (DataIntegrityViolationException exception) {
@@ -37,9 +38,10 @@ public class RegistrationService {
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.USERNAME_ALREADY_TAKEN;
 			throw new UsernameAlreadyTakenException(exceptionMessage.getErrorMessage());
 		}
-		
+
 		String confirmationToken = tokenHandle.createJsonWebToken(new CustomUserDetails(unconfirmedUser),
-				JwtExpirationConstants.EMAIL_CONFIRMATION_TOKEN_EXPIRATION_MILLISEC);
+				JwtExpirationConstants.EMAIL_CONFIRMATION_TOKEN_EXPIRATION_MILLISEC, JwtScopeClaim.CONFIRM);
+		
 		return new ConfirmationTokenResponse(confirmationToken, JwtHandle.DEFAULT_TOKEN_TYPE);
 	}
 

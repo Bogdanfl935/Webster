@@ -31,6 +31,7 @@ import org.postgresql.util.Base64;
 import com.webster.msauth.models.CustomUserDetails;
 import com.webster.msauth.token.JwtConfig;
 import com.webster.msauth.token.JwtHandle;
+import com.webster.msauth.token.JwtScopeClaim;
 import com.webster.msauth.token.JwtSecurity;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -70,27 +71,27 @@ class TokenHandleTest {
 	@Test
 	void verificationSuccessTokenIsValidForActuallyValidToken() {
 		// Given
-		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration);
+		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration, JwtScopeClaim.ACCESS);
 
 		// When & Then
-		assertThat(tokenHandle.isValidJwt(token)).isTrue();
+		assertThat(tokenHandle.isValidJwt(token, JwtScopeClaim.ACCESS)).isTrue();
 	}
 
 	@Test
 	void verificationFailForExpiredToken() throws InterruptedException {
 		// Given
 		expiration = 1L;
-		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration);
+		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration, JwtScopeClaim.ACCESS);
 
 		// When & Then
 		Thread.sleep(2);
-		assertThatThrownBy(() -> tokenHandle.isValidJwt(token)).isInstanceOf(ExpiredJwtException.class);
+		assertThatThrownBy(() -> tokenHandle.isValidJwt(token, JwtScopeClaim.ACCESS)).isInstanceOf(ExpiredJwtException.class);
 	}
 
 	@RepeatedTest(value = 3)
 	void verificationFailForTokenWithDifferentSecretKey() {
 		// Given
-		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration);
+		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration, JwtScopeClaim.ACCESS);
 
 		// When
 		byte[] bytes = new byte[512];
@@ -99,19 +100,19 @@ class TokenHandleTest {
 				.when(tokenSecurity).setTokenParserKey(any(JwtParserBuilder.class));
 
 		// Then
-		assertThatThrownBy(() -> tokenHandle.isValidJwt(token)).isInstanceOf(SignatureException.class);
+		assertThatThrownBy(() -> tokenHandle.isValidJwt(token, JwtScopeClaim.ACCESS)).isInstanceOf(SignatureException.class);
 	}
 
 	@Test
 	void verificationSuccessTokenIsInvalidForTokenWithDifferentIssuer() {
 		// Given
-		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration);
+		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration, JwtScopeClaim.ACCESS);
 
 		// When
 		doReturn(tokenConfig.getTokenIssuer() + "Suffix").when(tokenConfig).getTokenIssuer();
 
 		// Then
-		assertThat(tokenHandle.isValidJwt(token)).isFalse();
+		assertThat(tokenHandle.isValidJwt(token, JwtScopeClaim.ACCESS)).isFalse();
 	}
 
 	@ParameterizedTest()
@@ -131,19 +132,19 @@ class TokenHandleTest {
 				.signBuiltToken(any(JwtBuilder.class));
 		doAnswer(invocation -> invocation.getArgument(0, JwtParserBuilder.class).setSigningKey(key)).when(tokenSecurity)
 				.setTokenParserKey(any(JwtParserBuilder.class));
-		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration);
+		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration, JwtScopeClaim.ACCESS);
 		String tamperedHeader = Base64
 				.encodeBytes(String.format("{\"alg\":\"%s\"}", alternativeSignAlg.toString()).getBytes());
 		String tamperedToken = token.replaceFirst(".+?\\.", tamperedHeader + ".");
 
 		// Then
-		assertThatThrownBy(() -> tokenHandle.isValidJwt(tamperedToken)).isInstanceOf(JwtException.class);
+		assertThatThrownBy(() -> tokenHandle.isValidJwt(tamperedToken, JwtScopeClaim.ACCESS)).isInstanceOf(JwtException.class);
 	}
 
 	@RepeatedTest(value = 3)
 	void verificationFailForTamperedPayloadToken() throws NoSuchAlgorithmException {
 		// Given
-		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration);
+		String token = tokenHandle.createJsonWebToken(customUserDetails, expiration, JwtScopeClaim.ACCESS);
 
 		String base64JwtChars = "0123456789abcdefghijklmnopqrstuvwxyz=-_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		SecureRandom secureRandom = SecureRandom.getInstanceStrong();
@@ -154,7 +155,7 @@ class TokenHandleTest {
 		String tamperedWithToken = String.join(".", tokenSection);
 
 		// When & Then
-		assertThatThrownBy(() -> tokenHandle.isValidJwt(tamperedWithToken)).isInstanceOf(SignatureException.class);
+		assertThatThrownBy(() -> tokenHandle.isValidJwt(tamperedWithToken, JwtScopeClaim.ACCESS)).isInstanceOf(SignatureException.class);
 	}
 
 }

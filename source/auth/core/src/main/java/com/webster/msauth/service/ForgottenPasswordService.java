@@ -16,6 +16,7 @@ import com.webster.msauth.models.CustomUserDetails;
 import com.webster.msauth.models.User;
 import com.webster.msauth.repository.UserRepository;
 import com.webster.msauth.token.JwtHandle;
+import com.webster.msauth.token.JwtScopeClaim;
 
 @Service
 public class ForgottenPasswordService {
@@ -35,7 +36,8 @@ public class ForgottenPasswordService {
 		User user = locatedUser.get();
 
 		String resetPassToken = tokenHandle.createJsonWebToken(new CustomUserDetails(user),
-				JwtExpirationConstants.RESET_PASSWORD_TOKEN_EXPIRATION_MILLISEC);
+				JwtExpirationConstants.RESET_PASSWORD_TOKEN_EXPIRATION_MILLISEC, JwtScopeClaim.RESET);
+
 		return new ConfirmationTokenResponse(resetPassToken, JwtHandle.DEFAULT_TOKEN_TYPE);
 	}
 

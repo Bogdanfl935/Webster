@@ -2,10 +2,11 @@ package com.webster.msauth.exception;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
+@AllArgsConstructor(access=AccessLevel.PRIVATE)
 public enum AuthExceptionMessage {
 	USERNAME_NOT_FOUND("No account associated with username exists"), 
 	USERNAME_ALREADY_TAKEN("Username has already been taken"),
