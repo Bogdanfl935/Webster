@@ -1,10 +1,10 @@
 from app.constants import auth_endpoint_handler_constants
 from app.service import registration_service, authentication_service,\
 authorization_service, confirmation_service, password_reset_service
-from app.service.authorization_service import require_access_token
+from app.service.authorization_service import no_auth_only, require_access_token
 from app.constants import endpoint_constants
 from app.utilities.api_response_parser import *
-from flask import Blueprint
+from flask import Blueprint, Response
 
 auth = Blueprint('auth', __name__)
 
@@ -13,6 +13,7 @@ def inject_context_constants() -> dict:
     return dict(
         registration_endpoint=auth_endpoint_handler_constants.HANDLE_REGISTRATION_POST,
         authentication_endpoint=auth_endpoint_handler_constants.HANDLE_AUTHENTICATION_POST,
+        unauthentication_endpoint=auth_endpoint_handler_constants.HANDLE_UNAUTHENTICATION_POST,
         password_resetting_endpoint=auth_endpoint_handler_constants.HANDLE_PASSWORD_RESETTING_POST,
         password_change_endpoint=auth_endpoint_handler_constants.HANDLE_PASSWORD_FORGOTTEN_POST,
         confirmation_resending_get_endpoint=auth_endpoint_handler_constants.HANDLE_CONFIRMATION_RESENDING_GET,
@@ -23,14 +24,17 @@ def inject_context_constants() -> dict:
 # GET ENDPOINTS
 
 @auth.route(endpoint_constants.CONFIRMATION_RESENDING, methods=['GET'])
+@no_auth_only
 def handle_confirmation_resending_get() -> tuple:
     return confirmation_service.render_multichoice_page()
 
 @auth.route(endpoint_constants.CONFIRMATION, methods=['GET'])
+@no_auth_only
 def handle_confirmation_get() -> tuple:
     return confirmation_service.do_prerender_validation()
 
 @auth.route(endpoint_constants.PASSWORD_RESETTING, methods=['GET'])
+@no_auth_only
 def handle_password_resetting_get() -> tuple:
     return password_reset_service.do_prerender_validation()
 
@@ -43,6 +47,11 @@ def handle_registration_post() -> tuple:
 @auth.route(endpoint_constants.AUTHENTICATION, methods=['POST'])
 def handle_authentication_post() -> tuple:
     return authentication_service.make_authentication_post()
+
+@auth.route(endpoint_constants.UNAUTHENTICATION, methods=['POST'])
+@require_access_token
+def handle_unauthentication_post(response_object: Response, authenticated_user: str):
+    return authentication_service.unauthenticate(response_object, authenticated_user)
 
 @auth.route(endpoint_constants.REFRESHMENT, methods=['POST'])
 def handle_refreshment_post() -> tuple:

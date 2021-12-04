@@ -1,19 +1,31 @@
 from functools import wraps
-from app.constants import endpoint_constants, browser_constants, template_constants
+from app.constants import endpoint_constants, browser_constants, template_constants, main_endpoint_handler_constants
 from app.constants.token_scope import TokenScope
 from app.utilities.api_response_parser import *
 from app.utilities.url_joiner import urljoin
 from app.service import cookie_service
-from flask import request, make_response, abort, render_template
+from flask import request, make_response, abort, render_template, redirect, url_for
 import requests
 
-def require_access_token(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
+def require_access_token(wrapped_function):
+    @wraps(wrapped_function)
+    def access_token_filter(*args, **kwargs):
         access_token = request.cookies.get(browser_constants.ACCESS_TOKEN_COOKIE)
-        response_object, authenticated_user = unpack_access_token(access_token)
-        return f(response_object, authenticated_user, *args, **kwargs)            
-    return decorated_function
+        response_object, status, authenticated_user = unpack_access_token(access_token)
+        if authenticated_user is None:
+            abort(status)
+        return wrapped_function(response_object, authenticated_user, *args, **kwargs)            
+    return access_token_filter
+
+def no_auth_only(wrapped_function):
+    @wraps(wrapped_function)
+    def no_cookies_filter(*args, **kwargs):
+        access_token = request.cookies.get(browser_constants.ACCESS_TOKEN_COOKIE)
+        _, _, authenticated_user = unpack_access_token(access_token)
+        if authenticated_user is not None:
+            return redirect(url_for(main_endpoint_handler_constants.HANDLE_HOME_GET))
+        return wrapped_function(*args, **kwargs)
+    return no_cookies_filter
 
 def make_authorization_post(token: str, token_scope: TokenScope):
     headers = dict(Authorization=token)
@@ -43,7 +55,7 @@ def make_refreshment_post():
             cookie_service.set_access_token_cookie(return_content, access_token, token_type)
     return return_content, status, authenticated_user
 
-def unpack_access_token(access_token: str):
+def unpack_access_token(access_token: str) -> tuple:
     # Anticipate bad request to avoid additional HTTP requests if not needed
     response, status = make_authorization_post(access_token, TokenScope.ACCESS) if access_token is not None else (None, 401)
     authenticated_user = None
@@ -53,13 +65,11 @@ def unpack_access_token(access_token: str):
         case 200:
             authenticated_user = extract_subject_response(response)
         case 401:
-            response_object, new_token_request_status, authenticated_user = make_refreshment_post()
-            if new_token_request_status != 200:
-                abort(status)
+            response_object, status, authenticated_user = make_refreshment_post()
         case _:
-            abort(status)
+            pass
 
-    return response_object, authenticated_user
+    return response_object, status, authenticated_user
             
 def validate_token(target_modal_path: str, token_scope: TokenScope) -> tuple:
     token = request.args.get('token')
@@ -69,20 +79,14 @@ def validate_token(target_modal_path: str, token_scope: TokenScope) -> tuple:
 
     if status == 200:
         return_content = render_template(template_constants.SECTION_HOME_PATH, 
-            include_modals = (
-                target_modal_path,
-                template_constants.MODAL_LOGIN_PATH
-            ),
+            include_modals = (target_modal_path,),
             confirmation_email = extract_subject_response(response),
             token = token,
             token_type = type
         )
     elif status == 401:
         return_content = render_template(template_constants.SECTION_HOME_PATH,
-            include_modals = (
-                template_constants.MODAL_BAD_TOKEN_PATH,
-                template_constants.MODAL_LOGIN_PATH
-            )
+            include_modals = (template_constants.MODAL_BAD_TOKEN_PATH,)
         )
     else:
         abort(status)

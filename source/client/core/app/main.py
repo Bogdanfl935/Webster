@@ -1,4 +1,4 @@
-from flask import render_template, Response, redirect, url_for
+from flask import render_template, Response
 from app.constants import app_constants, endpoint_constants, template_constants, static_constants, main_endpoint_handler_constants
 from werkzeug.exceptions import HTTPException
 from app.config.app_config import app
@@ -18,10 +18,7 @@ def inject_constants() -> dict:
 
 @app.errorhandler(401)
 def handle_unauthorized_error(exception: HTTPException) -> str:
-    rendered_template = render_template(
-        template_constants.SECTION_HOME_PATH,
-        include_modals=(template_constants.MODAL_LOGIN_PATH,)
-    )
+    rendered_template = render_template(template_constants.SECTION_HOME_PATH)
     return rendered_template, exception.code
 
 
