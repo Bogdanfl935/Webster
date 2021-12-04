@@ -47,7 +47,6 @@ public class AuthenticationService {
 		}
 		catch (CredentialsExpiredException exception) {
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.ACCOUNT_NOT_CONFIRMED;
-			exceptionMessage.setErrorParameter(loginUserDto.getUsername());
 			throw new AccountNotConfirmedException(exceptionMessage.getErrorMessage());
 		}
 		catch (AuthenticationException exception) {

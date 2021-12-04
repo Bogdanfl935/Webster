@@ -21,8 +21,6 @@ import com.webster.msauth.dto.RegisterUserDTO;
 import com.webster.msauth.exception.UsernameAlreadyTakenException;
 import com.webster.msauth.models.User;
 import com.webster.msauth.repository.UserRepository;
-import com.webster.msauth.service.RegistrationService;
-import com.webster.msauth.service.UserDtoToEntityMapperService;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

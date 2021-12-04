@@ -3,6 +3,7 @@ package com.webster.msauth.validation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import com.webster.msauth.constants.ValidationConstants;
 import com.webster.msauth.dto.PasswordCarrierDTO;
 
 public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch, PasswordCarrierDTO> {
@@ -10,7 +11,7 @@ public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch
 
 	@Override
 	public void initialize(PasswordMatch constraintAnnotation) {
-		message = constraintAnnotation.message();
+		message = ValidationConstants.CUSTOM_CONSTRAINT_PREFIX + constraintAnnotation.message();
 	}
 
 	@Override
@@ -19,7 +20,7 @@ public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch
 
 		if (!isMatch) {
 			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(message).addPropertyNode("confirmPassword").addConstraintViolation();
 		}
 
 		return isMatch;

@@ -24,7 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 		if (locatedUser.isEmpty()) {
 			AuthExceptionMessage exceptionMessage = AuthExceptionMessage.USERNAME_NOT_FOUND;
-			exceptionMessage.setErrorParameter(username);
 			throw new UsernameNotFoundException(exceptionMessage.getErrorMessage());
 		}
 

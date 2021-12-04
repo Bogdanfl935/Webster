@@ -10,6 +10,8 @@ public final class ValidationConstants {
 	public final static int PASSWORD_MAX_LENGTH = 30;
 	/* Refresh Token DTO */
 	public final static int REFRESH_TOKEN_MAX_LENGTH = 4 * OpaqueTokenHandle.OPAQUE_TOKEN_BYTE_LENGTH / 3 + 3;
+	
+	public final static String CUSTOM_CONSTRAINT_PREFIX = "%%CONTAINS_FIELDNAME%%";
 
 	private ValidationConstants() {
 	}
