@@ -1,3 +1,4 @@
+import functools
 import json
 import sys
 import time
@@ -5,6 +6,14 @@ import re
 import requests
 import constants
 import endpoint_constants
+import asyncio
+import urllib
+import aiofiles
+import aiohttp
+from aiohttp import ClientSession
+from typing import IO
+from app.get_total_size import total_size
+
 
 def get_config():
     req_crawling_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIG}',
@@ -13,12 +22,12 @@ def get_config():
 
     return json_config
 
-def start_crawling(url):
-    page = requests.get(url)
 
+def start_crawling(url, html):
     dictPage = dict()
-    dictPage["url"] = page.url
-    dictPage["html"] = page.content.decode('utf-8')
+
+    dictPage["url"] = url
+    dictPage["html"] = html
 
     dictPage = json.dumps(dictPage)
 
@@ -27,44 +36,84 @@ def start_crawling(url):
     send_to_parser = requests.post(url=parser_url, data=dictPage, headers={'Content-type': 'application/json'})
     parser_resp_json = send_to_parser.json()
 
-    resp_size = sys.getsizeof(parser_resp_json)
+    resp_size = total_size(parser_resp_json)
 
     return resp_size
 
-def do_crawling(url):
+
+async def fetch_html(url: str, session: ClientSession, **kwargs) -> str:
+    resp = await session.request(method="GET", url=url, **kwargs)
+    resp.raise_for_status()
+    html = await resp.text()
+    return html
+
+
+async def process_crawling(url: str, session: ClientSession, **kwargs) -> set:
+    size = 0
+    try:
+        html = await fetch_html(url=url, session=session, **kwargs)
+    except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+    ) as e:
+        return size
+    except Exception as e:
+        return size
+    else:
+        size = start_crawling(url, html)
+        return size
+
+
+async def crawled_size(url: str, **kwargs) -> None:
+    res = await process_crawling(url=url, **kwargs)
+    if not res:
+        return 0
+
+    return res
+
+
+async def do_crawling(url):
+    urls = [url]
+    file = "output.txt"
+
     json_config = get_config()
 
     max_total_size = int(json_config["storage-limit"][0])
     max_total_size = max_total_size * 10 ** 6
 
-    crawled_size = start_crawling(url)
-    while crawled_size < max_total_size:
-        if crawled_size == -1:
-            next_urls = get_next_link()
-            for el in next_urls["urls"]:
-                crawled_size = start_crawling(el)
-        else:
-            max_total_size = max_total_size - crawled_size
-            next_urls = get_next_link()
-            for el in next_urls["urls"]:
-                crawled_size = start_crawling(el)
+    async with ClientSession() as session:
+        tasks = []
+        while len(urls) > 0 and max_total_size > 0:
+            for url in urls:
+                tasks.append(
+                    functools.partial(crawled_size, url=url, session=session)
+                )
+                urls.remove(url)
+            if len(urls) < 1:
+                next_links_from_db = get_next_link()
+                urls = next_links_from_db["urls"]
+            result = await asyncio.gather(*[func() for func in tasks])
+            max_total_size = max_total_size - result[-1]
 
     return ('', 200)
+
 
 def get_next_link():
     json_config = get_config()
 
     if 'True' in json_config["same-page"]:
         return json.dumps({"urls": []})
-    
+
     post_to_next_link = {'quantity': constants.CRAWLER_NEXT_LINK_LIMIT}
 
-    req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}', data=json.dumps(post_to_next_link))
+    req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}',
+                                   data=json.dumps(post_to_next_link))
     if req_next_links.status_code == 200:
         next_links = req_next_links.json()
     elif req_next_links.status_code != 200:
         time.sleep(2)
-        req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}', data=json.dumps(post_to_next_link))
+        req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}',
+                                       data=json.dumps(post_to_next_link))
         if req_next_links.status_code != 200:
             next_links = {'error_code': req_next_links.status_code}
         else:
