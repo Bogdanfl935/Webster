@@ -1,4 +1,4 @@
-from app.constants import endpoint_constants, auth_endpoint_handler_constants, main_endpoint_handler_constants
+from app.constants import endpoint_constants, auth_endpoint_handler_constants, nav_endpoint_handler_constants
 from flask import request, abort, url_for, make_response, redirect, Response
 from app.utilities.api_response_parser import *
 from app.service import cookie_service
@@ -37,6 +37,6 @@ def make_authentication_post():
     return return_content, response.status_code
 
 def unauthenticate(response_object: Response, authenticated_user: str):
-    response_object = make_response(redirect(url_for(main_endpoint_handler_constants.HANDLE_HOME_GET)))
+    response_object = make_response(redirect(url_for(nav_endpoint_handler_constants.HANDLE_HOME_GET)))
     cookie_service.remove_cookies(response_object)
     return response_object
