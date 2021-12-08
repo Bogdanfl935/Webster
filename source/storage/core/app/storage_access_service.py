@@ -23,8 +23,10 @@ def add_link_to_db(request):
     json_links = links["links"]
 
     for link in json_links:
-        db.session.add(NextLinks(url_site=link))
-
-    db.session.commit()
+        try:
+            db.session.add(NextLinks(url_site=link))
+            db.session.commit()
+        except (TypeError):
+            db.session.rollback()
 
     return jsonify({"success": "True"})
