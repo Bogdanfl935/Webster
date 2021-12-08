@@ -8,6 +8,7 @@ DEFAULT = "/"
 HOME = "/home"
 ERROR = "/error"
 CRAWLED_CONTENT = "/crawled-content"
+CONFIGURATION = "/configuration"
 
 # POST Endpoints
 REGISTRATION = "/registration"
