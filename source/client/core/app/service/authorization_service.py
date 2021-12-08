@@ -1,5 +1,5 @@
 from functools import wraps
-from app.constants import endpoint_constants, browser_constants, template_constants, main_endpoint_handler_constants
+from app.constants import endpoint_constants, browser_constants, template_constants, nav_endpoint_handler_constants
 from app.constants.token_scope import TokenScope
 from app.utilities.api_response_parser import *
 from app.utilities.url_joiner import urljoin
@@ -23,7 +23,7 @@ def no_auth_only(wrapped_function):
         access_token = request.cookies.get(browser_constants.ACCESS_TOKEN_COOKIE)
         _, _, authenticated_user = unpack_access_token(access_token)
         if authenticated_user is not None:
-            return redirect(url_for(main_endpoint_handler_constants.HANDLE_HOME_GET))
+            return redirect(url_for(nav_endpoint_handler_constants.HANDLE_HOME_GET))
         return wrapped_function(*args, **kwargs)
     return no_cookies_filter
 

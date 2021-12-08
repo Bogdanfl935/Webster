@@ -1,0 +1,67 @@
+{% extends template_constants.LAYOUT_LAYOUT_PATH %}
+
+{% block head %}
+{{ super() }}
+
+<!-- Own include files -->
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.STYLES_CONFIGURATION_PATH) }}">
+
+{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <section class="section--center mdl-grid">
+        <div class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+            <div class="mdl-card__title">
+                <h3 class="mdl-card__title-text"> Crawler configuration </h3>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <div class="row py-2 px-3">
+                    {% for config in crawler_config %}
+                    <div class="mdl-cell--3-col-desktop mdl-cell--5-col-tablet mdl-cell--5-col-phone text-center d-flex">
+                        <h5 class='align-self-center'>{{ config.title }}</h5>
+                    </div>
+                    <div class="mdl-cell--2-col-desktop mdl-cell--3-col-tablet mdl-cell--2-col-phone">
+                        <div class="mx-1 row d-flex flex-nowrap">
+                            <input type="radio" class="btn-check" name="{{config.fieldName}}" id="success-outlined-{{loop.index0}}" 
+                            {% if config.active %} checked {% endif %}
+                            autocomplete="off">
+                            <label class="btn btn-outline-success col-6 rounded-left px-1" for="success-outlined-{{loop.index0}}">Yes</label>
+                            <input type="radio" class="btn-check" name="{{config.fieldName}}" id="danger-outlined-{{loop.index0}}"
+                            {% if not config.active %} checked {% endif %}
+                            autocomplete="off">
+                            <label class="btn btn-outline-danger col-6 rounded-right px-1" for="danger-outlined-{{loop.index0}}">No</label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+            <div class="mdl-card__title">
+                <h3 class="mdl-card__title-text"> Parser configuration </h3>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <button type="button" class="mx-2 btn btn-success">
+                    <span class="lead">New tag</span> <i class="fas fa-tags"></i>
+                </button>
+                <div class="py-2 mx-2 row gx-3 gy-2">
+                {% for config in parser_config %}
+                        <div class="col-md-3 mx-1 card">
+                            <div class="row">
+                                <div class="col-lg-10 col-10 col-sm-11 card-body overflow-hidden">
+                                    <kbd>&lt;{{ config.tag }}&gt;</kbd> 
+                                </div>
+                                <div class="col-lg-2 col-2 col-sm-1 card-body">
+                                    <a class="" href=""><i class="fas fa-trash-alt text-danger"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

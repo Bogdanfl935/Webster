@@ -33,6 +33,12 @@ if __name__ == "__main__":
             file_output_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, \
                 "constants/auth_endpoint_handler_constants.py"),
             keep_file_prefix = True
+        ),
+        dict(
+            file_input_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, "nav.py"), 
+            file_output_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, \
+                "constants/nav_endpoint_handler_constants.py"),
+            keep_file_prefix = True
         )
     ]
     for entity_dict in path_scanner_entities:
