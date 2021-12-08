@@ -3,9 +3,13 @@
         <div class="icon material-icons" role="presentation">home</div>
         Dashboard
     </a>
-    <a class="mdl-navigation__link" href="{{ url_for(data_crawled_endpoint) }}">
+    <a class="mdl-navigation__link" href="{{ url_for(activity_endpoint) }}">
         <div class="icon material-icons" role="presentation">list</div>
         Activity
+    </a>
+    <a class="mdl-navigation__link" href="{{ url_for(config_endpoint) }}">
+        <div class="icon material-icons" role="presentation">settings_ethernet</div>
+        Configuration
     </a>
     <a class="mdl-navigation__link" href="{{ url_for(home_endpoint) }}">
         <div class="icon material-icons" role="presentation">person</div>
