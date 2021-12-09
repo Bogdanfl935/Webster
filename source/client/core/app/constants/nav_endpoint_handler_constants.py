@@ -2,3 +2,4 @@
 HANDLE_HOME_GET = 'nav.handle_home_get'
 HANDLE_ACTIVITY_GET = 'nav.handle_activity_get'
 HANDLE_CONFIG_GET = 'nav.handle_config_get'
+HANDLE_ARCHIVE_GET = 'nav.handle_archive_get'

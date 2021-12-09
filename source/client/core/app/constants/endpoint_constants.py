@@ -7,8 +7,9 @@ NEXT_LINK = "/next-link"
 DEFAULT = "/"
 HOME = "/home"
 ERROR = "/error"
-CRAWLED_CONTENT = "/crawled-content"
+ACTIVITY = "/activity"
 CONFIGURATION = "/configuration"
+ARCHIVE = "/archive"
 
 # POST Endpoints
 REGISTRATION = "/registration"
