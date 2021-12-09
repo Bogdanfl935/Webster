@@ -32,8 +32,22 @@ def handle_home_get(response_object: Response, authenticated_user: str) -> str:
 def handle_activity_get(response_object: Response, authenticated_user: str) -> str:
     response_object.set_data(
         render_template(
-            template_constants.SECTION_ACTIVITY_PATH,
-            authenticated_user=authenticated_user
+            template_constants.SECTION_ACTIVITY_ACTIVE_PATH,
+            authenticated_user=authenticated_user,
+            parser_entries=[
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="div", size="41.53kB", domain="stackoverflow"),
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="input", size="1.09kB", domain="stackoverflow"),
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="img", size="79.53MB", domain="stackoverflow"),
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="title", size="0.02kB", domain="stackoverflow"),
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="form", size="12.91kB", domain="stackoverflow"),
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="style", size="273.11MB", domain="stackoverflow")
+            ]
         )
     )
     return response_object
