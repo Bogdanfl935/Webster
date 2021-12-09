@@ -1,0 +1,87 @@
+{% extends template_constants.LAYOUT_LAYOUT_PATH %}
+
+{% block head %}
+{{ super() }}
+
+<!-- Own include files -->
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.STYLES_ACTIVITY_PATH) }}">
+
+{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <section class="section--center mdl-grid">
+        <div class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+            <div class="mdl-card__title">
+                <h3 class="mdl-card__title-text"> Crawler status:
+                    <span class="badge badge-success mx-2">Active</span>
+                </h3>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <div class="row mb-3 py-2 px-3">
+                    <span class="lead">Crawler is currently operational</span>
+                </div>
+                <div class="input-group col-sm-12 col-md-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">URL</span>
+                      </div>
+                    <input type="text" class="form-control" placeholder="Source" name="startUrl" disabled>
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-danger" type="button">Stop crawling</button>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-5 my-3 d-flex flex-column">
+                    <div class="row my-2">
+                        <span class="lead my-1 col-12">Memory usage:</span>
+                        <span class="py-2 px-3 mx-2 col-auto badge badge-warning">80.43MB out of 100MB</span>
+                    </div>
+                    <div class="row my-2">
+                        <span class="lead my-1 col-12">Elapsed time:</span>
+                        <span class="py-2 px-3 mx-2 col-auto badge badge-dark">00d 23h 59m 31s</span>
+                    </div>
+                    <div class="row my-2">
+                        <span class="lead my-1 col-12">Currently crawling:</span>
+                        <span class="py-2 px-3 mx-2 col-auto badge badge-info" role='button'
+                        data-toggle="tooltip" data-placement="bottom" 
+                        title="https://stackoverflow.com/questions/2281087/center-a-div-in-css">stackoverflow</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+            <div class="mdl-card__title">
+                <h3 class="mdl-card__title-text"> Parsing history </h3>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <div class="row py-2 px-3">
+                    <table class="table">
+                        <thead class="thead-dark">
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Tag</th>
+                            <th scope="col">Size</th>
+                            <th scope="col">Domain</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in parser_entries %}
+                            <tr role='button' data-toggle="tooltip" data-placement="bottom"
+                            title="{{ entry.url }}">
+                                <th scope="row">{{loop.index0}}</th>
+                                <td><span class="badge badge-dark">&lt;{{ entry.tag }}&gt;</span></td>
+                                <td><span class="badge badge-danger">{{ entry.size }}</span></td>
+                                <td><span class="badge badge-info">{{ entry.domain }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                      </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    $("[data-toggle='tooltip']").tooltip();
+</script>
+{% endblock %}

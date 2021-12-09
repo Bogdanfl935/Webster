@@ -1,0 +1,54 @@
+{% extends template_constants.LAYOUT_LAYOUT_PATH %}
+
+{% block head %}
+{{ super() }}
+
+<!-- Own include files -->
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.STYLES_ACTIVITY_PATH) }}">
+
+{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <section class="section--center mdl-grid">
+        <div class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+            <div class="mdl-card__title">
+                <h3 class="mdl-card__title-text"> Crawler status:
+                    <span class="badge badge-danger mx-2">Inactive</span>
+                </h3>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <div class="row mb-3 py-2 px-3">
+                    <span class="lead">Launch crawler to monitor activity</span>
+                </div>
+                <div class="input-group col-sm-12 col-md-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">URL</span>
+                      </div>
+                    <input type="text" class="form-control" placeholder="Source" name="startUrl">
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-success" type="button">Crawl</button>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-5 my-3 d-flex flex-column">
+                    <div class="row my-2">
+                        <span class="lead my-1 col-12">Memory usage:</span>
+                        <span class="py-2 mx-2 col-auto badge badge-success">0.00MB out of 100MB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+            <div class="mdl-card__title">
+                <h3 class="mdl-card__title-text"> Parsing history </h3>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <div class="row py-2 px-3">
+                    <span class="lead">No parsing history available. Start crawler to view real time parsing activity</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

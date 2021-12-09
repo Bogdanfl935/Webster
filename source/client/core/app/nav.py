@@ -11,7 +11,8 @@ def inject_context_constants() -> dict:
     return dict(
         home_endpoint=nav_endpoint_handler_constants.HANDLE_HOME_GET,
         activity_endpoint=nav_endpoint_handler_constants.HANDLE_ACTIVITY_GET,
-        config_endpoint=nav_endpoint_handler_constants.HANDLE_CONFIG_GET
+        config_endpoint=nav_endpoint_handler_constants.HANDLE_CONFIG_GET,
+        archive_endpoint=nav_endpoint_handler_constants.HANDLE_ARCHIVE_GET
     )
 
 @nav.route(endpoint_constants.DEFAULT, methods=['GET'])
@@ -26,23 +27,27 @@ def handle_home_get(response_object: Response, authenticated_user: str) -> str:
     )
     return response_object
 
-@nav.route(endpoint_constants.CRAWLED_CONTENT, methods=['GET'])
+@nav.route(endpoint_constants.ACTIVITY, methods=['GET'])
 @require_access_token
 def handle_activity_get(response_object: Response, authenticated_user: str) -> str:
-    content_list = list()
-    hosts = ("Github", "Google", "Wikipedia",
-             "Youtube", "Jira", "Facebook", "Instagram")
-    for i in range(0, 15):
-        content_list.append({
-            "page_host": random.choice(hosts),
-            "time_taken": random.randint(1, 30),
-            "quantity_found": random.randint(1, 100),
-        })
     response_object.set_data(
         render_template(
-            template_constants.SECTION_CRAWLED_CONTENT_PATH,
+            template_constants.SECTION_ACTIVITY_ACTIVE_PATH,
             authenticated_user=authenticated_user,
-            crawled_content_list=content_list
+            parser_entries=[
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="div", size="41.53kB", domain="stackoverflow"),
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="input", size="1.09kB", domain="stackoverflow"),
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="img", size="79.53MB", domain="stackoverflow"),
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="title", size="0.02kB", domain="stackoverflow"),
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="form", size="12.91kB", domain="stackoverflow"),
+                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
+                     tag="style", size="273.11MB", domain="stackoverflow")
+            ]
         )
     )
     return response_object
@@ -89,6 +94,27 @@ def handle_config_get(response_object: Response, authenticated_user: str) -> str
                 dict(tag="input"),
                 dict(tag="rocket")
             ]
+        )
+    )
+    return response_object
+
+@nav.route(endpoint_constants.ARCHIVE, methods=['GET'])
+@require_access_token
+def handle_archive_get(response_object: Response, authenticated_user: str) -> str:
+    content_list = list()
+    hosts = ("Github", "Google", "Wikipedia",
+             "Youtube", "Jira", "Facebook", "Instagram")
+    for i in range(0, 15):
+        content_list.append({
+            "page_host": random.choice(hosts),
+            "time_taken": random.randint(1, 30),
+            "quantity_found": random.randint(1, 100),
+        })
+    response_object.set_data(
+        render_template(
+            template_constants.SECTION_ARCHIVE_PATH,
+            authenticated_user=authenticated_user,
+            crawled_content_list=content_list
         )
     )
     return response_object
