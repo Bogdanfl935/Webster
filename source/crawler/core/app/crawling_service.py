@@ -14,6 +14,7 @@ from aiohttp import ClientSession
 from typing import IO
 from app.get_total_size import total_size
 
+last_crawled_links = list()
 
 def get_config():
     req_crawling_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIG}',
@@ -44,6 +45,9 @@ def start_crawling(url, html):
 async def fetch_html(url: str, session: ClientSession, **kwargs) -> str:
     resp = await session.request(method="GET", url=url, **kwargs)
     resp.raise_for_status()
+
+    last_crawled_links.append(url)
+
     html = await resp.text()
     return html
 
@@ -97,7 +101,6 @@ async def do_crawling(url):
 
     return ('', 200)
 
-
 def get_next_link():
     json_config = get_config()
 
@@ -120,3 +123,9 @@ def get_next_link():
             next_links = req_next_links.json()
 
     return next_links
+
+def get_last_crawled():
+    if len(last_crawled_links) > 0:
+        return last_crawled_links[-1]
+    else:
+        return ""
