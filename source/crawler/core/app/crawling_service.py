@@ -13,6 +13,7 @@ import aiohttp
 from aiohttp import ClientSession
 from typing import IO
 from app.get_total_size import total_size
+from app.config import app, redis_mem_capacity
 import redis
 from rq import Worker, Queue, Connection
 
@@ -86,6 +87,7 @@ async def do_crawling(url):
 
     max_total_size = int(json_config["storage-limit"][0])
     max_total_size = max_total_size * 10 ** 6
+    redis_mem_capacity.set("user1", max_total_size, nx=True)
 
     async with ClientSession() as session:
         tasks = []
@@ -99,7 +101,8 @@ async def do_crawling(url):
                 next_links_from_db = get_next_link()
                 urls = next_links_from_db["urls"]
             result = await asyncio.gather(*[func() for func in tasks])
-            max_total_size = max_total_size - result[-1]
+            redis_mem_capacity.decrby("user1", result[-1])
+            max_total_size = int(redis_mem_capacity.get("user1").decode())
 
     return ('', 200)
 

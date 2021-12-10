@@ -1,29 +1,10 @@
 from flask import Flask, jsonify, request
 from app.crawling_service import do_crawling, get_next_link, get_config, get_last_crawled
+from app.config import app
 import endpoint_constants
 import constants
 import app_constants
 import asyncio
-from decouple import AutoConfig
-import redis
-
-app = Flask(__name__)
-
-config = AutoConfig(search_path='../../init/.env')
-
-MY_PASSWORD = config('MY_PASSWORD')
-MY_HOST = config('MY_HOST')
-MY_PORT = config('MY_PORT')
-
-r = redis.Redis(host=MY_HOST, port=MY_PORT, password=MY_PASSWORD, db=1)
-
-# r.set('hello', 'world')  # True
-#
-# value = r.get('hello')
-# print(value)  # b'world'
-#
-# r.delete('hello')  # True
-# print(r.get('hello'))  # None
 
 
 @app.route(endpoint_constants.CRAWLER, methods=['POST'])

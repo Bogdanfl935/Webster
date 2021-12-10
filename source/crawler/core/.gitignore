@@ -6,4 +6,4 @@ Scripts
 Include
 pyvenv.cfg
 **/__pycache__
-../init/redis_data/
+**/redis_data/
