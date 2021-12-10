@@ -8,3 +8,7 @@ chardet2
 urllib3
 aiohttp
 aiofiles
+redis>=3.4.1
+rq>=1.2.2
+Flask-SQLAlchemy
+python-decouple

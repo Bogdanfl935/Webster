@@ -13,6 +13,8 @@ import aiohttp
 from aiohttp import ClientSession
 from typing import IO
 from app.get_total_size import total_size
+import redis
+from rq import Worker, Queue, Connection
 
 last_crawled_links = list()
 
