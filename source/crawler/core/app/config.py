@@ -6,8 +6,8 @@ app = Flask(__name__)
 
 config = AutoConfig(search_path='../../init/.env')
 
-MY_PASSWORD = config('MY_PASSWORD')
-MY_HOST = config('MY_HOST')
-MY_PORT = config('MY_PORT')
+REDIS_PASSWORD = config('REDIS_PASSWORD')
+REDIS_HOST = config('REDIS_HOST')
+REDIS_PORT = config('REDIS_PORT')
 
-redis_mem_capacity = redis.Redis(host=MY_HOST, port=MY_PORT, password=MY_PASSWORD, db=1)
+redis_mem_capacity = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, db=1)
