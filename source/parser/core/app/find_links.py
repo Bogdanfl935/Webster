@@ -87,3 +87,6 @@ def post_link_db(links_list):
                                       data=json.dumps({"links": links_list}))
 
     # config_json = req_parser_config.json()
+
+def get_last_parsed():
+    pass
