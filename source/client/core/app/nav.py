@@ -1,5 +1,6 @@
 from flask import render_template, Response, Blueprint
 from app.constants import endpoint_constants, template_constants, nav_endpoint_handler_constants
+from app.service import activity_service
 from app.service.authorization_service import require_access_token
 import random
 
@@ -29,28 +30,8 @@ def handle_home_get(response_object: Response, authenticated_user: str) -> str:
 
 @nav.route(endpoint_constants.ACTIVITY, methods=['GET'])
 @require_access_token
-def handle_activity_get(response_object: Response, authenticated_user: str) -> str:
-    response_object.set_data(
-        render_template(
-            template_constants.SECTION_ACTIVITY_ACTIVE_PATH,
-            authenticated_user=authenticated_user,
-            parser_entries=[
-                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
-                     tag="div", size="41.53kB", domain="stackoverflow"),
-                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
-                     tag="input", size="1.09kB", domain="stackoverflow"),
-                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
-                     tag="img", size="79.53MB", domain="stackoverflow"),
-                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
-                     tag="title", size="0.02kB", domain="stackoverflow"),
-                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
-                     tag="form", size="12.91kB", domain="stackoverflow"),
-                dict(url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
-                     tag="style", size="273.11MB", domain="stackoverflow")
-            ]
-        )
-    )
-    return response_object
+def handle_activity_get(response_object: Response, authenticated_user: str) -> Response:
+    return activity_service.get_crawler_activity(response_object, authenticated_user)
 
 @nav.route(endpoint_constants.CONFIGURATION, methods=['GET'])
 @require_access_token
