@@ -4,14 +4,24 @@ from flask import jsonify
 def get_next_links(request):
     json_resp = request.get_json('json_resp')
 
+    db.session.begin_nested()
+    db.session.execute('LOCK TABLE next_links IN ACCESS EXCLUSIVE MODE;')
+
     next_link_db_resp = NextLinks.query.limit(int(json_resp["quantity"])).all()
 
     dict_next_url = dict()
     dict_next_url["urls"] = []
     for el in next_link_db_resp:
         dict_next_url["urls"].append(el.url_site)
-        db.session.add(VisitedLinks(url_site=el.url_site))
         db.session.delete(el)
+
+    db.session.commit()
+
+    db.session.execute('LOCK TABLE visited_links IN ACCESS EXCLUSIVE MODE;')
+    for el in next_link_db_resp:
+        db.session.add(VisitedLinks(url_site=el.url_site))
+
+    db.session.commit()
 
     db.session.commit()
 
