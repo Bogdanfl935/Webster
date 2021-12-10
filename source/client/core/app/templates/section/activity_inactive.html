@@ -34,7 +34,17 @@
                 <div class="col-sm-12 col-md-5 my-3 d-flex flex-column">
                     <div class="row my-2">
                         <span class="lead my-1 col-12">Memory usage:</span>
-                        <span class="py-2 mx-2 col-auto badge badge-success">0.00MB out of 100MB</span>
+                        {% if crawler_status.memoryUsage < 0.3 * memory_limit %}
+                        <span class="py-2 mx-2 col-auto badge badge-success">
+                        {% elif crawler_status.memoryUsage < 0.8 * memory_limit %}
+                        <span class="py-2 mx-2 col-auto badge badge-warning">
+                        {% else %}
+                        <span class="py-2 mx-2 col-auto badge badge-danger">
+                        {% endif %}
+                            {{ "%.2fkB"|format(crawler_status.memoryUsage|float / 1024) }}
+                            out of 
+                            {{ "%.2fkB"|format(memory_limit|float / 1024) }}
+                        </span>
                     </div>
                 </div>
             </div>
