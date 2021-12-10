@@ -8,3 +8,6 @@ chardet2
 urllib3
 lxml
 beautifulsoup4
+redis>=3.4.1
+rq>=1.2.2
+python-decouple
