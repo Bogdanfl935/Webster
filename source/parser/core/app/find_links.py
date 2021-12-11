@@ -68,7 +68,11 @@ def parse_all(el_list, soup):
 
 
 def extract_domain(url):
-    return urllib.request.urlparse(url).netloc
+    parsed_domain = urllib.request.urlparse(url).netloc
+    if parsed_domain.startswith('www.'):
+        return parsed_domain[4:]
+
+    return parsed_domain
 
 
 def parsing_service(text, url):
@@ -111,10 +115,8 @@ def post_link_db(links_list):
 
 def get_last_parsed(username):
     json_from_redis = json.loads(redis_parsed_cache.get(username))
-    print(json_from_redis)
 
     rez_dict = dict()
-    rez_dict["active"] = True
     rez_dict["url"] = json_from_redis["url"]
     rez_dict["domain"] = json_from_redis["domain"]
 
