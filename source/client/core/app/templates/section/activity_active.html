@@ -29,31 +29,36 @@
                     </div>
                     <input type="text" class="form-control" placeholder="Source" name="startUrl" disabled>
                     <div class="input-group-append">
-                        <button class="btn btn-outline-danger" type="button">Stop crawling</button>
+                        <form id="crawlerStopForm" method="POST", action="{{ url_for(crawler_stop_endpoint) }}">
+                            <button class="btn btn-outline-danger" type="submit">Stop crawling</button>
+                        </form>
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-5 my-3 d-flex flex-column">
+                    <form id="crawlerStatusForm" method="GET", action="{{ url_for(crawler_status_endpoint) }}"></form>
                     <div class="row my-2">
                         <span class="lead my-1 col-12">Memory usage:</span>
                         {% if crawler_status.memoryUsage < 0.3 * memory_limit %}
-                        <span class="py-2 mx-2 col-auto badge badge-success">
+                        <span class="py-2 mx-2 col-auto badge badge-success" id="crawlerMemoryUsage">
                         {% elif crawler_status.memoryUsage < 0.8 * memory_limit %}
-                        <span class="py-2 mx-2 col-auto badge badge-warning">
+                        <span class="py-2 mx-2 col-auto badge badge-warning" id="crawlerMemoryUsage">
                         {% else %}
-                        <span class="py-2 mx-2 col-auto badge badge-danger">
+                        <span class="py-2 mx-2 col-auto badge badge-danger" id="crawlerMemoryUsage">
                         {% endif %}
+                        <span>
                             {{ "%.2fkB"|format(crawler_status.memoryUsage|float / 1024) }}
+                        </span>
                             out of 
                             {{ "%.2fkB"|format(memory_limit|float / 1024) }}
                         </span>
                     </div>
                     <div class="row my-2">
                         <span class="lead my-1 col-12">Monitoring time:</span>
-                        <span class="py-2 px-3 mx-2 col-auto badge badge-dark">00d 00h 00m 00s</span>
+                        <span id="elapsedTimeCounter" class="py-2 px-3 mx-2 col-auto badge badge-dark">00d 00h 00m 00s</span>
                     </div>
                     <div class="row my-2">
                         <span class="lead my-1 col-12">Currently crawling:</span>
-                        <span class="py-2 px-3 mx-2 col-auto badge badge-info" role='button' data-toggle="tooltip"
+                        <span class="py-2 px-3 mx-2 col-auto badge badge-info" role='button' data-toggle="tooltip" id="crawlerCurrentCrawl"
                             data-placement="bottom" title="{{ crawler_status.url }}">{{ crawler_status.domain }}</span>
                     </div>
                 </div>
@@ -66,7 +71,9 @@
             </div>
             <div class="mdl-card__supporting-text">
                 <div class="row py-2 px-3">
-                    {% if parser_status.active %}
+                    <form id="parserStatusForm" method="GET", action="{{ url_for(parser_status_endpoint) }}">
+                        <button class="btn btn-success">Refresh</button>
+                    </form>
                     <table class="table">
                         <thead class="thead-dark">
                             <tr>
@@ -79,32 +86,26 @@
                         <tbody>
                             {% for entry in parser_status.content %}
                             <tr>
-                                <th scope="row">{{loop.index0}}</th>
-                                <td><span class="badge badge-dark">&lt;{{ entry.tag }}&gt;</span></td>
-                                <td>
+                                <th class="col-md-1" scope="row">{{loop.index0}}</th>
+                                <td class="col-md-1"><span class="badge badge-dark">&lt;{{ entry.tag }}&gt;</span></td>
+                                <td class="col-md-1">
                                     <span class="badge badge-danger">
                                     {{ "%.2fkB"|format(entry.size|float / 1024) }}
                                     </span>
                                 </td>
-                                <td><span class="badge badge-info" role='button' data-toggle="tooltip"
+                                <td class="col-md-1"><span class="badge badge-info" role='button' data-toggle="tooltip"
                                         data-placement="bottom" title="{{ parser_status.url }}">
                                         {{ parser_status.domain }}
                                     </span>
                                 </td>
                             </tr>
                             {% endfor %}
-
                         </tbody>
                     </table>
-                    {% else %}
-                    <span class="lead">No content parsed. Refresh to view updates</span>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </section>
 </div>
-<script>
-    $("[data-toggle='tooltip']").tooltip();
-</script>
+<script src="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.SCRIPTS_ACTIVITY_PATH) }}"></script>
 {% endblock %}
