@@ -1,6 +1,7 @@
 from flask import render_template, Response
 from app.constants import template_constants
 from app.service import crawler_service, parser_service, config_service
+import json
 
 def get_crawler_activity(response_object: Response, authenticated_user: str) -> Response:
     crawler_latest_status = crawler_service.make_status_get(authenticated_user)
@@ -27,4 +28,16 @@ def get_crawler_activity(response_object: Response, authenticated_user: str) -> 
             )
         )
         
+    return response_object
+
+def get_crawler_status(response_object: Response, authenticated_user: str) -> Response:
+    crawler_latest_status = crawler_service.make_status_get(authenticated_user)
+    response_object.set_data(json.dumps(crawler_latest_status).encode('utf-8'))
+    response_object.mimetype = 'application/json'
+    return response_object
+
+def get_parser_status(response_object: Response, authenticated_user: str) -> Response:
+    crawler_latest_status = parser_service.make_status_get(authenticated_user)
+    response_object.set_data(json.dumps(crawler_latest_status).encode('utf-8'))
+    response_object.mimetype = 'application/json'
     return response_object
