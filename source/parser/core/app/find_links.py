@@ -4,9 +4,12 @@ import re
 import requests
 import constants
 import endpoint_constants
+import urllib
 from lxml import html
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
+from app.config import redis_parsed_cache
+from app.get_total_size import total_size
 
 
 def get_config():
@@ -17,10 +20,11 @@ def get_config():
 
     return config_json
 
+
 def parse_a_img(el_list, soup, url):
     parsed_content = dict()
     for tag in ["a", "img"]:
-        link_list=[]
+        link_list = []
         if tag in el_list:
             for link in soup.find_all(tag):
                 if link.get("href"):
@@ -48,6 +52,7 @@ def parse_a_img(el_list, soup, url):
 
     return el_list, parsed_content
 
+
 def parse_all(el_list, soup):
     tags = dict()
     parsed_content = dict()
@@ -61,6 +66,15 @@ def parse_all(el_list, soup):
 
     return el_list, parsed_content
 
+
+def extract_domain(url):
+    parsed_domain = urllib.request.urlparse(url).netloc
+    if parsed_domain.startswith('www.'):
+        return parsed_domain[4:]
+
+    return parsed_domain
+
+
 def parsing_service(text, url):
     soup = BeautifulSoup(text, "lxml")
 
@@ -70,6 +84,8 @@ def parsing_service(text, url):
     parsed_content_all = dict()
     parsed_content_links = dict()
 
+
+
     el_list, parsed_content_links = parse_a_img(el_list, soup, url)
 
     post_link_db(parsed_content_links)
@@ -78,12 +94,43 @@ def parsing_service(text, url):
 
     parsed_content_all.update(parsed_content_links)
 
+    parsed_content_all["url"] = url
+    parsed_content_all["domain"] = extract_domain(url)
+
+    redis_parsed_cache.set("user1", json.dumps(parsed_content_all))
+
+    print(parsed_content_all)
+
     return parsed_content_all
+
 
 def post_link_db(links_list):
     links_list = links_list["a"]
 
     post_req = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.STORAGE}',
-                                      data=json.dumps({"links": links_list}))
+                             data=json.dumps({"links": links_list}))
 
     # config_json = req_parser_config.json()
+
+
+def get_last_parsed(username):
+    json_from_redis = json.loads(redis_parsed_cache.get(username))
+
+    rez_dict = dict()
+    rez_dict["url"] = json_from_redis["url"]
+    rez_dict["domain"] = json_from_redis["domain"]
+
+    json_from_redis.pop("url")
+    json_from_redis.pop("domain")
+
+    rez_dict["content"] = list()
+
+    for key in json_from_redis:
+        inter_dict = dict()
+        inter_dict["tag"] = key
+        inter_dict["size"] = total_size(json_from_redis[key])
+        rez_dict["content"].append(inter_dict)
+
+
+
+    return rez_dict
