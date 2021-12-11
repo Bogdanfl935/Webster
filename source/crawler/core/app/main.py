@@ -20,9 +20,8 @@ def in_post_link() -> str:
 
 @app.route(endpoint_constants.CRAWLER, methods=['GET'])
 def in_get_data() -> str:
-    resp = get_last_crawled()
-    return jsonify({"last_link": resp})
-
+    username = request.args.get("username")
+    return get_last_crawled(username)
 
 if __name__ == '__main__':
     app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)

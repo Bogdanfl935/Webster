@@ -18,6 +18,7 @@ import redis
 from rq import Worker, Queue, Connection
 
 last_crawled_links = list()
+active = bool()
 
 def get_config():
     req_crawling_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIG}',
@@ -50,6 +51,8 @@ async def fetch_html(url: str, session: ClientSession, **kwargs) -> str:
     resp.raise_for_status()
 
     last_crawled_links.append(url)
+    global active
+    active = True
 
     html = await resp.text()
     return html
@@ -89,10 +92,12 @@ async def do_crawling(url):
     max_total_size = max_total_size * 10 ** 6
     redis_mem_capacity.set("user1", 0, nx=True)
     max_total_size = max_total_size - int(redis_mem_capacity.get("user1").decode())
+    global active
 
     async with ClientSession() as session:
         tasks = []
         while len(urls) > 0 and max_total_size > 0:
+            active = True
             for url in urls:
                 tasks.append(
                     functools.partial(crawled_size, url=url, session=session)
@@ -104,6 +109,11 @@ async def do_crawling(url):
             result = await asyncio.gather(*[func() for func in tasks])
             redis_mem_capacity.incrby("user1", result[-1])
             max_total_size = max_total_size - result[-1]
+            if len(urls) == 0 or max_total_size <= 0:
+                active = False
+                break
+
+    active = False
 
     return ('', 200)
 
@@ -130,8 +140,19 @@ def get_next_link():
 
     return next_links
 
-def get_last_crawled():
+def get_last_crawled(username):
+    return_dict = dict()
+    return_dict["active"] = active
+    return_dict["memoryUsage"] = int(redis_mem_capacity.get("user1").decode())
+
     if len(last_crawled_links) > 0:
-        return last_crawled_links[-1]
+        return_dict["url"] = last_crawled_links[-1]
+        parsed_domain = urllib.request.urlparse(last_crawled_links[-1]).netloc
+        if parsed_domain.startswith('www.'):
+            parsed_domain = parsed_domain[4:]
+        return_dict["domain"] = parsed_domain
     else:
-        return ""
+        return_dict["url"] = None
+        return_dict["domain"] = None
+
+    return return_dict
