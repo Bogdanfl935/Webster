@@ -22,17 +22,17 @@
                 <div class="row mb-3 py-2 px-3">
                     <span class="lead">Launch crawler to monitor activity</span>
                 </div>
-                <div class="input-group col-sm-12 col-md-5">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">URL</span>
-                      </div>
-                    <input type="text" class="form-control" placeholder="Source" name="startUrl">
-                    <div class="input-group-append">
-                        <form id="crawlerStartForm" method="POST", action="{{ url_for(crawler_start_endpoint) }}">
+                <form id="crawlerStartForm" method="POST", action="{{ url_for(crawler_start_endpoint) }}">
+                    <div class="input-group col-sm-12 col-md-5">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">URL</span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Source" name="startUrl" required>
+                        <div class="input-group-append">
                             <button class="btn btn-outline-success" type="submit">Crawl</button>
-                        </form>
+                        </div>
                     </div>
-                </div>
+                </form>
                 <div class="col-sm-12 col-md-5 my-3 d-flex flex-column">
                     <div class="row my-2">
                         <span class="lead my-1 col-12">Memory usage:</span>
