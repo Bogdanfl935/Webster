@@ -28,7 +28,9 @@
                       </div>
                     <input type="text" class="form-control" placeholder="Source" name="startUrl">
                     <div class="input-group-append">
-                      <button class="btn btn-outline-success" type="button">Crawl</button>
+                        <form id="crawlerStartForm" method="POST", action="{{ url_for(crawler_start_endpoint) }}">
+                            <button class="btn btn-outline-success" type="submit">Crawl</button>
+                        </form>
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-5 my-3 d-flex flex-column">
@@ -61,5 +63,9 @@
         </div>
     </section>
 </div>
-<script src="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.SCRIPTS_ACTIVITY_PATH) }}"></script>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.SCRIPTS_ACTIVITY_INACTIVE_PATH) }}"></script>
 {% endblock %}

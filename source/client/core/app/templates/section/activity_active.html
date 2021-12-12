@@ -29,7 +29,7 @@
                     </div>
                     <input type="text" class="form-control" placeholder="Source" name="startUrl" disabled>
                     <div class="input-group-append">
-                        <form id="crawlerStopForm" method="POST", action="{{ url_for(crawler_stop_endpoint) }}">
+                        <form method="POST", action="{{ url_for(crawler_stop_endpoint) }}">
                             <button class="btn btn-outline-danger" type="submit">Stop crawling</button>
                         </form>
                     </div>
@@ -72,28 +72,28 @@
             <div class="mdl-card__supporting-text">
                 <div class="row py-2 px-3">
                     <form id="parserStatusForm" method="GET", action="{{ url_for(parser_status_endpoint) }}">
-                        <button class="btn btn-success">Refresh</button>
+                        <button class="btn btn-success mb-3"><i class="fas fa-sync-alt"></i> Refresh</button>
                     </form>
-                    <table class="table">
+                    <table class="table table-hover mx-1" style="table-layout: fixed;">
                         <thead class="thead-dark">
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Tag</th>
-                                <th scope="col">Size</th>
-                                <th scope="col">Domain</th>
+                                <th scope="col" class="col-1">#</th>
+                                <th scope="col" class="col-4 overflow-hidden">Tag</th>
+                                <th scope="col" class="col-3">Size</th>
+                                <th scope="col" class="col-4 overflow-hidden">Domain</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="parserStatusTable">
                             {% for entry in parser_status.content %}
                             <tr>
-                                <th class="col-md-1" scope="row">{{loop.index0}}</th>
-                                <td class="col-md-1"><span class="badge badge-dark">&lt;{{ entry.tag }}&gt;</span></td>
-                                <td class="col-md-1">
+                                <th class="overflow-hidden" scope="row">{{loop.index0}}</th>
+                                <td class="overflow-hidden"><span class="badge badge-dark">&lt;{{ entry.tag }}&gt;</span></td>
+                                <td class="overflow-hidden">
                                     <span class="badge badge-danger">
                                     {{ "%.2fkB"|format(entry.size|float / 1024) }}
                                     </span>
                                 </td>
-                                <td class="col-md-1"><span class="badge badge-info" role='button' data-toggle="tooltip"
+                                <td class="overflow-hidden"><span class="badge badge-info" role='button' data-toggle="tooltip"
                                         data-placement="bottom" title="{{ parser_status.url }}">
                                         {{ parser_status.domain }}
                                     </span>
@@ -107,5 +107,9 @@
         </div>
     </section>
 </div>
-<script src="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.SCRIPTS_ACTIVITY_PATH) }}"></script>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.SCRIPTS_ACTIVITY_ACTIVE_PATH) }}"></script>
 {% endblock %}

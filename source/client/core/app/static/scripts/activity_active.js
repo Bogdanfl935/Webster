@@ -15,6 +15,7 @@ function initActivityHandlers() {
     enableTooltips();
     //startElapsedTimeCounter();
     //enableCrawlerStatusPolling();
+    bindParserFormSubmitHandle();
 }
 
 function enableCrawlerStatusPolling(){
@@ -22,7 +23,7 @@ function enableCrawlerStatusPolling(){
     let continuePolling = true;
     let intervalHandle = setInterval(()=>{
         if(continuePolling){
-            makeAjaxRequest($("#crawlerStatusForm"), handleStatusFormSubmitSuccessResponse, (form, data)=>{console.log(data)});
+            makeAjaxRequest($("#crawlerStatusForm"), handleCrawlerStatusFormSubmitSuccessResponse, (form, data)=>{console.log(data)});
         }
         else{
             clearInterval(intervalHandle);
@@ -31,21 +32,33 @@ function enableCrawlerStatusPolling(){
     }, pollingFrequency);
 }
 
-function makeAjaxRequest(form, success_handle, error_handle){
-    $.ajax({
-        type: $(form).attr('method'),
-        url: $(form).attr('action'),
-        data: $(form).serialize(),
-        success: (data) => { success_handle(form, data); },
-        error: (data) => { 
-            if (data.responseJSON) {
-                error_handle(form, data);
-            }
-        }
+function bindParserFormSubmitHandle(){
+    let form = $('#parserStatusForm');
+    form.on('submit', (event) => {
+        formSubmitHandler(
+            event, 
+            form,
+            handleParserStatusFormSubmitSuccessResponse, /* Success handle */
+            (_form, data)=>{console.log(data);} /* Error handle */
+        );
     });
 }
 
-function handleStatusFormSubmitSuccessResponse(form, data){
+function handleParserStatusFormSubmitSuccessResponse(_form, data){
+    let tableBody = $('#parserStatusTable');
+    tableBody.empty();
+    data.content.forEach((entry, index)=>{
+        let col_1 = `<th class="col-md-1" scope="row">${index}</th>`
+        let col_2 = `<td class="col-md-1"><span class="badge badge-dark">&lt;${entry.tag}&gt;</span></td>`
+        let col_3 = `<td class="col-md-1"><span class="badge badge-danger">${(entry.size/1024).toFixed(2)+"kB"}</span></td>`
+        let col_4 = `<td class="col-md-1"><span class="badge badge-info" role='button' data-toggle="tooltip"
+        data-placement="bottom" title="${data.url}">${data.domain}</span></td>`
+        tableBody.append(`<tr>${col_1}${col_2}${col_3}${col_4}</tr>`);
+    });
+    enableTooltips();
+}
+
+function handleCrawlerStatusFormSubmitSuccessResponse(form, data){
     $("#crawlerMemoryUsage span").text((parseFloat(data.memoryUsage)/1024).toFixed(2).toString()+"kB");
     $("#crawlerCurrentCrawl").text(data.domain).attr("data-bs-original-title", data.url);
 }
