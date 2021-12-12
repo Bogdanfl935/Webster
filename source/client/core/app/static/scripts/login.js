@@ -25,32 +25,15 @@ function bindShowHideClickHandler() {
 
 function bindFormSubmitHandler() {
     $('form[class*="ajax-handled"]').each((index, form) => {
-        $(form).on('submit', (event) => { formSubmitHandler(event, form) });
-    });
-}
-
-function formSubmitHandler(event, form) {
-    event.preventDefault();
-    if (!$(form).valid()) {
-        event.stopPropagation()
-    }
-    else {
-        makeFormAjaxCall(form);
-    }
-    $(form).find("input[required]").addClass('was-validated');
-}
-
-function makeFormAjaxCall(form) {
-    $.ajax({
-        type: $(form).attr('method'),
-        url: $(form).attr('action'),
-        data: $(form).serialize(),
-        success: (data) => { handleFormSubmitSuccessResponse(form, data); },
-        error: (data) => { 
-            if (data.responseJSON) {
-                handleFormSubmitErrorResponse(form, data); 
-            }
-        }
+        $(form).on('submit', (event) => { 
+            formSubmitHandler(
+                event, 
+                form,
+                handleFormSubmitSuccessResponse, /* Success handle */
+                handleFormSubmitErrorResponse, /* Error handle */
+                () => {$(form).find("input[required]").addClass('was-validated');} /* Callback */
+            );
+        });
     });
 }
 

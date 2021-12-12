@@ -68,4 +68,7 @@
         {% include modal_path %}
     {% endfor %}
 </div>
+{% block scripts %}
+<script src="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.SCRIPTS_AJAX_INTERFACE_PATH) }}"></script>
+{% endblock %}
 {% endblock %}
