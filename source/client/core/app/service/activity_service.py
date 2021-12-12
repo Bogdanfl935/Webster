@@ -41,3 +41,11 @@ def get_parser_status(response_object: Response, authenticated_user: str) -> Res
     response_object.set_data(json.dumps(crawler_latest_status).encode('utf-8'))
     response_object.mimetype = 'application/json'
     return response_object
+
+def start_crawling(response_object: Response, authenticated_user: str) -> Response:
+    crawler_service.make_crawler_start_post(authenticated_user)
+    return response_object
+
+def stop_crawling(response_object: Response, authenticated_user: str) -> Response:
+    crawler_service.make_crawler_stop_post(authenticated_user)
+    return response_object

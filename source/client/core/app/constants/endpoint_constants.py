@@ -33,7 +33,7 @@ PASSWORD_FORGOTTEN = "/password-forgotten"
 EMAIL_CONFIRMATION = "/email-confirmation"
 EMAIL_PASSWORD_RESET = "/email-password-reset"
 
-
+CRAWLER_START = "/crawler-start"
 CRAWLER_STOP = "/crawler-stop"
 
 AUTH_MS_URL="http://localhost:5550"
