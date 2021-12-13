@@ -19,6 +19,7 @@ from rq import Worker, Queue, Connection
 
 last_crawled_links = list()
 active = bool()
+keep_running = bool()
 
 def get_config():
     req_crawling_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIG}',
@@ -93,10 +94,12 @@ async def do_crawling(url):
     redis_mem_capacity.set("user1", 0, nx=True)
     max_total_size = max_total_size - int(redis_mem_capacity.get("user1").decode())
     global active
+    global keep_running
+    keep_running = True
 
     async with ClientSession() as session:
         tasks = []
-        while len(urls) > 0 and max_total_size > 0:
+        while len(urls) > 0 and max_total_size > 0 and keep_running == True:
             active = True
             for url in urls:
                 tasks.append(
@@ -156,3 +159,8 @@ def get_last_crawled(username):
         return_dict["domain"] = None
 
     return return_dict
+
+def stop_crawling():
+    global keep_running
+    keep_running = False
+    return ('', 200)
