@@ -13,8 +13,8 @@ $(document).ready(() => {
 
 function initActivityHandlers() {
     enableTooltips();
-    //startElapsedTimeCounter();
-    //enableCrawlerStatusPolling();
+    startElapsedTimeCounter();
+    enableCrawlerStatusPolling();
     bindParserFormSubmitHandle();
 }
 

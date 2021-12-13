@@ -1,7 +1,3 @@
-CRAWLER = "/crawler"
-PARSER = "/parser"
-NEXT_LINK = "/next-link"
-
 # Own Endpoints
 # GET Endpoints
 
@@ -35,8 +31,11 @@ EMAIL_PASSWORD_RESET = "/email-password-reset"
 
 CRAWLER_START = "/crawler-start"
 CRAWLER_STOP = "/crawler-stop"
+CRAWLER_CONFIGURATION = "/crawler-configuration"
 
 AUTH_MS_URL="http://localhost:5550"
 NOTIFICATION_MS_URL="http://localhost:5551"
-STORAGE_MS_URL= "http://localhost:50006"
-PARSER_MS_URL= "http://localhost:50005"
+
+CRAWLER_MS_URL="http://webster-tw-2021.tplinkdns.com:50003"
+CONFIG_MS_URL= "http://webster-tw-2021.tplinkdns.com:50004"
+PARSER_MS_URL= "http://webster-tw-2021.tplinkdns.com:50005"

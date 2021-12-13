@@ -16,7 +16,7 @@ function bindCrawlerStartFormSubmitHandle(){
             event, 
             form,
             handleCrawlerStartFormSubmitSuccessResponse, /* Success handle */
-            (_form, data)=>{console.log(data);}, /* Error handle */
+            (_form, data)=>{console.log(data); location.reload();}, /* Error handle */
             () => {$(form).find("input[required]").addClass('was-validated');} /* Callback */
         );
     });
@@ -56,5 +56,5 @@ function createCustomUrlRule(){
 }
 
 function handleCrawlerStartFormSubmitSuccessResponse(form, data){
-
+    location.reload();
 }
