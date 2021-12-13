@@ -16,6 +16,9 @@ from app.get_total_size import total_size
 from app.config import app, redis_mem_capacity
 import redis
 from rq import Worker, Queue, Connection
+import validators
+from werkzeug.exceptions import HTTPException
+from flask import abort
 
 last_crawled_links = set()
 active = False
@@ -83,6 +86,7 @@ async def crawled_size(url: str, **kwargs) -> None:
 
 
 async def do_crawling(url):
+    validate_url_start(url)
     urls = [url]
 
     json_config = get_config()
@@ -129,6 +133,8 @@ def get_next_link():
                                    data=json.dumps(post_to_next_link))
     if req_next_links.status_code == 200:
         next_links = req_next_links.json()
+        for el in next_links[constants.NEXT_LINK_KEY]:
+            validate_url_in_progress(el)
     elif req_next_links.status_code != 200:
         time.sleep(2)
         req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}',
@@ -159,7 +165,16 @@ def get_last_crawled(username):
 
     return return_dict
 
+
 def stop_crawling():
     global keep_running
     keep_running = False
     return ('', 200)
+
+def validate_url_start(url):
+    if not validators.url(url):
+        abort(400, description={"fieldName": constants.START_LINK_KEY, "errorMessage":f"{constants.START_LINK_KEY} url not properly formated"})
+
+def validate_url_in_progress(url):
+    if not validators.url(url):
+        abort(400, description={"fieldName": constants.NEXT_LINK_KEY, "errorMessage":f"{constants.NEXT_LINK_KEY} url not properly formated"})
