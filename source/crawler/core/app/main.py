@@ -9,9 +9,19 @@ import app_constants
 import asyncio
 import time
 from datetime import datetime
+from flask_expects_json import expects_json
+
+schema = {
+    'type': 'object',
+    'properties': {
+        f'{constants.START_LINK_KEY}': {'type': 'string', 'format': 'uri'}
+    },
+    'required': [f'{constants.START_LINK_KEY}']
+}
 
 
 @app.route(endpoint_constants.CRAWLER, methods=['POST'])
+@expects_json(schema, check_formats=True)
 def handle_crawler_post() -> str:
     text = request.json.get(constants.START_LINK_KEY, None)
     # crawled_response = do_crawling(text)
@@ -35,7 +45,8 @@ def handle_stop_crawling_get() -> str:
 
 @app.errorhandler(400)
 def handle_unauthorized_error(exception: HTTPException) -> str:
-    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code, error="Bad Request",
+    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code,
+                           error="Bad Request",
                            errors=[exception.description])
     return jsonify(myError.__dict__)
 
@@ -48,9 +59,11 @@ def handle_generic_error(exception) -> str:
     path = exception.request.path_url if isinstance(
         exception, HTTPException) else None
 
-    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code, error="Internal Server Error",
+    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
+                           error="Internal Server Error",
                            message=str(exception), path=path)
     return jsonify(myError.__dict__)
+
 
 if __name__ == '__main__':
     app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
