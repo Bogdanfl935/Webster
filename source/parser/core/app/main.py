@@ -16,10 +16,9 @@ def handle_parser_post() -> str:
 
     return next_urls
 
-@app.route(endpoint_constants.PARSER, methods=['GET'])
-def handle_parser_get() -> str:
+@app.route(endpoint_constants.PARSER_STATUS, methods=['GET'])
+def handle_parser_status_get() -> str:
     username = request.args.get('username')
-
     return get_last_parsed(username)
 
 if __name__ == '__main__':
