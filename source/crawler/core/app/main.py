@@ -10,6 +10,7 @@ import asyncio
 @app.route(endpoint_constants.CRAWLER_START, methods=['POST'])
 def handle_crawler_start_post() -> str:
     text = request.json.get(constants.START_LINK_KEY, None)
+    print(request.json)
     # crawled_response = do_crawling(text)
 
     asyncio.run(do_crawling(text))

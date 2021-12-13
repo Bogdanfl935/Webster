@@ -33,7 +33,7 @@ def retr_config_from_db(request, type_conf):
     resp_json = dict()
 
     if type_conf == "crawler":
-        resp_json["storage-limit"] = from_db_resp_json["storage-limit"]
+        resp_json["memoryLimit"] = from_db_resp_json["memoryLimit"]
         resp_json["same-page"] = from_db_resp_json["same-page"]
     elif type_conf == "parser":
         resp_json["specific-tag"] = from_db_resp_json["specific-tag"]

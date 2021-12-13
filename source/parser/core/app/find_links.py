@@ -13,8 +13,7 @@ from app.get_total_size import total_size
 
 
 def get_config():
-    req_parser_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.PARSER_CONFIG}',
-                                      data=json.dumps({}))
+    req_parser_config = requests.get(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.PARSER_CONFIGURATION}')
 
     config_json = req_parser_config.json()
 
@@ -61,8 +60,10 @@ def parse_all(el_list, soup):
         tags[el] = []
         for data in soup.find_all(el):
             tags[el].append(data.text)
-
-        parsed_content[el] = tags[el]
+        if len(tags[el]) == 0:
+            tags.pop(el)
+        else:
+            parsed_content[el] = tags[el]
 
     return el_list, parsed_content
 
@@ -85,7 +86,6 @@ def parsing_service(text, url):
     parsed_content_links = dict()
 
 
-
     el_list, parsed_content_links = parse_a_img(el_list, soup, url)
 
     post_link_db(parsed_content_links)
@@ -98,8 +98,6 @@ def parsing_service(text, url):
     parsed_content_all["domain"] = extract_domain(url)
 
     redis_parsed_cache.set("user1", json.dumps(parsed_content_all))
-
-    print(parsed_content_all)
 
     return parsed_content_all
 
@@ -114,22 +112,25 @@ def post_link_db(links_list):
 
 
 def get_last_parsed(username):
-    json_from_redis = json.loads(redis_parsed_cache.get(username))
-
     rez_dict = dict()
-    rez_dict["url"] = json_from_redis["url"]
-    rez_dict["domain"] = json_from_redis["domain"]
+    username = "user1"
 
-    json_from_redis.pop("url")
-    json_from_redis.pop("domain")
+    if redis_parsed_cache.get(username):
+        json_from_redis = json.loads(redis_parsed_cache.get(username))
 
-    rez_dict["content"] = list()
+        rez_dict["url"] = json_from_redis["url"]
+        rez_dict["domain"] = json_from_redis["domain"]
 
-    for key in json_from_redis:
-        inter_dict = dict()
-        inter_dict["tag"] = key
-        inter_dict["size"] = total_size(json_from_redis[key])
-        rez_dict["content"].append(inter_dict)
+        json_from_redis.pop("url")
+        json_from_redis.pop("domain")
+
+        rez_dict["content"] = list()
+
+        for key in json_from_redis:
+            inter_dict = dict()
+            inter_dict["tag"] = key
+            inter_dict["size"] = total_size(json_from_redis[key])
+            rez_dict["content"].append(inter_dict)
 
 
 
