@@ -24,6 +24,7 @@ last_crawled_links = set()
 active = False
 keep_running = bool()
 
+
 def get_config():
     req_crawling_config = requests.get(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIGURATION}')
     json_config = req_crawling_config.json()
@@ -44,7 +45,11 @@ def start_crawling(url, html):
     send_to_parser = requests.post(url=parser_url, data=dictPage, headers={'Content-type': 'application/json'})
     parser_resp_json = send_to_parser.json()
 
-    resp_size = total_size(parser_resp_json)
+    # in the case parser throws an error
+    if "domain" in parser_resp_json.keys():
+        resp_size = total_size(parser_resp_json)
+    else:
+        resp_size = 0
 
     return resp_size
 
@@ -121,6 +126,7 @@ async def do_crawling(url):
 
     return ('', 200)
 
+
 def get_next_link():
     json_config = get_config()
 
@@ -131,6 +137,7 @@ def get_next_link():
 
     req_next_links = requests.post(url=f'{endpoint_constants.STORAGE_MS_URL}{endpoint_constants.NEXT_LINK}',
                                    data=json.dumps(post_to_next_link))
+
     if req_next_links.status_code == 200:
         next_links = req_next_links.json()
         for el in next_links[constants.NEXT_LINK_KEY]:
@@ -145,6 +152,7 @@ def get_next_link():
             next_links = req_next_links.json()
 
     return next_links
+
 
 def get_last_crawled(username):
     print(last_crawled_links)
@@ -171,10 +179,14 @@ def stop_crawling():
     keep_running = False
     return ('', 200)
 
+
 def validate_url_start(url):
     if not validators.url(url):
-        abort(400, description={"fieldName": constants.START_LINK_KEY, "errorMessage":f"{constants.START_LINK_KEY} url not properly formated"})
+        abort(400, description={"fieldName": constants.START_LINK_KEY,
+                                "errorMessage": f"{constants.START_LINK_KEY} url not properly formated"})
+
 
 def validate_url_in_progress(url):
     if not validators.url(url):
-        abort(400, description={"fieldName": constants.NEXT_LINK_KEY, "errorMessage":f"{constants.NEXT_LINK_KEY} url not properly formated"})
+        abort(400, description={"fieldName": constants.NEXT_LINK_KEY,
+                                "errorMessage": f"{constants.NEXT_LINK_KEY} url not properly formated"})
