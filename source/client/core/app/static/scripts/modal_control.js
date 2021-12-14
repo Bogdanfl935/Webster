@@ -14,7 +14,7 @@ function launchPopupModals(){
 }
 
 function hideActiveModals(){
-    $(".modal").modal("hide");
+    $(".modal").hide();
 }
 
 function renderFeedbackModalTemplate(html_content){
