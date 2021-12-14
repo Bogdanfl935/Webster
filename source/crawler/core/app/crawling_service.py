@@ -17,13 +17,12 @@ from app.config import app, redis_mem_capacity
 import redis
 from rq import Worker, Queue, Connection
 
-last_crawled_links = list()
-active = bool()
+last_crawled_links = set()
+active = False
 keep_running = bool()
 
 def get_config():
-    req_crawling_config = requests.post(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIG}',
-                                        data=json.dumps({}))
+    req_crawling_config = requests.get(url=f'{endpoint_constants.CONFIG_MS_URL}{endpoint_constants.CRAWLER_CONFIGURATION}')
     json_config = req_crawling_config.json()
 
     return json_config
@@ -51,7 +50,7 @@ async def fetch_html(url: str, session: ClientSession, **kwargs) -> str:
     resp = await session.request(method="GET", url=url, **kwargs)
     resp.raise_for_status()
 
-    last_crawled_links.append(url)
+    last_crawled_links.add(url)
     global active
     active = True
 
@@ -85,12 +84,10 @@ async def crawled_size(url: str, **kwargs) -> None:
 
 async def do_crawling(url):
     urls = [url]
-    file = "output.txt"
 
     json_config = get_config()
 
-    max_total_size = int(json_config["storage-limit"][0])
-    max_total_size = max_total_size * 10 ** 6
+    max_total_size = int(json_config["memoryLimit"])
     redis_mem_capacity.set("user1", 0, nx=True)
     max_total_size = max_total_size - int(redis_mem_capacity.get("user1").decode())
     global active
@@ -144,13 +141,15 @@ def get_next_link():
     return next_links
 
 def get_last_crawled(username):
+    print(last_crawled_links)
     return_dict = dict()
     return_dict["active"] = active
+    redis_mem_capacity.set("user1", 0, nx=True)
     return_dict["memoryUsage"] = int(redis_mem_capacity.get("user1").decode())
 
     if len(last_crawled_links) > 0:
-        return_dict["url"] = last_crawled_links[-1]
-        parsed_domain = urllib.request.urlparse(last_crawled_links[-1]).netloc
+        return_dict["url"] = last_crawled_links.pop()
+        parsed_domain = urllib.request.urlparse(return_dict["url"]).netloc
         if parsed_domain.startswith('www.'):
             parsed_domain = parsed_domain[4:]
         return_dict["domain"] = parsed_domain

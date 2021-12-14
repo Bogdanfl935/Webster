@@ -1,27 +1,21 @@
-import random
+from flask import request, abort
+from app.constants import endpoint_constants
+from app.utilities.url_joiner import construct_parameterized_url
+import requests
 
 def make_status_get(authenticated_user: str) -> dict:
-    # Return dummy data until microservices are integrated
-    letters = "abcdefghijklmonpqrstuvwxyz"
-    data = dict(domain=str(random.choice(letters)*random.randint(1, 10)),
-                url=str(random.choice(letters)*random.randint(1, 10)),
-                content=[
-                    dict(tag=str(random.choice(letters)*random.randint(1, 10)), size=random.randint(1, 10)),
-                    dict(tag=str(random.choice(letters)*random.randint(1, 10)), size=random.randint(1, 10)),
-                    dict(tag=str(random.choice(letters)*random.randint(1, 10)), size=random.randint(1, 10))
-                    ])
-    return data
-    """
-    return dict(
-        active=True,
-        url="https://stackoverflow.com/questions/2281087/center-a-div-in-css",
-        domain="stackoverflow",
-        content=[
-            dict(tag="div", size=4153),
-            dict(tag="input", size=109),
-            dict(tag="img", size=7953),
-            dict(tag="style", size=27311),
-            dict(tag="form", size=1291),
-            dict(tag="title", size=20)
-        ]
-    )"""
+    target_url = construct_parameterized_url(endpoint_constants.PARSER_MS_URL + endpoint_constants.PARSER_STATUS,\
+        dict(username=authenticated_user))
+    response = requests.get(target_url)
+    return_content = None
+    
+    match response.status_code:
+        case 200:
+            return_content = response.json()
+        case 400:
+            print(response.json())
+            abort(400)
+        case _:
+            abort(response.status_code)
+    
+    return return_content, response.status_code

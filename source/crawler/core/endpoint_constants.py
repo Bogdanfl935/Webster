@@ -1,8 +1,12 @@
-CRAWLER = "/crawler"
 PARSER = "/parser"
 NEXT_LINK = "/next-link"
-CRAWLER_CONFIG = "/crawler-config"
-STOP_CRAWLING = "/stop-crawling"
-STORAGE_MS_URL = "http://localhost:50006"
-PARSER_MS_URL = "http://localhost:50005"
-CONFIG_MS_URL = "http://localhost:50004"
+CRAWLER_CONFIGURATION = "/crawler-configuration"
+
+
+CRAWLER_START = "/crawler-start"
+CRAWLER_STOP = "/crawler-stop"
+CRAWLER_STATUS = "/crawler-status"
+
+STORAGE_MS_URL = "http://192.168.100.215:50006"
+PARSER_MS_URL = "http://192.168.100.215:50005"
+CONFIG_MS_URL = "http://192.168.100.215:50004"
