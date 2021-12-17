@@ -13,6 +13,7 @@ from app.get_total_size import total_size
 from flask import abort
 from werkzeug.exceptions import HTTPException
 import validators
+from flask_expects_json import expects_json
 
 
 def get_config():
@@ -20,7 +21,7 @@ def get_config():
 
     config_json = req_parser_config.json()
 
-    return config_json  
+    return config_json
 
 
 def parse_a_img(el_list, soup, url):
@@ -31,7 +32,6 @@ def parse_a_img(el_list, soup, url):
             for link in soup.find_all(tag):
                 if link.get("href"):
                     href_link = link.get("href")
-                    validate_url(href_link)
                     parsed_url = urlparse(href_link)
                     if parsed_url.scheme != '' and parsed_url.netloc != '':
                         link_list.append(href_link.encode(encoding='UTF-8').decode('unicode-escape').replace('"', ''))
@@ -137,8 +137,3 @@ def get_last_parsed(username):
             rez_dict["content"].append(inter_dict)
 
     return rez_dict
-
-
-def validate_url(url):
-    if not validators.url(url):
-        abort(400, description={"fieldName": "href", "errorMessage": f"href url {url} not properly formated"})

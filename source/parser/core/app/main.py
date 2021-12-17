@@ -1,15 +1,19 @@
 from flask import Flask, jsonify, request
 from app.find_links import parsing_service, get_last_parsed
-from app.config import app
+from app.config import app, schema
 import endpoint_constants
 import constants
 import app_constants
 from werkzeug.exceptions import HTTPException
+from requests.exceptions import ConnectionError
 from app.error_handler import ErrorHandler
 import time
 from datetime import datetime
+from flask_expects_json import expects_json
+
 
 @app.route(endpoint_constants.PARSER, methods=['POST'])
+@expects_json(schema=schema, check_formats=True)
 def handle_parser_post() -> str:
     text = request.json.get(constants.CONTENT_KEY, None)
     url = request.json.get(constants.URL_KEY, None)
@@ -27,7 +31,8 @@ def handle_parser_status_get() -> str:
 
 @app.errorhandler(400)
 def handle_unauthorized_error(exception: HTTPException) -> str:
-    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code, error="Bad Request",
+    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code,
+                           error="Bad Request",
                            errors=[exception.description])
     return jsonify(myError.__dict__)
 
@@ -39,8 +44,11 @@ def handle_generic_error(exception) -> str:
 
     path = exception.request.path_url if isinstance(
         exception, HTTPException) else None
+    path = exception.request.path_url if isinstance(
+        exception, ConnectionError) else None
 
-    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code, error="Internal Server Error",
+    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
+                           error="Internal Server Error",
                            message=str(exception), path=path)
     return jsonify(myError.__dict__)
 

@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, request
 from app.crawling_service import do_crawling, get_next_link, get_config, get_last_crawled, stop_crawling
-from app.config import app
+from app.config import app, schema
 from werkzeug.exceptions import HTTPException
+from requests.exceptions import ConnectionError
 from app.error_handler import ErrorHandler
 import endpoint_constants
 import constants
@@ -10,14 +11,6 @@ import asyncio
 import time
 from datetime import datetime
 from flask_expects_json import expects_json
-
-schema = {
-    'type': 'object',
-    'properties': {
-        f'{constants.START_LINK_KEY}': {'type': 'string', 'format': 'uri'}
-    },
-    'required': [f'{constants.START_LINK_KEY}']
-}
 
 
 @app.route(endpoint_constants.CRAWLER, methods=['POST'])
@@ -58,6 +51,8 @@ def handle_generic_error(exception) -> str:
 
     path = exception.request.path_url if isinstance(
         exception, HTTPException) else None
+    path = exception.request.path_url if isinstance(
+        exception, ConnectionError) else None
 
     myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
                            error="Internal Server Error",
