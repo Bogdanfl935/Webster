@@ -11,10 +11,11 @@ import asyncio
 import time
 from datetime import datetime
 from flask_expects_json import expects_json
+from app.marshmallow_validator import validate_schema, StartCrawlerSchema
 
 
-@app.route(endpoint_constants.CRAWLER, methods=['POST'])
-@expects_json(schema, check_formats=True)
+@app.route(endpoint_constants.CRAWLER_START, methods=['POST'])
+@validate_schema(StartCrawlerSchema)
 def handle_crawler_post() -> str:
     text = request.json.get(constants.START_LINK_KEY, None)
     print(request.json)
@@ -40,7 +41,7 @@ def handle_crawler_stop_post() -> str:
 def handle_unauthorized_error(exception: HTTPException) -> str:
     myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code,
                            error="Bad Request",
-                           errors=[exception.description])
+                           errors=exception.description)
     return jsonify(myError.__dict__)
 
 

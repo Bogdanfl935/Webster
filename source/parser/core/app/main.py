@@ -10,10 +10,11 @@ from app.error_handler import ErrorHandler
 import time
 from datetime import datetime
 from flask_expects_json import expects_json
+from app.marshmallow_validator import validate_schema, StartParserSchema
 
 
 @app.route(endpoint_constants.PARSER, methods=['POST'])
-@expects_json(schema=schema, check_formats=True)
+@validate_schema(StartParserSchema)
 def handle_parser_post() -> str:
     text = request.json.get(constants.CONTENT_KEY, None)
     url = request.json.get(constants.URL_KEY, None)
@@ -33,7 +34,7 @@ def handle_parser_status_get() -> str:
 def handle_unauthorized_error(exception: HTTPException) -> str:
     myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code,
                            error="Bad Request",
-                           errors=[exception.description])
+                           errors=exception.description)
     return jsonify(myError.__dict__)
 
 

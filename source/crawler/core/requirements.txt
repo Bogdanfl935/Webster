@@ -14,3 +14,4 @@ Flask-SQLAlchemy
 python-decouple
 validators
 flask-expects-json
+marshmallow
