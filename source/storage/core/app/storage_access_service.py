@@ -1,5 +1,9 @@
 from app.config import app, db, NextLinks, VisitedLinks, Configuration
 from flask import jsonify
+from flask import abort
+from werkzeug.exceptions import HTTPException
+import validators
+
 
 def get_next_links(request):
     json_resp = request.get_json('json_resp')
@@ -12,6 +16,7 @@ def get_next_links(request):
     dict_next_url = dict()
     dict_next_url["urls"] = []
     for el in next_link_db_resp:
+        validate_url(el.url_site)
         dict_next_url["urls"].append(el.url_site)
         db.session.delete(el)
 
@@ -19,6 +24,7 @@ def get_next_links(request):
 
     db.session.execute('LOCK TABLE visited_links IN ACCESS EXCLUSIVE MODE;')
     for el in next_link_db_resp:
+        validate_url(el.url_site)
         db.session.add(VisitedLinks(url_site=el.url_site))
 
     db.session.commit()
@@ -40,3 +46,7 @@ def add_link_to_db(request):
             db.session.rollback()
 
     return jsonify({"success": "True"})
+
+def validate_url(url):
+    if not validators.url(url):
+        abort(400, description={"fieldName": "urls", "errorMessage": f"url not properly formated"})

@@ -10,6 +10,10 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from app.config import redis_parsed_cache
 from app.get_total_size import total_size
+from flask import abort
+from werkzeug.exceptions import HTTPException
+import validators
+from flask_expects_json import expects_json
 
 
 def get_config():
@@ -131,7 +135,5 @@ def get_last_parsed(username):
             inter_dict["tag"] = key
             inter_dict["size"] = total_size(json_from_redis[key])
             rez_dict["content"].append(inter_dict)
-
-
 
     return rez_dict
