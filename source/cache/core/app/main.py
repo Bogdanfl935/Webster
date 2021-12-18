@@ -1,97 +1,65 @@
+from flask import jsonify, Response
 from app.constants import endpoint_constants, app_constants
+from app.services.validation_service import validate_with_schema
 from app.services import memory_usage_service, concurrent_status_service, concurrent_continuation_service, \
     last_url_service
-from flask import jsonify, request, Response
+from app.dto.error_handler import ErrorHandler
 from app.config.app_config import flask_app
+from app.validation import validation_schema
 from werkzeug.exceptions import HTTPException
 from requests.exceptions import ConnectionError
-from app.dto.error_handler import ErrorHandler
-import app.constants
 import time
 from datetime import datetime
-from app.services.validation_service import validate_schema
-from app.validation import validation_schema
-from http import HTTPStatus
 
 
 @flask_app.route(endpoint_constants.MEMORY_USAGE, methods=['POST'])
-@validate_schema(validation_schema.MemoryUsageSchema)
+@validate_with_schema(validation_schema.MemoryUsageSchema)
 def handle_memory_usage_post() -> Response:
-    username = request.json.get("username", None)
-    memory_usage = request.json.get("memoryUsage", None)
-
-    memory_usage_service.modify_memory_usage(username, memory_usage)
-
-    return Response(status=HTTPStatus.OK)
+    return memory_usage_service.set_memory_usage()
 
 
 @flask_app.route(endpoint_constants.MEMORY_USAGE, methods=['GET'])
 def handle_memory_usage_get() -> dict:
-    username = request.args.get("username")
-
-    return memory_usage_service.get_memory_usage(username)
+    return memory_usage_service.get_memory_usage()
 
 
-@flask_app.route(f'{endpoint_constants.MEMORY_USAGE}{endpoint_constants.STATUS}', methods=['GET'])
+@flask_app.route(endpoint_constants.STATUS, methods=['GET'])
 def handle_status_get() -> dict:
-    username = request.args.get("username")
-
-    return concurrent_status_service.get_active_status(username)
+    return concurrent_status_service.get_active_status()
 
 
 @flask_app.route(endpoint_constants.CONCURRENT_STATUS_READING, methods=['POST'])
-@validate_schema(validation_schema.ConcurrentReadingSchema)
+@validate_with_schema(validation_schema.ConcurrentReadingSchema)
 def handle_concurrent_status_reading_post() -> dict:
-    username = request.json.get("username", None)
-
-    return concurrent_status_service.get_active_status(username)
+    return concurrent_status_service.get_active_status()
 
 
 @flask_app.route(endpoint_constants.CONCURRENT_STATUS_WRITING, methods=['POST'])
-@validate_schema(validation_schema.ConcurrentWritingSchema)
+@validate_with_schema(validation_schema.ConcurrentWritingSchema)
 def handle_concurrent_status_writing_post() -> Response:
-    username = request.json.get("username", None)
-    active = request.json.get("active", None)
-
-    concurrent_status_service.set_active_status(username, active)
-
-    return Response(status=HTTPStatus.OK)
+    return concurrent_status_service.set_active_status()
 
 
 @flask_app.route(endpoint_constants.CONCURRENT_CONTINUATION_READING, methods=['POST'])
-@validate_schema(validation_schema.ConcurrentReadingSchema)
+@validate_with_schema(validation_schema.ConcurrentReadingSchema)
 def handle_concurrent_continuation_reading_post() -> dict:
-    username = request.json.get("username", None)
-
-    return concurrent_continuation_service.get_continuation_status(username)
+    return concurrent_continuation_service.get_continuation_status()
 
 
 @flask_app.route(endpoint_constants.CONCURRENT_CONTINUATION_WRITING, methods=['POST'])
-@validate_schema(validation_schema.ConcurrentContinuationWritingSchema)
+@validate_with_schema(validation_schema.ConcurrentContinuationWritingSchema)
 def handle_concurrent_continuation_writing_post() -> Response:
-    username = request.json.get("username", None)
-    continuation = request.json.get("continuation", None)
-
-    concurrent_continuation_service.set_continuation_status(username, continuation)
-
-    return Response(status=HTTPStatus.OK)
+    return concurrent_continuation_service.set_continuation_status()
 
 
 @flask_app.route(endpoint_constants.LAST_URL, methods=['POST'])
-@validate_schema(validation_schema.LastUrlSchema)
+@validate_with_schema(validation_schema.LastUrlSchema)
 def handle_last_url_post() -> Response:
-    username = request.json.get("username", None)
-    last_url = request.json.get("lastUrl", None)
-
-    last_url_service.set_last_url(username, last_url)
-
-    return Response(status=HTTPStatus.OK)
+    return last_url_service.set_last_url()
 
 
 @flask_app.route(endpoint_constants.LAST_URL, methods=['GET'])
 def handle_last_url_get() -> Response:
-    username = request.args.get("username")
-
     return last_url_service.get_last_url(username)
 
 

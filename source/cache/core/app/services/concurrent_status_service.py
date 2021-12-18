@@ -1,17 +1,21 @@
-import json
+from http import HTTPStatus
 
 from app.config.redis_config import redis_status
+from flask import request, Response
 
 
-def get_active_status(username):
+def get_active_status():
+    username = request.args.get("username")
     result = redis_status.get(username)
     if result:
-        result = str(result.decode('utf-8'))
-    else:
-        result = None
+        result = bool(result.decode('utf-8'))
 
-    return json.dumps({"active": result})
+    return {"active": result}
 
 
-def set_active_status(username, active):
+def set_active_status():
+    username = request.json.get("username", None)
+    active = request.json.get("active", None)
+
     redis_status.set(username, active)
+    return Response(status=HTTPStatus.OK)

@@ -1,11 +1,10 @@
-from marshmallow import Schema, fields, ValidationError, validates, post_load, INCLUDE
+from marshmallow import ValidationError, INCLUDE
 from flask import request, abort
-from app.config.app_config import flask_app
 from functools import wraps
 from itertools import chain
 
 
-def validate_schema(schema):
+def validate_with_schema(schema):
     def validate_schema_inner(wrapped_function):
         @wraps(wrapped_function)
         def inside_func(*args, **kwargs):

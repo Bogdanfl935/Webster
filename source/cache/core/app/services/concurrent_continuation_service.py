@@ -1,17 +1,22 @@
-import json
+from http import HTTPStatus
 
 from app.config.redis_config import redis_continuation
+from flask import request, Response
 
 
-def get_continuation_status(username):
+def get_continuation_status():
+    username = request.json.get("username", None)
     result = redis_continuation.get(username)
-    if result:
-        result = str(result.decode('utf-8'))
-    else:
-        result = None
+    if result is not None:
+        result = bool(result.decode('utf-8'))
 
-    return json.dumps({"continuation": result})
+    return {"continuation": result}
 
 
-def set_continuation_status(username, continuation):
+def set_continuation_status():
+    username = request.json.get("username", None)
+    continuation = request.json.get("continuation", None)
+
     redis_continuation.set(username, continuation)
+
+    return Response(status=HTTPStatus.OK)
