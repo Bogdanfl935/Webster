@@ -7,7 +7,7 @@ from flask import request, Response
 def get_active_status():
     username = request.args.get("username")
     result = redis_status.get(username)
-    if result:
+    if result is not None:
         result = bool(result.decode('utf-8'))
 
     return {"active": result}

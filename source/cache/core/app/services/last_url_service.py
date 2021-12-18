@@ -7,7 +7,7 @@ from flask import request, Response
 def get_last_url():
     username = request.args.get("username")
     result = redis_last_url.get(username)
-    if result:
+    if result is not None:
         result = str(result.decode('utf-8'))
 
     return {"username": username, "lastUrl": result}

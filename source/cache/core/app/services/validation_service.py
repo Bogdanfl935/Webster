@@ -9,7 +9,7 @@ def validate_with_schema(schema):
         @wraps(wrapped_function)
         def inside_func(*args, **kwargs):
             try:
-                result = schema().load(request.json, unknown=INCLUDE)
+                schema().load(request.json, unknown=INCLUDE)
             except ValidationError as e:
                 error_nested_list = ([dict(fieldName=key, errorMessage=message) for message in e.messages[key]] for key
                                      in e.messages)

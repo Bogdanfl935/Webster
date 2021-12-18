@@ -60,7 +60,7 @@ def handle_last_url_post() -> Response:
 
 @flask_app.route(endpoint_constants.LAST_URL, methods=['GET'])
 def handle_last_url_get() -> Response:
-    return last_url_service.get_last_url(username)
+    return last_url_service.get_last_url()
 
 
 @flask_app.errorhandler(400)

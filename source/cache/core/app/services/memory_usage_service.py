@@ -16,9 +16,7 @@ def set_memory_usage():
 def get_memory_usage():
     username = request.args.get("username")
     result = redis_memory_usage.get(username)
-    if result:
+    if result is not None:
         result = str(result.decode('utf-8'))
-    else:
-        result = None
 
     return {"username": username, "memoryUsage": result}
