@@ -1,0 +1,15 @@
+Flask>=1.0.2
+pytest>=4.6.2
+flask-inputs>=0.3.0
+jsonschema>=3.0.1
+twisted
+requests
+chardet2
+urllib3
+aiohttp
+aiofiles
+redis>=3.4.1
+rq>=1.2.2
+python-decouple
+validators
+marshmallow
