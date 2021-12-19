@@ -7,7 +7,7 @@ class MemoryUsageSchema(Schema):
     unknown = INCLUDE
 
 
-class ConcurrentReadingSchema(Schema):
+class UsernameAccessSchema(Schema):
     username = fields.Email(required=True)
     unknown = INCLUDE
 
