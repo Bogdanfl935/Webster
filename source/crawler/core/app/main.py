@@ -1,64 +1,46 @@
-from flask import Flask, jsonify, request
-from app.crawling_service import do_crawling, get_next_link, get_config, get_last_crawled, stop_crawling
-from app.config import app, schema
+from app.service.validation_service import ValidationTarget, validate_with_schema
+from app.constants import endpoint_constants, app_constants
+from flask import jsonify, make_response, request, Response
 from werkzeug.exceptions import HTTPException
-from requests.exceptions import ConnectionError
-from app.error_handler import ErrorHandler
-import endpoint_constants
-import constants
-import app_constants
-import asyncio
-import time
+from app.dto.error_handler import ErrorHandler
+from app.validation import validation_schema
+from app.service import crawling_service
+from app.config import app
+from http import HTTPStatus
 from datetime import datetime
-from flask_expects_json import expects_json
-from app.marshmallow_validator import validate_schema, StartCrawlerSchema
+import time
 
 
 @app.route(endpoint_constants.CRAWLER_START, methods=['POST'])
-@validate_schema(StartCrawlerSchema)
-def handle_crawler_post() -> str:
-    text = request.json.get(constants.START_LINK_KEY, None)
-    print(request.json)
-    # crawled_response = do_crawling(text)
-
-    asyncio.run(do_crawling(text))
-    # asyncio.run(do_crawling(text))
-
-    return ('', 200)
-
-
-@app.route(endpoint_constants.CRAWLER_STATUS, methods=['GET'])
-def handle_crawler_status_get() -> str:
-    username = request.args.get("username")
-    return get_last_crawled(username)
+@validate_with_schema(validation_schema.StartCrawlerSchema)
+def handle_crawler_post():
+    return crawling_service.start_crawling()
 
 @app.route(endpoint_constants.CRAWLER_STOP, methods=['POST'])
-def handle_crawler_stop_post() -> str:
-    return stop_crawling()
+@validate_with_schema(validation_schema.UsernameAccessSchema)
+def handle_crawler_stop_post():
+    return crawling_service.stop_crawling()
 
+@app.route(endpoint_constants.CRAWLER_STATUS, methods=['GET'])
+@validate_with_schema(validation_schema.UsernameAccessSchema, target=ValidationTarget.NAMED_URL_PARAMETERS)
+def handle_crawler_status_get():
+    return crawling_service.get_last_crawled_url()
 
-@app.errorhandler(400)
-def handle_unauthorized_error(exception: HTTPException) -> str:
-    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code,
-                           error="Bad Request",
-                           errors=exception.description)
-    return jsonify(myError.__dict__)
+@app.errorhandler(HTTPStatus.BAD_REQUEST)
+def handle_bad_request_error(exception: HTTPException) -> Response:
+    exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code,
+                            error=HTTPStatus(exception.code).phrase,
+                            errors=exception.description, path=request.path)
+    return make_response(jsonify(exception_dto.__dict__), exception.code)
 
 
 @app.errorhandler(Exception)
-def handle_generic_error(exception) -> str:
-    error_code = exception.code if isinstance(
-        exception, HTTPException) else 500
-
-    path = exception.request.path_url if isinstance(
-        exception, HTTPException) else None
-    path = exception.request.path_url if isinstance(
-        exception, ConnectionError) else None
-
-    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
-                           error="Internal Server Error",
-                           message=str(exception), path=path)
-    return jsonify(myError.__dict__)
+def handle_generic_error(exception) -> Response:
+    error_code = exception.code if isinstance(exception, HTTPException) else HTTPStatus.INTERNAL_SERVER_ERROR
+    exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
+                            error=HTTPStatus(error_code).phrase,
+                            message=str(exception), path=request.path)
+    return make_response(jsonify(exception_dto.__dict__), error_code)
 
 
 if __name__ == '__main__':
