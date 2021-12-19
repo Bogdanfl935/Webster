@@ -15,7 +15,7 @@ from datetime import datetime
 @flask_app.route(endpoint_constants.MEMORY_USAGE, methods=['POST'])
 @validate_with_schema(validation_schema.MemoryUsageSchema)
 def handle_memory_usage_post() -> Response:
-    return memory_usage_service.set_memory_usage()
+    return memory_usage_service.increase_memory_usage()
 
 
 @flask_app.route(endpoint_constants.MEMORY_USAGE, methods=['GET'])
@@ -61,11 +61,12 @@ def handle_last_url_post() -> Response:
 
 
 @flask_app.route(endpoint_constants.LAST_URL, methods=['GET'])
+@validate_with_schema(validation_schema.UsernameAccessSchema, target=ValidationTarget.NAMED_URL_PARAMETERS)
 def handle_last_url_get() -> Response:
     return last_url_service.get_last_url()
 
 
-@flask_app.errorhandler(400)
+@flask_app.errorhandler(HTTPStatus.BAD_REQUEST)
 def handle_bad_request_error(exception: HTTPException) -> Response:
     exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code,
                             error=HTTPStatus(exception.code).phrase,
@@ -77,7 +78,7 @@ def handle_bad_request_error(exception: HTTPException) -> Response:
 def handle_generic_error(exception) -> Response:
     error_code = exception.code if isinstance(exception, HTTPException) else HTTPStatus.INTERNAL_SERVER_ERROR
     exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
-                            error=HTTPStatus(exception.code).phrase,
+                            error=HTTPStatus(error_code).phrase,
                             message=str(exception), path=request.path)
     return make_response(jsonify(exception_dto.__dict__), error_code)
 

@@ -1,0 +1,1 @@
+REDIS_URL_EXPIRATION = 1800 # TTL in seconds
