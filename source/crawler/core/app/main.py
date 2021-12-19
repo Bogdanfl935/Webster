@@ -5,7 +5,7 @@ from werkzeug.exceptions import HTTPException
 from app.dto.error_handler import ErrorHandler
 from app.validation import validation_schema
 from app.service import crawling_service
-from app.config import app
+from app.config.app_config import app
 from http import HTTPStatus
 from datetime import datetime
 import time
