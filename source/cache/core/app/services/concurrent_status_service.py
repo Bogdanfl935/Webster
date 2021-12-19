@@ -1,21 +1,35 @@
 from http import HTTPStatus
-
+from app.constants import serialization_constants
+from app.services.concurrent_access_service import acquire_lock, release_lock
+from app.constants.lock_types import LockType
 from app.config.redis_config import redis_status
-from flask import request, Response
-
+from flask import request, make_response, jsonify, Response
 
 def get_active_status():
-    username = request.args.get("username")
-    result = redis_status.get(username)
-    if result:
-        result = bool(result.decode('utf-8'))
+    username = request.args.get(serialization_constants.USERNAME_KEY)
+    active = bool(redis_status.get(username).decode('utf-8')) if redis_status.exists(username) != 0 else False
+    return make_response(jsonify(dict(active=active)), HTTPStatus.OK)
 
-    return {"active": result}
+
+def get_and_set_active_status():
+    username = request.json.get(serialization_constants.USERNAME_KEY)
+    
+    acquire_lock(LockType.STATUS_LOCK) # Enter critical section
+    active = bool(redis_status.get(username).decode('utf-8')) if redis_status.exists(username) != 0 else False
+    if active is False: # Read and set active to True in an atomic operation
+        redis_status.set(username, bytes(True))
+    release_lock(LockType.STATUS_LOCK) # Exit critical section
+
+    return make_response(jsonify(dict(active=active)), HTTPStatus.OK)
 
 
 def set_active_status():
-    username = request.json.get("username", None)
-    active = request.json.get("active", None)
+    username = request.json.get(serialization_constants.USERNAME_KEY)
+    active = request.json.get(serialization_constants.STATUS_KEY)
 
-    redis_status.set(username, active)
+    if active is False: # Avoid caching if not neccessary => Remove entry if no longer active
+        acquire_lock(LockType.STATUS_LOCK) # Enter critical section
+        redis_status.delete(username)
+        release_lock(LockType.STATUS_LOCK) # Exit critical section
+    
     return Response(status=HTTPStatus.OK)

@@ -1,13 +1,13 @@
-from marshmallow import Schema, fields, INCLUDE
+from marshmallow import Schema, fields, validate, INCLUDE
 
 
 class MemoryUsageSchema(Schema):
     username = fields.Email(required=True)
-    memoryUsage = fields.Integer(required=True)
+    memoryUsage = fields.Integer(required=True, validate=validate.Range(min=0))
     unknown = INCLUDE
 
 
-class ConcurrentReadingSchema(Schema):
+class UsernameAccessSchema(Schema):
     username = fields.Email(required=True)
     unknown = INCLUDE
 

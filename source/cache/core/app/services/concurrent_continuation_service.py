@@ -1,22 +1,30 @@
 from http import HTTPStatus
-
+from app.constants import serialization_constants
+from app.services.concurrent_access_service import acquire_lock, release_lock
+from app.constants.lock_types import LockType
 from app.config.redis_config import redis_continuation
-from flask import request, Response
+from flask import request, make_response, jsonify, Response
 
 
-def get_continuation_status():
-    username = request.json.get("username", None)
-    result = redis_continuation.get(username)
-    if result is not None:
-        result = bool(result.decode('utf-8'))
+def get_and_set_continuation_status():
+    username = request.json.get(serialization_constants.USERNAME_KEY)
+    
+    acquire_lock(LockType.CONTINUATION_LOCK) # Enter critical section
+    continuation = bool(redis_continuation.get(username).decode('utf-8')) if redis_continuation.exists(username) != 0 else True
+    if continuation is False: # Read and clear continuation in an atomic operation
+        redis_continuation.delete(username)
+    release_lock(LockType.CONTINUATION_LOCK) # Exit critical section
 
-    return {"continuation": result}
+    return make_response(jsonify(dict(continuation=continuation)), HTTPStatus.OK)
 
 
 def set_continuation_status():
-    username = request.json.get("username", None)
-    continuation = request.json.get("continuation", None)
+    username = request.json.get(serialization_constants.USERNAME_KEY)
+    continuation = request.json.get(serialization_constants.CONTINUATION_KEY)
 
-    redis_continuation.set(username, continuation)
+    if continuation is False: # Avoid caching if not neccessary => Only cache if continuation is false
+        acquire_lock(LockType.CONTINUATION_LOCK) # Enter critical section
+        redis_continuation.set(username, bytes(continuation))
+        release_lock(LockType.CONTINUATION_LOCK) # Exit critical section
 
     return Response(status=HTTPStatus.OK)
