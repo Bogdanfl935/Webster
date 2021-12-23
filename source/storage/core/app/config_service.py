@@ -1,4 +1,4 @@
-from app.config import app, db, NextLinks, VisitedLinks, Configuration
+from app.config import app, db, ParsedUrls, VisitedUrls, Configuration
 from flask import jsonify
 
 def get_config_from_db(request):

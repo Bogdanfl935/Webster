@@ -3,11 +3,11 @@ CREATE FUNCTION verify_duplicate()
     RETURNS trigger AS
 $BODY$
 BEGIN
-    IF EXISTS(SELECT 1 FROM next_links WHERE new.url = url) THEN
+    IF EXISTS(SELECT 1 FROM parsed_urls WHERE new.url = url) THEN
         RETURN NULL;
     END IF;
 
-    IF EXISTS(SELECT 1 FROM visited_links WHERE new.url = url) THEN
+    IF EXISTS(SELECT 1 FROM visited_urls WHERE new.url = url) THEN
         RETURN NULL;
     END IF;
 
