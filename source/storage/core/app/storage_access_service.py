@@ -25,7 +25,7 @@ def get_next_links(request):
     db.session.execute('LOCK TABLE visited_urls IN ACCESS EXCLUSIVE MODE;')
     for el in next_link_db_resp:
         validate_url(el.url)
-        db.session.add(VisitedUrls(url=el.url))
+        db.session.add(VisitedUrls(url=el.url, user_id = el.user_id))
 
     db.session.commit()
 
@@ -37,10 +37,11 @@ def get_next_links(request):
 def add_link_to_db(request):
     links = request.get_json(force=True)
     json_links = links["links"]
+    json_user_id = links["user_id"]
 
     for link in json_links:
         try:
-            db.session.add(ParsedUrls(url=link))
+            db.session.add(ParsedUrls(url=link, user_id=json_user_id))
             db.session.commit()
         except (TypeError):
             db.session.rollback()

@@ -1,18 +1,21 @@
 -- Creation of parsed_urls table
 CREATE TABLE parsed_urls (
   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  user_id BIGINT NOT NULL,
   url varchar(2083) NOT NULL
 );
 
 -- Creation of visited_urls table
 CREATE TABLE visited_urls (
   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  user_id BIGINT NOT NULL,
   url varchar(2083) NOT NULL
 );
 
 -- Creation of config table
 CREATE TABLE config (
   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  user_id BIGINT NOT NULL,
   key varchar(16) NOT NULL,
   value varchar(16) NOT NULL
 );

@@ -21,7 +21,8 @@ db = SQLAlchemy(app)
 class ParsedUrls(db.Model):
     __tablename__ = sql_ddl_constants.NEXT_LINKS
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.BigInteger, nullable=False)
     url = db.Column(db.String(2083), nullable=False)
 
     def __repr__(self):
@@ -30,7 +31,8 @@ class ParsedUrls(db.Model):
 class VisitedUrls(db.Model):
     __tablename__ = sql_ddl_constants.VISITED_LINKS
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.BigInteger, nullable=False)
     url = db.Column(db.String(2083), nullable=False)
 
     def __repr__(self):
@@ -39,7 +41,8 @@ class VisitedUrls(db.Model):
 class Configuration(db.Model):
     __tablename__ = sql_ddl_constants.CONFIGURATION
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.BigInteger, nullable=False)
     key = db.Column(db.String(16), nullable=False)
     value = db.Column(db.String(16), nullable=False)
 
