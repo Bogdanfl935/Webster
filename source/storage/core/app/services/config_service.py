@@ -1,4 +1,4 @@
-from app.config import app, db, ParsedUrls, VisitedUrls, Configuration
+from app.config.config import db, Configuration
 from flask import jsonify
 
 def get_config_from_db(request):
@@ -23,8 +23,8 @@ def add_new_config_to_db(request):
     config_json = request.get_json(force=True)
 
     user_id = config_json["user_id"]
-    specific_tag = config_json["specific-tag"]
-    same_page = config_json["same-page"]
+    specific_tag = config_json["specificTag"]
+    same_page = config_json["samePage"]
     storage_limit = config_json["memoryLimit"]
 
     for el in specific_tag:

@@ -1,8 +1,6 @@
-from app.config import app, db, ParsedUrls, VisitedUrls, Configuration
-from flask import jsonify
-from flask import abort
-from werkzeug.exceptions import HTTPException
-import validators
+from app.config.config import db, ParsedUrls, VisitedUrls
+from flask import jsonify, abort, make_response
+from http import HTTPStatus
 
 
 def get_next_links(request):
@@ -16,7 +14,6 @@ def get_next_links(request):
     dict_next_url = dict()
     dict_next_url["urls"] = []
     for el in next_link_db_resp:
-        validate_url(el.url)
         dict_next_url["urls"].append(el.url)
         db.session.delete(el)
 
@@ -24,20 +21,18 @@ def get_next_links(request):
 
     db.session.execute('LOCK TABLE visited_urls IN ACCESS EXCLUSIVE MODE;')
     for el in next_link_db_resp:
-        validate_url(el.url)
         db.session.add(VisitedUrls(url=el.url, user_id = el.user_id))
 
     db.session.commit()
 
     db.session.commit()
 
-    return dict_next_url
-
+    return jsonify(dict_next_url)
 
 def add_link_to_db(request):
     links = request.get_json(force=True)
     json_links = links["links"]
-    json_user_id = links["user_id"]
+    json_user_id = int(links["user_id"])
 
     for link in json_links:
         try:
@@ -47,7 +42,3 @@ def add_link_to_db(request):
             db.session.rollback()
 
     return jsonify({"success": "True"})
-
-def validate_url(url):
-    if not validators.url(url):
-        abort(400, description={"fieldName": "urls", "errorMessage": f"url not properly formated"})
