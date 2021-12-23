@@ -1,13 +1,13 @@
--- Creation of function that checks for duplicates in next_links and visited_links
+-- Creation of function that checks for duplicates in parsed_urls and visited_urls
 CREATE FUNCTION verify_duplicate()
     RETURNS trigger AS
 $BODY$
 BEGIN
-    IF EXISTS(SELECT 1 FROM next_links WHERE new.url_site = url_site) THEN
+    IF EXISTS(SELECT 1 FROM parsed_urls WHERE new.url = url) THEN
         RETURN NULL;
     END IF;
 
-    IF EXISTS(SELECT 1 FROM visited_links WHERE new.url_site = url_site) THEN
+    IF EXISTS(SELECT 1 FROM visited_urls WHERE new.url = url) THEN
         RETURN NULL;
     END IF;
 
@@ -18,6 +18,6 @@ $BODY$
 
 CREATE TRIGGER verify_duplicate_next_links
     BEFORE INSERT
-    ON next_links
+    ON parsed_urls
     FOR EACH ROW
 EXECUTE PROCEDURE verify_duplicate();

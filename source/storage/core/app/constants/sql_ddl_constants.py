@@ -1,3 +1,5 @@
-VISITED_LINKS='visited_links'
-NEXT_LINKS='next_links'
+VISITED_LINKS='visited_urls'
+NEXT_LINKS='parsed_urls'
 CONFIGURATION='config'
+PARSED_CONTENT = 'parsed_content'
+PARSED_IMAGES = 'parsed_images'

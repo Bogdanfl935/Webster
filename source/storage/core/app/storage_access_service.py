@@ -1,4 +1,4 @@
-from app.config import app, db, NextLinks, VisitedLinks, Configuration
+from app.config import app, db, ParsedUrls, VisitedUrls, Configuration
 from flask import jsonify
 from flask import abort
 from werkzeug.exceptions import HTTPException
@@ -9,23 +9,23 @@ def get_next_links(request):
     json_resp = request.get_json('json_resp')
 
     db.session.begin_nested()
-    db.session.execute('LOCK TABLE next_links IN ACCESS EXCLUSIVE MODE;')
+    db.session.execute('LOCK TABLE parsed_urls IN ACCESS EXCLUSIVE MODE;')
 
-    next_link_db_resp = NextLinks.query.limit(int(json_resp["quantity"])).all()
+    next_link_db_resp = ParsedUrls.query.limit(int(json_resp["quantity"])).all()
 
     dict_next_url = dict()
     dict_next_url["urls"] = []
     for el in next_link_db_resp:
-        validate_url(el.url_site)
-        dict_next_url["urls"].append(el.url_site)
+        validate_url(el.url)
+        dict_next_url["urls"].append(el.url)
         db.session.delete(el)
 
     db.session.commit()
 
-    db.session.execute('LOCK TABLE visited_links IN ACCESS EXCLUSIVE MODE;')
+    db.session.execute('LOCK TABLE visited_urls IN ACCESS EXCLUSIVE MODE;')
     for el in next_link_db_resp:
-        validate_url(el.url_site)
-        db.session.add(VisitedLinks(url_site=el.url_site))
+        validate_url(el.url)
+        db.session.add(VisitedUrls(url=el.url, user_id = el.user_id))
 
     db.session.commit()
 
@@ -37,10 +37,11 @@ def get_next_links(request):
 def add_link_to_db(request):
     links = request.get_json(force=True)
     json_links = links["links"]
+    json_user_id = links["user_id"]
 
     for link in json_links:
         try:
-            db.session.add(NextLinks(url_site=link))
+            db.session.add(ParsedUrls(url=link, user_id=json_user_id))
             db.session.commit()
         except (TypeError):
             db.session.rollback()

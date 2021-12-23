@@ -18,30 +18,55 @@ app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql+psycopg2://{MY_USER}:{MY_PA
 db = SQLAlchemy(app)
 
 
-class NextLinks(db.Model):
+class ParsedUrls(db.Model):
     __tablename__ = sql_ddl_constants.NEXT_LINKS
 
-    id = db.Column(db.Integer, primary_key=True)
-    url_site = db.Column(db.String(2083), nullable=False)
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.BigInteger, nullable=False)
+    url = db.Column(db.String(2083), nullable=False)
 
     def __repr__(self):
-        return '<Category %r>' % self.url_site
+        return '<Category %r>' % self.url
 
-class VisitedLinks(db.Model):
+class VisitedUrls(db.Model):
     __tablename__ = sql_ddl_constants.VISITED_LINKS
 
-    id = db.Column(db.Integer, primary_key=True)
-    url_site = db.Column(db.String(2083), nullable=False)
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.BigInteger, nullable=False)
+    url = db.Column(db.String(2083), nullable=False)
 
     def __repr__(self):
-        return '<Category %r>' % self.url_site
+        return '<Category %r>' % self.url
 
 class Configuration(db.Model):
     __tablename__ = sql_ddl_constants.CONFIGURATION
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.BigInteger, nullable=False)
     key = db.Column(db.String(16), nullable=False)
     value = db.Column(db.String(16), nullable=False)
 
     def __repr__(self):
         return '<Category %r>' % self.key
+
+class ParsedContent(db.Model):
+    __tablename__ = sql_ddl_constants.PARSED_CONTENT
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.BigInteger, nullable=False)
+    tag = db.Column(db.String(32), nullable=False)
+    content = db.Column(db.LargeBinary, nullable=False)
+
+    def __repr__(self):
+        return '<Category %r>' % self.content
+
+class ParsedImages(db.Model):
+    __tablename__ = sql_ddl_constants.PARSED_IMAGES
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.BigInteger, nullable=False)
+    extension = db.Column(db.String(16), nullable=False)
+    content = db.Column(db.LargeBinary, nullable=False)
+
+    def __repr__(self):
+        return '<Category %r>' % self.content

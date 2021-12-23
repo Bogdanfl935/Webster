@@ -25,6 +25,14 @@ def handle_store_config_post() -> str:
 def handle_retr_config_post() -> str:
     return config_service.get_config_from_db(request)
 
+@app.route(endpoint_constants.PARSED_CONTENT, methods=['POST'])
+def handle_parsed_content_post() -> str:
+    return (200, '')
+
+@app.route(endpoint_constants.PARSED_IMAGES, methods=['POST'])
+def handle_parsed_images_post() -> str:
+    return (200, '')
+
 @app.errorhandler(400)
 def handle_unauthorized_error(exception: HTTPException) -> str:
     myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code, error="Bad Request",
