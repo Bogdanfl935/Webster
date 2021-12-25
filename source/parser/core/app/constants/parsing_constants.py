@@ -1,0 +1,2 @@
+BASE_64_INDICATOR = ";base64,"
+BASE_64_DATA_PREFIX = "data:"
