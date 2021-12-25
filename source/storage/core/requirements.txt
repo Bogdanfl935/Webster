@@ -12,3 +12,4 @@ Flask-Migrate
 mysqlclient
 python-decouple
 validators
+marshmallow

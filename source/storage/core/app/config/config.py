@@ -2,8 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from decouple import AutoConfig
 from app.constants import sql_ddl_constants
-
-app = Flask(__name__)
+from app.config.app_config import flask_app
 
 config = AutoConfig(search_path='../../init/.env')
 
@@ -12,10 +11,10 @@ MY_PASSWORD = config('MY_PASSWORD')
 MY_HOST = config('MY_HOST')
 MY_PORT = config('MY_PORT')
 
-app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql+psycopg2://{MY_USER}:{MY_PASSWORD}@{MY_HOST}:{MY_PORT}/{MY_USER}"
+flask_app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql+psycopg2://{MY_USER}:{MY_PASSWORD}@{MY_HOST}:{MY_PORT}/{MY_USER}"
 # app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 # app.config[""]
-db = SQLAlchemy(app)
+db = SQLAlchemy(flask_app)
 
 
 class ParsedUrls(db.Model):
