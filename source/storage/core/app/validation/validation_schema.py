@@ -23,6 +23,11 @@ class RetrieveConfigSchema(Schema):
     user_id = fields.Integer(required=True)
     unknown = INCLUDE
 
+class UsernameAccessSchema(Schema):
+    user_id = fields.Integer(required=True)
+    unknown = INCLUDE
+
 class ParsedDataSchema(Schema):
     user_id = fields.Integer(required=True)
+    content = fields.Dict(keys=fields.String(), values=fields.List(fields.String()), required=True)
     unknown = INCLUDE
