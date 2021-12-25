@@ -5,6 +5,9 @@ class LockType(Enum):
     def __init__(self, *args, **kwargs):
         self.lock = threading.Lock()
     
-    STATUS_LOCK = auto()
-    CONTINUATION_LOCK = auto()
+    CRAWLER_STATUS_LOCK = auto()
+    PARSER_STATUS_LOCK = auto()
+    CRAWLER_CONTINUATION_LOCK = auto()
+    PARSER_CONTINUATION_LOCK = auto()
     LAST_URL_LOCK = auto()
+    LAST_PARSED_LOCK = auto()
