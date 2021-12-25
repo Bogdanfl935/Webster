@@ -12,7 +12,6 @@ def get_content_from_db():
     resp_json["content"] = dict()
 
     for el in db_resp:
-        resp_json["user_id"] = el[0]
         if el[1] not in resp_json["content"].keys():
             resp_json["content"][el[1]] = [el[2].decode('utf-8')]
         else:

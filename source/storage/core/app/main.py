@@ -68,13 +68,13 @@ def handle_bad_request_error(exception: HTTPException) -> Response:
     return make_response(jsonify(exception_dto.__dict__), exception.code)
 
 
-# @flask_app.errorhandler(Exception)
-# def handle_generic_error(exception) -> Response:
-#     error_code = exception.code if isinstance(exception, HTTPException) else HTTPStatus.INTERNAL_SERVER_ERROR
-#     exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
-#                                  error=HTTPStatus(error_code).phrase,
-#                                  message=str(exception), path=request.path)
-#     return make_response(jsonify(exception_dto.__dict__), error_code)
+@flask_app.errorhandler(Exception)
+def handle_generic_error(exception) -> Response:
+    error_code = exception.code if isinstance(exception, HTTPException) else HTTPStatus.INTERNAL_SERVER_ERROR
+    exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
+                                 error=HTTPStatus(error_code).phrase,
+                                 message=str(exception), path=request.path)
+    return make_response(jsonify(exception_dto.__dict__), error_code)
 
 
 if __name__ == '__main__':
