@@ -29,19 +29,12 @@ class LastUrlSchema(Schema):
     lastUrl = fields.Url(required=True)
     unknown = INCLUDE
 
-class TagDetailsSchema(Schema):
+class LastParsedSchema(Schema):
+    username = fields.Email(required=True)
+    url = fields.Url(required=True)
     tag = fields.String(required=True)
     memoryUsage = fields.Integer(required=True, validate=validate.Range(min=0))
     unknown = INCLUDE
 
-class ParsedContentSchema(Schema):
-    url = fields.Url(required=True)
-    content = fields.List(fields.Nested(TagDetailsSchema, required=True), required=True)
-    unknown = INCLUDE
-
-class LastParsedSchema(Schema):
-    username = fields.Email(required=True)
-    lastParsed = fields.Nested(ParsedContentSchema, required=True)
-    unknown = INCLUDE
 
 
