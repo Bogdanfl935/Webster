@@ -12,6 +12,4 @@ redis_crawler_status = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=RE
 redis_crawler_continuation = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, db=2)
 redis_last_url = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, db=3)
 
-redis_parser_status = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, db=4)
-redis_parser_continuation = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, db=5)
-redis_last_parsed = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, db=6)
+redis_last_parsed = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, db=4)

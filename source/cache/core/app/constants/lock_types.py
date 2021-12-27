@@ -6,8 +6,6 @@ class LockType(Enum):
         self.lock = threading.Lock()
     
     CRAWLER_STATUS_LOCK = auto()
-    PARSER_STATUS_LOCK = auto()
     CRAWLER_CONTINUATION_LOCK = auto()
-    PARSER_CONTINUATION_LOCK = auto()
     LAST_URL_LOCK = auto()
     LAST_PARSED_LOCK = auto()

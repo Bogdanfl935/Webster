@@ -7,7 +7,7 @@ from app.dto.error_handler import ErrorHandler
 from app.config.app_config import flask_app
 from app.validation import validation_schema
 from werkzeug.exceptions import HTTPException
-import time
+import time, logging, traceback
 from datetime import datetime
 
 
@@ -38,8 +38,12 @@ def handle_generic_error(exception) -> Response:
     exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
                             error=HTTPStatus(error_code).phrase,
                             message=str(exception), path=request.path)
+    if error_code == HTTPStatus.INTERNAL_SERVER_ERROR:
+        logging.log(level=logging.DEBUG, msg=traceback.format_exc())
     return make_response(jsonify(exception_dto.__dict__), error_code)
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG, filename="logfile", filemode="a+",
+                        format="%(asctime)-15s %(levelname)-8s %(message)s")
     flask_app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
