@@ -9,7 +9,8 @@ function config_user_data() {
     echo "Creating user $user in database $POSTGRES_DB"
 	psql -v ON_ERROR_STOP=1 -v user_var="$user"  -v password_var="$password" --username "$POSTGRES_USER" <<-EOSQL
 		CREATE USER :user_var WITH ENCRYPTED PASSWORD ':password_var';
-		GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_DB TO :user_var
+		GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_DB TO :user_var;
+		GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO :user_var;
 	EOSQL
 }
 
