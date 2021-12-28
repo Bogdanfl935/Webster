@@ -1,6 +1,6 @@
 from flask import request, jsonify, Response, make_response
 from app.constants import app_constants, endpoint_constants
-from app.services import config_service, storage_access_service, parsed_content_service, parsed_images_service
+from app.services import storage_access_service
 from app.config.app_config import flask_app
 from werkzeug.exceptions import HTTPException
 from app.dto.error_handler import ErrorHandler
@@ -8,56 +8,16 @@ from app.services.validation_service import validate_with_schema, ValidationTarg
 from app.dto.error_handler import ErrorHandler
 from app.validation import validation_schema
 from http import HTTPStatus
-import time
+import time, logging, traceback
 from datetime import datetime
 
 
-# users = User.query.all()
 
-@flask_app.route(endpoint_constants.STORAGE, methods=['POST'])
-@validate_with_schema(validation_schema.AddingUrlsSchema)
-def handle_storage_post() -> str:
-    return storage_access_service.add_link_to_db(request)
-
-
-@flask_app.route(endpoint_constants.NEXT_LINK, methods=['POST'])
-@validate_with_schema(validation_schema.NextUrlsSchema)
-def handle_next_link_post() -> str:
-    return storage_access_service.get_next_links(request)
-
-
-@flask_app.route(endpoint_constants.STORE_CONFIGURATION, methods=['POST'])
-@validate_with_schema(validation_schema.StoreConfigSchema)
-def handle_store_config_post() -> str:
-    return config_service.add_new_config_to_db(request)
-
-
-@flask_app.route(endpoint_constants.RETR_CONFIGURATION, methods=['POST'])
-@validate_with_schema(validation_schema.RetrieveConfigSchema)
-def handle_retr_config_post() -> str:
-    return config_service.get_config_from_db(request)
-
-
-@flask_app.route(endpoint_constants.PARSED_CONTENT, methods=['POST'])
-@validate_with_schema(validation_schema.ParsedDataSchema)
-def handle_parsed_content_post() -> str:
-    return parsed_content_service.add_new_content_to_db()
-
-@flask_app.route(endpoint_constants.PARSED_CONTENT, methods=['GET'])
+@flask_app.route(endpoint_constants.MEMORY_LIMIT, methods=['GET'])
 @validate_with_schema(validation_schema.UsernameAccessSchema, target=ValidationTarget.NAMED_URL_PARAMETERS)
-def handle_parsed_content_get() -> str:
-    return parsed_content_service.get_content_from_db()
+def handle_memory_limit_get() -> Response:
+    return storage_access_service.get_memory_limit()
 
-
-@flask_app.route(endpoint_constants.PARSED_IMAGES, methods=['POST'])
-@validate_with_schema(validation_schema.ParsedDataSchema)
-def handle_parsed_images_post() -> str:
-    return parsed_images_service.add_new_content_to_db()
-
-@flask_app.route(endpoint_constants.PARSED_IMAGES, methods=['GET'])
-@validate_with_schema(validation_schema.UsernameAccessSchema, target=ValidationTarget.NAMED_URL_PARAMETERS)
-def handle_parsed_images_get() -> str:
-    return parsed_images_service.get_content_from_db()
 
 
 @flask_app.errorhandler(HTTPStatus.BAD_REQUEST)
@@ -74,8 +34,12 @@ def handle_generic_error(exception) -> Response:
     exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
                                  error=HTTPStatus(error_code).phrase,
                                  message=str(exception), path=request.path)
+    if error_code == HTTPStatus.INTERNAL_SERVER_ERROR:
+        logging.log(level=logging.DEBUG, msg=traceback.format_exc())
     return make_response(jsonify(exception_dto.__dict__), error_code)
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG, filename="logfile", filemode="a+",
+                        format="%(asctime)-15s %(levelname)-8s %(message)s")
     flask_app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
