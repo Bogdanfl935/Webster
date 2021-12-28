@@ -1,33 +1,56 @@
-from marshmallow import Schema, fields, validate, INCLUDE
+from marshmallow import Schema, fields, INCLUDE
 
 
-class AddingUrlsSchema(Schema):
-    user_id = fields.Integer(required=True)
-    links = fields.List(fields.Url(), required=True)
+class UrlInsertionSchema(Schema):
+    username = fields.Email(required=True)
+    urls = fields.List(fields.Url(), required=True)
+    unknown = INCLUDE
+
+class UrlUpdateSchema(Schema):
+    username = fields.Email(required=True)
+    urls = fields.List(fields.Url(), required=True)
+    visited = fields.Boolean(required=True)
     unknown = INCLUDE
 
 
-class NextUrlsSchema(Schema):
-    user_id = fields.Integer(required=True)
+class UrlRetrievalSchema(Schema):
+    username = fields.Email(required=True)
     quantity = fields.Integer(required=True)
     unknown = INCLUDE
 
-class StoreConfigSchema(Schema):
-    user_id = fields.Integer(required=True)
-    specificTag = fields.List(fields.String(), required=True)
-    samePage = fields.Boolean(required=True)
-    memoryLimit = fields.Integer(required=True)
+
+class ParserConfigurationSchema(Schema):
+    username = fields.Email(required=True)
+    tag = fields.String(required=True)
     unknown = INCLUDE
 
-class RetrieveConfigSchema(Schema):
-    user_id = fields.Integer(required=True)
+class CrawlerConfigurationSchema(Schema):
+    username = fields.Email(required=True)
+    keyword = fields.String(required=True)
+    active = fields.Boolean(required=True)
     unknown = INCLUDE
+
 
 class UsernameAccessSchema(Schema):
-    user_id = fields.Integer(required=True)
+    username = fields.Email(required=True)
     unknown = INCLUDE
 
-class ParsedDataSchema(Schema):
-    user_id = fields.Integer(required=True)
-    content = fields.Dict(keys=fields.String(), values=fields.List(fields.String()), required=True)
+
+class ParsedContentInsertionSchema(Schema):
+    username = fields.Email(required=True)
+    tag = fields.String(required=True)
+    content = fields.String(required=True)
+    unknown = INCLUDE
+
+
+class ParsedImageInsertionSchema(Schema):
+    username = fields.Email(required=True)
+    extension = fields.String(required=True)
+    content = fields.String(required=True)
+    unknown = INCLUDE
+
+
+class ParsedDataDeletionSchema(Schema):
+    username = fields.Email(required=True)
+    id = fields.Integer(required=True)
     unknown = INCLUDE
