@@ -4,18 +4,15 @@
 \set DESCRIPTION_MAX_LENGTH 60
 \set KEYWORD_MAX_LENGTH 15
 
+CREATE TYPE URL_STATE AS ENUM ('READY', 'PENDING', 'VISITED');
+
 -- Creation of parsed url table
 CREATE TABLE parsed_url (
   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id BIGINT NOT NULL,
-  url VARCHAR(:URL_MAX_LENGTH) NOT NULL
-);
-
--- Creation of visited url table
-CREATE TABLE visited_url (
-  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  user_id BIGINT NOT NULL,
-  url VARCHAR(:URL_MAX_LENGTH) NOT NULL
+  url VARCHAR(:URL_MAX_LENGTH) NOT NULL,
+  state URL_STATE NOT NULL,
+  UNIQUE(user_id, url)
 );
 
 -- Creation of parser configuration table
