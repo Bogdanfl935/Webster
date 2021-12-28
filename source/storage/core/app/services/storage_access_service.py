@@ -1,44 +1,19 @@
-from app.config.config import db, ParsedUrls, VisitedUrls
-from flask import jsonify, abort, make_response
+from app.constants import serialization_constants, sql_models
+from app.services import persistence_service
+from app.services.user_mapping_service import fetch_user_id
+from flask import request, make_response, jsonify
 from http import HTTPStatus
 
 
-def get_next_links(request):
-    json_resp = request.get_json('json_resp')
 
-    db.session.begin_nested()
-    db.session.execute('LOCK TABLE parsed_urls IN ACCESS EXCLUSIVE MODE;')
+def get_memory_limit():
+    # User ID is not used as memory limit is not distinguished between users
+    # If different memory limits are introduced for users, the User ID may
+    # be used to fetch associated memory limit (i.e. according to their account
+    # status perks)
+    user_id = fetch_user_id(request.args.get(serialization_constants.USERNAME_KEY))
+    query_func = lambda session: session.query(sql_models.MemoryLimit).value(sql_models.MemoryLimit.capacity)
+    record = persistence_service.query(query_func)
+    response = {serialization_constants.MEMORY_LIMIT_KEY: record}
 
-    next_link_db_resp = ParsedUrls.query.limit(int(json_resp["quantity"])).all()
-
-    dict_next_url = dict()
-    dict_next_url["urls"] = []
-    for el in next_link_db_resp:
-        dict_next_url["urls"].append(el.url)
-        db.session.delete(el)
-
-    db.session.commit()
-
-    db.session.execute('LOCK TABLE visited_urls IN ACCESS EXCLUSIVE MODE;')
-    for el in next_link_db_resp:
-        db.session.add(VisitedUrls(url=el.url, user_id = el.user_id))
-
-    db.session.commit()
-
-    db.session.commit()
-
-    return jsonify(dict_next_url)
-
-def add_link_to_db(request):
-    links = request.get_json(force=True)
-    json_links = links["links"]
-    json_user_id = int(links["user_id"])
-
-    for link in json_links:
-        try:
-            db.session.add(ParsedUrls(url=link, user_id=json_user_id))
-            db.session.commit()
-        except (TypeError):
-            db.session.rollback()
-
-    return jsonify({"success": "True"})
+    return make_response(jsonify(response), HTTPStatus.OK)

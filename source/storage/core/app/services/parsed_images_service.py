@@ -1,34 +1,42 @@
-from app.config.config import db, ParsedImages
-from flask import jsonify, request
-import psycopg2
+from app.constants import serialization_constants, sql_models
+from app.services import persistence_service
+from app.services.user_mapping_service import fetch_user_id
+from flask import request, Response, make_response, jsonify
+from http import HTTPStatus
+import base64
 
-def get_content_from_db():
-    user_id = int(request.args.get("user_id"))
 
-    db_resp = db.session.query(ParsedImages.user_id, ParsedImages.extension, ParsedImages.content).filter(ParsedImages.user_id == user_id)
+def add_image():
+    user_id = fetch_user_id(request.json.get(serialization_constants.USERNAME_KEY))
+    extension = request.json.get(serialization_constants.EXTENSION_KEY)
+    content = base64.b64decode(request.json.get(serialization_constants.CONTENT_KEY).encode('ascii'))
+    record = sql_models.ParsedImage(user_id=user_id, extension=extension, content=content)
 
-    resp_json = dict()
+    persistence_service.add(record, commit=True)
+    return Response(status=HTTPStatus.OK)
 
-    resp_json["content"] = dict()
+def delete_image():
+    user_id = fetch_user_id(request.json.get(serialization_constants.USERNAME_KEY))
+    content_id = request.json.get(serialization_constants.ID_KEY)
+    query_func = lambda session: session.query(sql_models.ParsedImage).filter(
+        sql_models.ParsedImage.user_id == user_id,
+        sql_models.ParsedImage.id == content_id).delete()
+    
+    persistence_service.query(query_func)
+    persistence_service.commit_session()
 
-    for el in db_resp:
-        if el[1] not in resp_json["content"].keys():
-            resp_json["content"][el[1]] = [el[2].decode('utf-8')]
-        else:
-            resp_json["content"][el[1]].append(el[2].decode('utf-8'))
+    return Response(status=HTTPStatus.OK)
 
-    return jsonify(resp_json)
+def get_images():
+    user_id = fetch_user_id(request.args.get(serialization_constants.USERNAME_KEY))
 
-def add_new_content_to_db():
-    config_json = request.get_json(force=True)
-
-    user_id = config_json["user_id"]
-    content = config_json["content"]
-
-    for tag in content:
-        for i in range(len(content[tag])):
-            db.session.add(ParsedImages(user_id=user_id, extension=tag, content=content[tag][i].encode('utf-8')))
-
-    db.session.commit()
-
-    return jsonify({"success": "True"})
+    query_func = lambda session: session.query(sql_models.ParsedImage).filter(
+        sql_models.ParsedImage.user_id == user_id).values(
+        sql_models.ParsedImage.id, sql_models.ParsedImage.extension, sql_models.ParsedImage.content)
+    records = persistence_service.query(query_func)
+    response = {serialization_constants.PARSED_IMAGES_KEY: [
+            {key: base64.b64encode(value).decode("ascii") if key == serialization_constants.CONTENT_KEY else value 
+            for key, value in record._asdict().items()}
+        for record in records]
+    }
+    return make_response(jsonify(response), HTTPStatus.OK)

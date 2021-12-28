@@ -13,6 +13,8 @@ CREATE TABLE App_User(
 	is_credentials_non_expired		BOOLEAN		NOT NULL
 );
 
+CREATE VIEW User_Record AS SELECT (id, username) FROM App_User;
+
 CREATE TABLE Role(
 --	Field name		Field type			Field constraints
 	id 				BIGINT 		PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
