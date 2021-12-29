@@ -1,10 +1,14 @@
-CRAWLER_CONFIGURATION = "/crawler-configuration"
-
-NEXT_URL = "/next-url"
-
+# Own endpoints
 CRAWLER_START = "/crawler-start"
 CRAWLER_STOP = "/crawler-stop"
 CRAWLER_STATUS = "/crawler-status"
+
+# Foreign endpoints
+CRAWLER_CONFIGURATION = "/crawler-configuration"
+
+MEMORY_LIMIT = "/memory-limit"
+URL_STORAGE = "/url-storage"
+NEXT_URL = "/next-url"
 
 MEMORY_USAGE = "/memory-usage"
 CONCURRENT_STATUS_READING = "/concurrent-status-reading"

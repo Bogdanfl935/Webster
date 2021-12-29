@@ -35,22 +35,3 @@ def make_last_url_get(authenticated_user):
     parameterized_url = url_joiner.construct_parameterized_url(target_url, parameters=dict(username=authenticated_user))
     response = requests.get(parameterized_url)
     return unpack_response(response)
-
-# def get_last_crawled(username):
-#     print(last_crawled_links)
-#     return_dict = dict()
-#     return_dict["active"] = active
-#     #redis_mem_capacity.set("user1", 0, nx=True)
-#     #return_dict["memoryUsage"] = int(redis_mem_capacity.get("user1").decode())
-
-#     if len(last_crawled_links) > 0:
-#         return_dict["url"] = last_crawled_links.pop()
-#         parsed_domain = urllib.request.urlparse(return_dict["url"]).netloc
-#         if parsed_domain.startswith('www.'):
-#             parsed_domain = parsed_domain[4:]
-#         return_dict["domain"] = parsed_domain
-#     else:
-#         return_dict["url"] = None
-#         return_dict["domain"] = None
-
-#     return return_dict
