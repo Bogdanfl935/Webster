@@ -1,57 +1,44 @@
-from flask import Flask, jsonify, request
-from app.find_links import parsing_service, get_last_parsed
-from app.config import app, schema
-import endpoint_constants
-import constants
-import app_constants
+from app.service.validation_service import ValidationTarget, validate_with_schema
+from flask import jsonify, make_response, request, Response
+from app.constants import endpoint_constants, app_constants
+from app.config.queue_config import AMQP_QUEUE
+from app.validation import validation_schema
+from app.dto.error_handler import ErrorHandler
 from werkzeug.exceptions import HTTPException
-from requests.exceptions import ConnectionError
-from app.error_handler import ErrorHandler
-import time
+from app.service import parsing_service, queue_consumer_service
+from app.config.app_config import app
+from http import HTTPStatus
 from datetime import datetime
-from flask_expects_json import expects_json
-from app.marshmallow_validator import validate_schema, StartParserSchema
+import time, logging, traceback
 
 
-@app.route(endpoint_constants.PARSER, methods=['POST'])
-@validate_schema(StartParserSchema)
-def handle_parser_post() -> str:
-    text = request.json.get(constants.CONTENT_KEY, None)
-    url = request.json.get(constants.URL_KEY, None)
-    # text = request.data.decode()
-
-    # get links from the webpage
-    next_urls = parsing_service(text, url)
-
-    return next_urls
 
 @app.route(endpoint_constants.PARSER_STATUS, methods=['GET'])
+@validate_with_schema(validation_schema.UsernameAccessSchema, target=ValidationTarget.NAMED_URL_PARAMETERS)
 def handle_parser_status_get() -> str:
-    username = request.args.get('username')
-    return get_last_parsed(username)
+    return parsing_service.get_last_parsed_content()
 
-@app.errorhandler(400)
-def handle_unauthorized_error(exception: HTTPException) -> str:
-    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code,
-                           error="Bad Request",
-                           errors=exception.description)
-    return jsonify(myError.__dict__)
+@app.errorhandler(HTTPStatus.BAD_REQUEST)
+def handle_bad_request_error(exception: HTTPException) -> Response:
+    exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code,
+                            error=HTTPStatus(exception.code).phrase,
+                            errors=exception.description, path=request.path)
+    return make_response(jsonify(exception_dto.__dict__), exception.code)
 
 
 @app.errorhandler(Exception)
-def handle_generic_error(exception) -> str:
-    error_code = exception.code if isinstance(
-        exception, HTTPException) else 500
-
-    path = exception.request.path_url if isinstance(
-        exception, HTTPException) else None
-    path = exception.request.path_url if isinstance(
-        exception, ConnectionError) else None
-
-    myError = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
-                           error="Internal Server Error",
-                           message=str(exception), path=path)
-    return jsonify(myError.__dict__)
+def handle_generic_error(exception) -> Response:
+    error_code = exception.code if isinstance(exception, HTTPException) else HTTPStatus.INTERNAL_SERVER_ERROR
+    exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
+                            error=HTTPStatus(error_code).phrase,
+                            message=str(exception), path=request.path)
+    if error_code == HTTPStatus.INTERNAL_SERVER_ERROR:
+        logging.log(level=logging.DEBUG, msg=traceback.format_exc())
+    return make_response(jsonify(exception_dto.__dict__), error_code)
 
 if __name__ == '__main__':
-    app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
+    logging.basicConfig(level=logging.DEBUG, filename="logfile", filemode="a+",
+                        format="%(asctime)-15s %(levelname)-8s %(message)s")
+    queue_consumer_service.subscribe(AMQP_QUEUE)
+    app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT)
+    queue_consumer_service.shutdown()

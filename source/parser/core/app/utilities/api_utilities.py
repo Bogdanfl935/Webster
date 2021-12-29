@@ -6,7 +6,8 @@ def unpack_response(response: Response):
     return_content = None
     match response.status_code:
         case HTTPStatus.OK:
-            return_content = response.json()
+            if int(response.headers.get('Content-Length', '0')) > 0:
+                return_content = response.json()
         case _:
             abort(response.status_code, response.json())
     return return_content, response.status_code
