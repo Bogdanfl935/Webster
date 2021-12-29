@@ -17,10 +17,12 @@ def get_last_url():
 def set_last_url():
     username = request.json.get(serialization_constants.USERNAME_KEY)
     last_url = request.json.get(serialization_constants.LAST_URL_KEY)
-    
+
     acquire_lock(LockType.LAST_URL_LOCK) # Enter critical section
-    redis_last_url.set(username, last_url, ex=redis_constants.REDIS_LATEST_EXPIRATION)
-    release_lock(LockType.LAST_URL_LOCK) # Exit critical section
+    try:
+        redis_last_url.set(username, last_url, ex=redis_constants.REDIS_LATEST_EXPIRATION)
+    finally:
+        release_lock(LockType.LAST_URL_LOCK) # Exit critical section
     
     return Response(status=HTTPStatus.OK)
 
@@ -41,16 +43,18 @@ def set_last_parsed():
     filtered_request_dict = {key: request.json.get(key) for key in serialization_keys}
 
     acquire_lock(LockType.LAST_PARSED_LOCK)  # Enter critical section
-    if redis_last_parsed.exists(username) != 0:
-        parsing_history = json.loads(redis_last_parsed.get(username).decode('utf-8'))
-        parsing_history[url] = parsing_history.get(url, []) + [filtered_request_dict]
-    else:
-        parsing_history = {url: [filtered_request_dict]}
+    try:
+        if redis_last_parsed.exists(username) != 0:
+            parsing_history = json.loads(redis_last_parsed.get(username).decode('utf-8'))
+            parsing_history[url] = parsing_history.get(url, []) + [filtered_request_dict]
+        else:
+            parsing_history = {url: [filtered_request_dict]}
 
-    
-    redis_last_parsed.set(username, json.dumps(parsing_history).encode(
-            'utf-8'), ex=redis_constants.REDIS_LATEST_EXPIRATION)
-    release_lock(LockType.LAST_PARSED_LOCK)  # Exit critical section
+        
+        redis_last_parsed.set(username, json.dumps(parsing_history).encode(
+                'utf-8'), ex=redis_constants.REDIS_LATEST_EXPIRATION)
+    finally:
+        release_lock(LockType.LAST_PARSED_LOCK)  # Exit critical section
 
     return Response(status=HTTPStatus.OK)
 

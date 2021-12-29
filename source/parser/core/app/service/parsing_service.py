@@ -31,23 +31,19 @@ def _parse(authenticated_user, memory_limit, html_content, page_url):
     tags = set(parser_config_response.get(serialization_constants.TAGS_KEY))
     tags.add(parsing_constants.ANCHOR_TAG) # Mandatory anchor tag for parsing
     
-    try:
-        soup = BeautifulSoup(html_content, "lxml")
-        for tag in tags:
-            fetched_content = soup.find_all(tag)
-            match tag:
-                case parsing_constants.IMAGE_TAG:
-                    executor_service.submit_task(
-                        lambda: image_parsing_service.process_images(authenticated_user, fetched_content, memory_limit, page_url))
-                case parsing_constants.ANCHOR_TAG:
-                    executor_service.submit_task(
-                        lambda: url_parsing_service.process_anchors(authenticated_user, fetched_content, memory_limit, page_url))
-                case _:
-                    executor_service.submit_task(
-                        lambda: generic_parsing_service.process_generic_tag(
-                            authenticated_user, fetched_content, memory_limit, page_url, tag))
-    except Exception:
-        import logging, traceback
-        logging.log(level=logging.DEBUG, msg=traceback.format_exc())
+    soup = BeautifulSoup(html_content, "lxml")
+    for tag in tags:
+        fetched_content = soup.find_all(tag)
+        match tag:
+            case parsing_constants.IMAGE_TAG:
+                executor_service.submit_task(
+                    lambda: image_parsing_service.process_images(authenticated_user, fetched_content, memory_limit, page_url))
+            case parsing_constants.ANCHOR_TAG:
+                executor_service.submit_task(
+                    lambda: url_parsing_service.process_anchors(authenticated_user, fetched_content, memory_limit, page_url))
+            case _:
+                executor_service.submit_task(
+                    lambda: generic_parsing_service.process_generic_tag(
+                        authenticated_user, fetched_content, memory_limit, page_url, tag))
 
 

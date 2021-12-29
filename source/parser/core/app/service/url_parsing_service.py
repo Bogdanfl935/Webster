@@ -23,7 +23,7 @@ def process_anchors(authenticated_user: str, content_iterable: ResultSet, memory
             cache_service.make_last_parsed_post(authenticated_user, parsing_constants.ANCHOR_TAG, referrer, memory_usage)
             storage_service.make_url_storage_post(authenticated_user, list(
                 map(lambda binary_content: binary_content.decode(
-                    encoding=parsing_constants.ENCODING, errors="ignore"), tag_content_binaries)))
+                    encoding=parsing_constants.ENCODING), tag_content_binaries)))
             storage_service.make_parsed_content_post(authenticated_user, tag_content_binaries, parsing_constants.ANCHOR_TAG)
     finally:
         executor_service.release_user_lock(authenticated_user) # Exit critical section

@@ -12,8 +12,10 @@ def set_crawler_active_status():
 
     if active is False:  # Avoid caching if not neccessary => Remove entry if no longer active
         acquire_lock(LockType.CRAWLER_STATUS_LOCK)  # Enter critical section
-        redis_crawler_status.delete(username)
-        release_lock(LockType.CRAWLER_STATUS_LOCK)  # Exit critical section
+        try:
+            redis_crawler_status.delete(username)
+        finally:
+            release_lock(LockType.CRAWLER_STATUS_LOCK)  # Exit critical section
 
     return Response(status=HTTPStatus.OK)
 
@@ -22,11 +24,13 @@ def get_and_set_crawler_active_status():
     username = request.json.get(serialization_constants.USERNAME_KEY)
 
     acquire_lock(LockType.CRAWLER_STATUS_LOCK)  # Enter critical section
-    active = bool(redis_crawler_status.get(username).decode(
-        'utf-8')) if redis_crawler_status.exists(username) != 0 else False
-    if active is False:  # Read and set active to True in an atomic operation
-        redis_crawler_status.set(username, bytes(True))
-    release_lock(LockType.CRAWLER_STATUS_LOCK)  # Exit critical section
+    try:
+        active = bool(redis_crawler_status.get(username).decode(
+            'utf-8')) if redis_crawler_status.exists(username) != 0 else False
+        if active is False:  # Read and set active to True in an atomic operation
+            redis_crawler_status.set(username, bytes(True))
+    finally:
+        release_lock(LockType.CRAWLER_STATUS_LOCK)  # Exit critical section
 
     return make_response(jsonify(dict(active=active)), HTTPStatus.OK)
 

@@ -12,7 +12,7 @@ def process_generic_tag(authenticated_user: str, content_iterable: ResultSet, me
             fetched_content = content_iterable,
             memory_limit = memory_limit, 
             binary_conversion_func = lambda tag_content: str(tag_content).encode(
-                encoding=parsing_constants.ENCODING, errors='replace')
+                encoding=parsing_constants.ENCODING, errors='ignore')
         )
 
         if len(tag_content_binaries) > 0: # At least one tag had been successfully processed

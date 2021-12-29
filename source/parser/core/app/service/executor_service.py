@@ -26,11 +26,15 @@ def release_user_lock(authenticated_user: str):
         lock.release()
 
 
-def submit_task(task):
-    __futures_queue.put(__executor.submit(task), block=False)
+def submit_task(task, skip_result: bool = False):
+    if skip_result is False:
+        __futures_queue.put(__executor.submit(task), block=False)
+    else:
+        __executor.submit(task)
 
 def shutdown():
      __futures_queue.put(__StopCondition(), block=False)
+     __executor.shutdown(wait=False, cancel_futures=True)
         
 def __await_futures():
     while True:
