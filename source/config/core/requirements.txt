@@ -13,3 +13,5 @@ rq>=1.2.2
 python-decouple
 validators
 marshmallow
+psycopg2
+flask-sqlalchemy

@@ -1,14 +1,18 @@
-from marshmallow import Schema, fields, validate, INCLUDE
+from marshmallow import Schema, fields, INCLUDE
 
 
-class AddConfigSchema(Schema):
-    user_id = fields.Integer(required=True, validate=validate.Range(min=0))
-    memoryLimit = fields.Integer(required=True, validate=validate.Range(min=0))
-    specificTag = fields.List(fields.String(), required=True)
-    samePage = fields.Boolean()
+class ParserConfigurationSchema(Schema):
+    username = fields.Email(required=True)
+    tag = fields.String(required=True)
+    unknown = INCLUDE
+
+class CrawlerConfigurationSchema(Schema):
+    username = fields.Email(required=True)
+    keyword = fields.String(required=True)
+    active = fields.Boolean(required=True)
     unknown = INCLUDE
 
 
-class RetriveConfigSchema(Schema):
-    user_id = fields.Integer(required=True, validate=validate.Range(min=0))
+class UsernameAccessSchema(Schema):
+    username = fields.Email(required=True)
     unknown = INCLUDE
