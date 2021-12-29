@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+  postgres:
+    container_name: pg_config_ms
+    image: postgres:latest
+    networks:
+      - msauth
+    restart: always
+    env_file: .env
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    # network_mode: "host"
+    ports:
+      - '${DB_PORT}:${DB_PORT}'
+    volumes: 
+      #- ./postgres-data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
+    command: -p ${DB_PORT}
+networks:
+  msauth:
+    external: true
+    name: msauth
