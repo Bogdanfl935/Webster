@@ -1,7 +1,6 @@
 from app.config.queue_config import channel, amqp_connection
 from app.constants import serialization_constants, parsing_constants
-from app.service import parsing_service
-from app.service.executor_service import executor
+from app.service import parsing_service, executor_service
 import json
 
 def _process_message(*args):
@@ -10,12 +9,13 @@ def _process_message(*args):
     authenticated_user = serialized_message.get(serialization_constants.USERNAME_KEY)
     html_content = serialized_message.get(serialization_constants.CONTENT_KEY)
     page_url = serialized_message.get(serialization_constants.URL_KEY)
-    executor.submit(lambda: parsing_service.init_parsing(authenticated_user, html_content, page_url))
+    executor_service.submit_task(lambda: parsing_service.init_parsing(authenticated_user, html_content, page_url))
+
     
 
 def subscribe(queue: str):
     channel.basic_consume(queue, _process_message, auto_ack=True)
-    return executor.submit(lambda: channel.start_consuming())
+    return executor_service.submit_task(lambda: channel.start_consuming())
 
 def shutdown():
     channel.cancel()

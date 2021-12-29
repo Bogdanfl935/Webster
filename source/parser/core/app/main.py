@@ -5,7 +5,7 @@ from app.config.queue_config import AMQP_QUEUE
 from app.validation import validation_schema
 from app.dto.error_handler import ErrorHandler
 from werkzeug.exceptions import HTTPException
-from app.service import parsing_service, queue_consumer_service
+from app.service import parsing_service, queue_consumer_service, executor_service
 from app.config.app_config import app
 from http import HTTPStatus
 from datetime import datetime
@@ -42,3 +42,4 @@ if __name__ == '__main__':
     queue_consumer_service.subscribe(AMQP_QUEUE)
     app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT)
     queue_consumer_service.shutdown()
+    executor_service.shutdown()
