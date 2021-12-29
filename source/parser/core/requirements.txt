@@ -14,3 +14,4 @@ python-decouple
 validators
 flask_expects_json
 marshmallow
+pika
