@@ -1,28 +1,26 @@
 ﻿namespace statistics.services
 {
-    using statistics.constants;
     using RestSharp;
+    using statistics.constants;
+    using statistics.dto;
+
     public class UnknownUserService
     {
 
-        internal Dictionary<string, string> GetStatistics()
+        internal StatisticsDto GetStatistics()
         {
             var client = new RestClient(AppConstants.appURL + ":" + EndpointConstants.storagePort);
 
 
-            var requestNextLinks = new RestRequest(EndpointConstants.numberNextLinksEndpoint);
-            var responseNextLinks = client.Get(requestNextLinks);
-            var contentNextLinks = responseNextLinks.Content;
+            var requestNextUrls = new RestRequest(EndpointConstants.numberNextUrlsEndpoint);
+            var responseNextUrls = client.Get(requestNextUrls);
+            var contentNextUrls = responseNextUrls.Content;
 
-            var requestVisitedLinks = new RestRequest(EndpointConstants.numberVisitedLinksEndpoint);
-            var responseVisitedLinks = client.Get(requestVisitedLinks);
-            var contentVisitedLinks = responseVisitedLinks.Content;
+            var requestVisitedUrls = new RestRequest(EndpointConstants.numberVisitedUrlsEndpoint);
+            var responseVisitedUrls = client.Get(requestVisitedUrls);
+            var contentVisitedUrls = responseVisitedUrls.Content;
 
-            var results = new Dictionary<string, string>
-            {
-                {"numberNextLinks", contentNextLinks },
-                {"numberVisitedLinks", contentVisitedLinks }
-            };
+            var results = new StatisticsDto(long.Parse(contentNextUrls), long.Parse(contentVisitedUrls));
 
             return results;
         }
