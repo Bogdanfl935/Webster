@@ -1,6 +1,7 @@
 using statistics.services;
+using statistics.constants;
 
-using System.Net.Http;
+using RestSharp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-HttpClient client = new HttpClient();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -39,17 +39,17 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast");
 
 
-app.MapGet("/public-stats", async () =>
+app.MapGet("/public-stats", () =>
 {
-    return await client.GetStringAsync("http://example.com");
-    //var pubStats = new KnownUserService();
-    //return pubStats.GetStatistics("example.com", client);
+    var publicStats = new UnknownUserService();
+    return publicStats.GetStatistics();
 })
     .WithName("GetPublicStatistics");
 
-app.MapGet("/private-stats", () =>
+app.MapGet("/private-stats", (int userID) =>
 {
-
+    var privateStats = new KnownUserService();
+    return privateStats.GetStatistics(userID);
 })
     .WithName("GetPrivateStatistics");
 
