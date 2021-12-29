@@ -66,8 +66,7 @@ def _crawl(authenticated_user: str, memory_limit: int, urls: list):
             queue_publisher_service.dispatch_message(authenticated_user, page_response.text)
         
         if len(urls) == 0:
-            next_urls_response, _ = storage_service.make_next_url_post(authenticated_user)
-            urls = next_urls_response.get(serialization_constants.URLS_KEY)
+            urls = storage_service.make_sequential_next_url_post(authenticated_user)
             
         memory_usage_response, _ = cache_service.make_memory_usage_get(authenticated_user)
         current_memory_usage = memory_usage_response.get(serialization_constants.MEMORY_USAGE_KEY)
