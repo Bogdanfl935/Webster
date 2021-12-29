@@ -6,14 +6,14 @@ import requests, time, random
 
 
 def make_sequential_next_url_post(authenticated_user: str):
-    next_urls_response, _ = make_sequential_next_url_post(authenticated_user)
+    next_urls_response, _ = make_next_url_post(authenticated_user)
     urls = next_urls_response.get(serialization_constants.URLS_KEY)
     current_attempt = 0
 
     while len(urls) == 0 and current_attempt < storage_constants.MAX_NEXT_URL_ATTEMPTS:
         current_attempt += 1
         _sequencial_sleep(current_attempt)
-        next_urls_response, _ = make_sequential_next_url_post(authenticated_user)
+        next_urls_response, _ = make_next_url_post(authenticated_user)
         urls = next_urls_response.get(serialization_constants.URLS_KEY)
         
     return urls

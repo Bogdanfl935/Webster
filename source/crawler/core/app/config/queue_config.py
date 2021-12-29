@@ -1,5 +1,5 @@
 from decouple import AutoConfig
-import pika
+import pika, logging
 
 
 config = AutoConfig(search_path='../init/.env')
@@ -10,6 +10,7 @@ AMQP_HOST = config("AMQP_HOST")
 AMQP_PORT = config("AMQP_PORT")
 AMQP_QUEUE = config("AMQP_QUEUE")
 
+logging.getLogger("pika").propagate = False
 
 __credentials = pika.PlainCredentials(AMQP_USERNAME, AMQP_PASSWORD)
 __parameters = pika.ConnectionParameters(AMQP_HOST, AMQP_PORT, '/', __credentials)
