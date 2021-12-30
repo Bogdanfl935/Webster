@@ -13,7 +13,7 @@
 
     public class ParsedImagesService
     {
-        internal void ExportImages(int userID)
+        internal void ExportImages(string username)
         {
             var dictExtensions = new Dictionary<string, ImageFormat>()
             {
@@ -44,6 +44,7 @@
             {
                 foreach (var dict in listOfDict)
                 {
+
                     string extension = dict[StorageResponseConstants.extensionKey];
                     string filename;
 
@@ -51,19 +52,25 @@
 
                     using (MemoryStream ms = new MemoryStream(valueByte))
                     {
-                        Image image = Image.FromStream(ms);
-                        filename = System.Convert.ToBase64String(Encoding.UTF8.GetBytes(extension + nonce + userID)) + userID + "." + extension;
-                        image.Save(filename, dictExtensions[extension]);
-                        nonce++;
-                    }
-
-                    using (FileStream zipFile = File.Open(userID + "_images.zip", FileMode.OpenOrCreate))
-                    {
-                        using (ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Update))
+                        using (FileStream zipFile = File.Open(username + "_images.zip", FileMode.OpenOrCreate))
                         {
-                            ZipArchiveEntry readmeEntry = archive.CreateEntry(filename);
+                            Image image = Image.FromStream(ms);
+                            filename = "image_" + nonce.ToString() + "." + extension;
+                            nonce++;
 
-                            archive.CreateEntry(filename);
+                            using (ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Update))
+                            {
+                                ZipArchiveEntry readmeEntry = archive.CreateEntry(filename);
+
+                                using (var entryStream = readmeEntry.Open())
+                                using (var streamWriter = new StreamWriter(entryStream))
+                                using (MemoryStream imageStream = new MemoryStream())
+                                {
+                                    image.Save(imageStream, dictExtensions[extension]);
+                                    streamWriter.Write(imageStream);
+
+                                }
+                            }
                         }
                     }
                 }

@@ -16,16 +16,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapGet("/export-content", (int userID) =>
+app.MapGet("/export-content", (string username) =>
 {
     var contentExporter = new ParsedContentService();
+    contentExporter.ExportContent(username);
 })
     .WithName("GetExportContent");
 
-app.MapGet("/export-images", (int userID) =>
+app.MapGet("/export-images", (string username) =>
 {
     var imageExporter = new ParsedImagesService();
-    imageExporter.ExportImages(userID);
+    imageExporter.ExportImages(username);
 })
     .WithName("GetExportImages");
 

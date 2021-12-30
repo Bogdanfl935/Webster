@@ -13,21 +13,8 @@
     public class ParsedContentService
     {
 
-        internal void ExportContent(int userID)
-        {
-            var dictExtensions = new Dictionary<string, ImageFormat>()
-            {
-                {"jpeg", ImageFormat.Jpeg},
-                {"jpg", ImageFormat.Jpeg },
-                {"png", ImageFormat.Png},
-                {"gif", ImageFormat.Gif},
-                {"bmp", ImageFormat.Bmp},
-                {"ico", ImageFormat.Icon},
-                {"exif", ImageFormat.Exif},
-                {"tiff", ImageFormat.Tiff},
-                {"wmf", ImageFormat.Wmf},
-            };
-
+        internal void ExportContent(string username)
+        { 
             var nonce = 0;
 
             var client = new RestClient(AppConstants.appURL + ":" + EndpointConstants.storagePort);
@@ -50,22 +37,22 @@
 
                     using (MemoryStream ms = new MemoryStream(valueByte))
                     {
-
-                        filename = System.Convert.ToBase64String(Encoding.UTF8.GetBytes((nonce.ToString() + userID.ToString()).ToCharArray())) + userID;
-                        using (FileStream file = new FileStream(filename, FileMode.Create, FileAccess.Write))
+                        using (FileStream zipFile = File.Open(username + "_content.zip", FileMode.OpenOrCreate))
                         {
-                            ms.WriteTo(file);
-                        }
-                        nonce++;
-                    }
+                            filename = "content_" + nonce.ToString();
+                            nonce++;
 
-                    using (FileStream zipFile = File.Open(userID + "_content.zip", FileMode.OpenOrCreate))
-                    {
-                        using (ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Update))
-                        {
-                            ZipArchiveEntry readmeEntry = archive.CreateEntry(filename);
+                            using (ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Update))
+                            {
+                                ZipArchiveEntry readmeEntry = archive.CreateEntry(filename);
 
-                            archive.CreateEntry(filename);
+                                using (var entryStream = readmeEntry.Open())
+                                using (var streamWriter = new StreamWriter(entryStream))
+                                {
+                                    streamWriter.Write(ms);
+
+                                }
+                            }
                         }
                     }
                 }
