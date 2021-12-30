@@ -15,6 +15,11 @@ def make_status_reading_post(authenticated_user):
     response = requests.post(target_url, json=dict(username=authenticated_user))
     return unpack_response(response)
 
+def make_status_writing_post(authenticated_user: str, active: bool):
+    target_url = url_joiner.urljoin(endpoint_constants.CACHE_MS_URL, endpoint_constants.CONCURRENT_STATUS_WRITING)
+    response = requests.post(target_url, json=dict(username=authenticated_user, active=active))
+    return unpack_response(response)
+
 def make_continuation_reading_post(authenticated_user):
     target_url = url_joiner.urljoin(endpoint_constants.CACHE_MS_URL, endpoint_constants.CONCURRENT_CONTINUATION_READING)
     response = requests.post(target_url, json=dict(username=authenticated_user))

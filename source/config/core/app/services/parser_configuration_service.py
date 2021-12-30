@@ -11,7 +11,7 @@ def get_tags():
     query_func = lambda session: session.query(sql_models.ParserConfiguration).filter(
         sql_models.ParserConfiguration.user_id == user_id).values(sql_models.ParserConfiguration.tag)
     records = persistence_service.query(query_func)
-    response = {serialization_constants.TAGS_KEY: [record._asdict() for record in records]}
+    response = {serialization_constants.TAGS_KEY: [record.tag for record in records]}
     return make_response(jsonify(response), HTTPStatus.OK)
 
 def add_tag():

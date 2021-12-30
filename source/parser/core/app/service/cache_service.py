@@ -30,10 +30,9 @@ def make_memory_usage_post(authenticated_user: str, memory_usage: int):
 
 def make_last_parsed_post(authenticated_user: str, tag: str, url: str, memory_usage: int):
     target_url = url_joiner.urljoin(endpoint_constants.CACHE_MS_URL, endpoint_constants.LAST_PARSED)
-    response = requests.post(target_url, json={
+    requests.post(target_url, json={
         serialization_constants.USERNAME_KEY: authenticated_user,
         serialization_constants.URL_KEY: url,
         serialization_constants.TAG_KEY: tag,
         serialization_constants.MEMORY_USAGE_KEY: memory_usage
     })
-    return unpack_response(response)

@@ -8,28 +8,28 @@ def process_anchors(authenticated_user: str, content_iterable: ResultSet, memory
     filtered_anchor_hrefs = _filter_same_page_anchors(raw_anchor_hrefs)
 
     executor_service.acquire_user_lock(authenticated_user) # Enter critical section
+    try:
+        tag_content_binaries = generic_parsing_service.extract_content(
+            authenticated_user=authenticated_user,
+            fetched_content=filtered_anchor_hrefs,
+            memory_limit=memory_limit,
+            binary_conversion_func=lambda tag_content: str(_prepend_anchor_url_content(
+                tag_content, referrer)).encode(encoding=parsing_constants.ENCODING, errors='ignore')
+        )
 
-    tag_content_binaries = generic_parsing_service.extract_content(
-        authenticated_user=authenticated_user,
-        fetched_content=filtered_anchor_hrefs,
-        memory_limit=memory_limit,
-        binary_conversion_func=lambda tag_content: str(_prepend_anchor_url_content(
-            tag_content, referrer)).encode(encoding=parsing_constants.ENCODING, errors='replace')
-    )
-
-    if len(tag_content_binaries) > 0:  # At least one tag had been successfully processed
-        memory_usage = sum(map(len, tag_content_binaries))
-        cache_service.make_memory_usage_post(authenticated_user, memory_usage)
-        cache_service.make_last_parsed_post(authenticated_user, parsing_constants.ANCHOR_TAG, referrer, memory_usage)
-        storage_service.make_url_storage_post(authenticated_user, list(
-            map(lambda binary_content: binary_content.decode(
-                encoding=parsing_constants.ENCODING, errors="replace"), tag_content_binaries)))
-        storage_service.make_parsed_content_post(authenticated_user, tag_content_binaries, parsing_constants.ANCHOR_TAG)
-
-    executor_service.release_user_lock(authenticated_user) # Exit critical section
+        if len(tag_content_binaries) > 0:  # At least one tag had been successfully processed
+            memory_usage = sum(map(len, tag_content_binaries))
+            cache_service.make_memory_usage_post(authenticated_user, memory_usage)
+            cache_service.make_last_parsed_post(authenticated_user, parsing_constants.ANCHOR_TAG, referrer, memory_usage)
+            storage_service.make_url_storage_post(authenticated_user, list(
+                map(lambda binary_content: binary_content.decode(
+                    encoding=parsing_constants.ENCODING), tag_content_binaries)))
+            storage_service.make_parsed_content_post(authenticated_user, tag_content_binaries, parsing_constants.ANCHOR_TAG)
+    finally:
+        executor_service.release_user_lock(authenticated_user) # Exit critical section
 
 def _filter_same_page_anchors(anchors):
-    return (anchor for anchor in anchors if anchor.path not in ('', '/'))
+    return list(set((anchor for anchor in anchors if anchor.path not in ('', '/'))))
     
 
 def _prepend_anchor_url_content(anchor: ParseResult, referrer):

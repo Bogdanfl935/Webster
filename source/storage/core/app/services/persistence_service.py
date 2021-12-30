@@ -16,12 +16,13 @@ def delete(record: any, commit: bool = False):
         commit_session()
 
 
-def commit_session():
+def commit_session(supress_exceptions: bool = False):
     try:
         db.session.commit()
     except persistence_error.IntegrityError as exception:
         db.session.rollback()
-        abort(HTTPStatus.CONFLICT, exception.orig)
+        if supress_exceptions is False:
+            abort(HTTPStatus.CONFLICT, exception.orig)
 
 
 def query(query_func):
