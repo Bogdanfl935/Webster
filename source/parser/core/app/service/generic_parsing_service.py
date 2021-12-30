@@ -6,22 +6,22 @@ import logging, traceback
 
 def process_generic_tag(authenticated_user: str, content_iterable: ResultSet, memory_limit: int, referrer: str, tag: str):
     executor_service.acquire_user_lock(authenticated_user) # Enter critical section
+    try:
+        tag_content_binaries = extract_content(
+            authenticated_user = authenticated_user, 
+            fetched_content = content_iterable,
+            memory_limit = memory_limit, 
+            binary_conversion_func = lambda tag_content: str(tag_content).encode(
+                encoding=parsing_constants.ENCODING, errors='ignore')
+        )
 
-    tag_content_binaries = extract_content(
-        authenticated_user = authenticated_user, 
-        fetched_content = content_iterable,
-        memory_limit = memory_limit, 
-        binary_conversion_func = lambda tag_content: str(tag_content).encode(
-            encoding=parsing_constants.ENCODING, errors='replace')
-    )
-
-    if len(tag_content_binaries) > 0: # At least one tag had been successfully processed
-        memory_usage = sum(map(len, tag_content_binaries))
-        cache_service.make_memory_usage_post(authenticated_user, memory_usage)
-        cache_service.make_last_parsed_post(authenticated_user, tag, referrer, memory_usage)
-        storage_service.make_parsed_content_post(authenticated_user, tag_content_binaries, tag)
-
-    executor_service.release_user_lock(authenticated_user) # Exit critical section
+        if len(tag_content_binaries) > 0: # At least one tag had been successfully processed
+            memory_usage = sum(map(len, tag_content_binaries))
+            cache_service.make_memory_usage_post(authenticated_user, memory_usage)
+            cache_service.make_last_parsed_post(authenticated_user, tag, referrer, memory_usage)
+            storage_service.make_parsed_content_post(authenticated_user, tag_content_binaries, tag)
+    finally:
+        executor_service.release_user_lock(authenticated_user) # Exit critical section
 
 def extract_content(authenticated_user, fetched_content, memory_limit, binary_conversion_func) -> list:
     memory_usage_response, _ = cache_service.make_memory_usage_get(authenticated_user)

@@ -34,7 +34,7 @@ def get_content():
         sql_models.ParsedContent.id, sql_models.ParsedContent.tag, sql_models.ParsedContent.content)
     records = persistence_service.query(query_func)
     response = {serialization_constants.PARSED_CONTENT_KEY: [
-            {key: base64.b64encode(value).decode("ascii") if key == serialization_constants.CONTENT_KEY else value 
+            {key: base64.b64encode(value).decode("utf-8") if key == serialization_constants.CONTENT_KEY else value 
             for key, value in record._asdict().items()}
         for record in records]
     }

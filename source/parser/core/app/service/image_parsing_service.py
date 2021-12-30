@@ -2,27 +2,27 @@ from app.constants import parsing_constants
 from app.service import url_parsing_service, executor_service, generic_parsing_service, cache_service, storage_service
 from urllib.parse import urlparse, urlunparse
 from mimetypes import guess_extension
-import base64, requests, logging, traceback, itertools
+import base64, requests, itertools
 from bs4.element import ResultSet
 
 def process_images(authenticated_user: str, content_iterable: ResultSet, memory_limit, referrer: str):
     image_sources = (source for image in content_iterable if (source := image.get('src')) is not None)
     executor_service.acquire_user_lock(authenticated_user) # Enter critical section
+    try:
+        tag_content_binaries = generic_parsing_service.extract_content(
+            authenticated_user = authenticated_user, 
+            fetched_content = image_sources,
+            memory_limit = memory_limit, 
+            binary_conversion_func = lambda source: _process_image_by_source(source, referrer)
+        )
 
-    tag_content_binaries = generic_parsing_service.extract_content(
-        authenticated_user = authenticated_user, 
-        fetched_content = image_sources,
-        memory_limit = memory_limit, 
-        binary_conversion_func = lambda source: _process_image_by_source(source, referrer)
-    )
-
-    if len(tag_content_binaries) > 0: # At least one tag had been successfully processed
-        memory_usage = sum(itertools.starmap(lambda _, content: len(content), tag_content_binaries))
-        cache_service.make_memory_usage_post(authenticated_user, memory_usage)
-        cache_service.make_last_parsed_post(authenticated_user, parsing_constants.IMAGE_TAG, referrer, memory_usage)
-        storage_service.make_parsed_images_post(authenticated_user, tag_content_binaries)
-
-    executor_service.release_user_lock(authenticated_user) # Exit critical section
+        if len(tag_content_binaries) > 0: # At least one tag had been successfully processed
+            memory_usage = sum(itertools.starmap(lambda _, content: len(content), tag_content_binaries))
+            cache_service.make_memory_usage_post(authenticated_user, memory_usage)
+            cache_service.make_last_parsed_post(authenticated_user, parsing_constants.IMAGE_TAG, referrer, memory_usage)
+            storage_service.make_parsed_images_post(authenticated_user, tag_content_binaries)
+    finally:
+        executor_service.release_user_lock(authenticated_user) # Exit critical section
 
 def _process_image_by_source(source, referrer):
     image_binary = None

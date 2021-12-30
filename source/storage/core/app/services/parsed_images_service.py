@@ -35,7 +35,7 @@ def get_images():
         sql_models.ParsedImage.id, sql_models.ParsedImage.extension, sql_models.ParsedImage.content)
     records = persistence_service.query(query_func)
     response = {serialization_constants.PARSED_IMAGES_KEY: [
-            {key: base64.b64encode(value).decode("ascii") if key == serialization_constants.CONTENT_KEY else value 
+            {key: base64.b64encode(value).decode("utf-8") if key == serialization_constants.CONTENT_KEY else value 
             for key, value in record._asdict().items()}
         for record in records]
     }
