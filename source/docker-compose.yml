@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  auth-db:
+    image: postgres
+    environment:
+      - CREATE_USER_INTERACTIVE=off
+    volumes:
+      - ./auth-db/init/:/docker-entrypoint-initdb.d/
+
+  postgres:
+    container_name: pg_storage_ms
+    image: postgres:latest
+    networks:
+      - msauth
+    restart: always
+    env_file: .env
+    environment:
+      - POSTGRES_USER=${STORAGE_DB_USERNAME}
+      - POSTGRES_PASSWORD=${STORAGE_DB_PASSWORD}
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    # network_mode: "host"
+    ports:
+      - '${STORAGE_DB_PORT}:${STORAGE_DB_PORT}'
+    volumes: 
+      #- ./postgres-data:/var/lib/postgresql/data
+      - ./storage/init/sql:/docker-entrypoint-initdb.d
+    command: -p ${STORAGE_DB_PORT}
+
+  # storage:
+  #   depends_on:
+  #     - auth-db
+  #     - postgres
+  #   build: 
+  #     context: .
+  #   working_dir: ./storage/core/app/dist/
+  #   entrypoint: ./main.exe
+
+
+
+  # storage:
+  #   depends_on:
+  #     - auth-db
+  #     - postgres
+  #   image: python:3.10-bullseye
+  #   volumes:
+  #     - "./storage/core/:/core/"
+  #   command: >
+  #     bash -c "python3 -m venv /core/ 
+  #     && source /core/bin/activate 
+  #     && pip install -r /core/requirements.txt
+  #     && cd /core
+  #     && python3 /core/app/main.py"
+
+    # build: 
+    #   context: .
+    # working_dir: ./storage/core/app/
+    # entrypoint: ./main.exe
+
+    
+  # auth:
+  #   depends_on:
+  #     - auth-db
+  #   image: openjdk:11-jre-slim
+  #   build: 
+  #     context: .
+  #   # volumes:
+  #   #   - ${AUTH_INIT_DIR_PATH}/preEntrypoint.sh ${AUTH_DOCKER_DIR_PATH}/
+  #   #   - ${AUTH_CORE_DIR_PATH}${AUTH_SOURCE_JAR} ${AUTH_DOCKER_DIR_PATH}/msAuthApp.jar
+  #   working_dir: ${AUTH_DOCKER_DIR_PATH}/
+  #   entrypoint:
+  #    - ./preEntrypoint.sh
+  #    - java
+  #    - -jar
+  #    - ./msAuthApp.jar
+
+  # cache:
+  #   depends_on:
+  #     - auth-db
+  #     # - storage
+  #   image: python:3.10-bullseye
+  #   volumes:
+  #     - "./cache/core/:/core/"
+  #   command: >
+  #     bash -c "python3 -m venv /core/ 
+  #     && source /core/bin/activate 
+  #     && pip install -r /core/requirements.txt
+  #     && cd /core
+  #     && python3 /core/app/main.py"
+    
+  # client:
+  #   depends_on:
+  #     - auth-db
+  #     - storage
+
+  # config:
+  #   depends_on:
+  #     - auth-db
+
+  # crawler:
+  #   depends_on:
+  #     - auth-db
+
+  # exporter:
+  #   depends_on:
+  #     - auth-db
+    # image: mcr.microsoft.com/dotnet/aspnet:6.0
+    # volumes:
+    #   - "./exporter/core/exporter/exporter/bin/Release/net6.0/publish/:/App/"
+    # entrypoint: ["dotnet", "DotNet.Docker.dll"]
+
+
+  # notification:
+  #   depends_on:
+  #     - auth-db
+
+  # parser:
+  #   depends_on:
+  #     - auth-db
+
+  statistics:
+    depends_on:
+      - auth-db
+    build: ./statistics/core/statistics/
+
+networks:
+  msauth:
+    external: true
+    name: msauth
