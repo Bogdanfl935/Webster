@@ -104,13 +104,10 @@ services:
   #   depends_on:
   #     - auth-db
 
-  # exporter:
-  #   depends_on:
-  #     - auth-db
-    # image: mcr.microsoft.com/dotnet/aspnet:6.0
-    # volumes:
-    #   - "./exporter/core/exporter/exporter/bin/Release/net6.0/publish/:/App/"
-    # entrypoint: ["dotnet", "DotNet.Docker.dll"]
+  exporter:
+    depends_on:
+      - auth-db
+    build: ./exporter/core/exporter/
 
 
   # notification:
