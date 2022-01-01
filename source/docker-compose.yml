@@ -41,22 +41,25 @@ services:
 
 
 
-  # storage:
-  #   depends_on:
-  #     - auth-db
-  #     - postgres
-  #   image: python:3.10-bullseye
-  #   volumes:
-  #     - "./storage/core/:/core/"
-  #   command: >
-  #     bash -c "python3 -m venv /core/ 
-  #     && source /core/bin/activate 
-  #     && pip install -r /core/requirements.txt
-  #     && cd /core
-  #     && python3 /core/app/main.py"
-
-    # build: 
-    #   context: .
+  storage:
+    depends_on:
+      - auth-db
+      - postgres
+    # image: python:3.10-bullseye
+    # volumes:
+    #   - "./storage/core/:/core/"
+    # command: >
+    #   bash -c "python3 -m venv /core/ 
+    #   && source /core/bin/activate 
+    #   && pip install -r /core/requirements.txt
+    #   && cd /core
+    #   && python3 /core/app/main.py"
+    networks:
+      - msauth
+    build: 
+      context: ./storage/
+    ports:
+      - 50006:50006
     # working_dir: ./storage/core/app/
     # entrypoint: ./main.exe
 
@@ -104,10 +107,10 @@ services:
   #   depends_on:
   #     - auth-db
 
-  exporter:
-    depends_on:
-      - auth-db
-    build: ./exporter/core/exporter/
+  # exporter:
+  #   depends_on:
+  #     - auth-db
+  #   build: ./exporter/core/exporter/
 
 
   # notification:
@@ -118,10 +121,10 @@ services:
   #   depends_on:
   #     - auth-db
 
-  statistics:
-    depends_on:
-      - auth-db
-    build: ./statistics/core/statistics/
+  # statistics:
+  #   depends_on:
+  #     - auth-db
+  #   build: ./statistics/core/statistics/
 
 networks:
   msauth:
