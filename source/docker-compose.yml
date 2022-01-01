@@ -30,38 +30,31 @@ services:
       - ./storage/init/sql:/docker-entrypoint-initdb.d
     command: -p ${STORAGE_DB_PORT}
 
-  # storage:
-  #   depends_on:
-  #     - auth-db
-  #     - postgres
-  #   build: 
-  #     context: .
-  #   working_dir: ./storage/core/app/dist/
-  #   entrypoint: ./main.exe
-
-
+  rabbitmq:
+    depends_on:
+      - auth-db
+    container_name: rabbitmq_ms
+    hostname: rabbitmq
+    networks:
+      - msauth
+    image:
+      rabbitmq:latest
+    environment:
+      - RABBIT_HOST_IP=0.0.0.0
+    ports:
+      - 15672:15672
+      - 5672:5672
 
   storage:
     depends_on:
       - auth-db
       - postgres
-    # image: python:3.10-bullseye
-    # volumes:
-    #   - "./storage/core/:/core/"
-    # command: >
-    #   bash -c "python3 -m venv /core/ 
-    #   && source /core/bin/activate 
-    #   && pip install -r /core/requirements.txt
-    #   && cd /core
-    #   && python3 /core/app/main.py"
     networks:
       - msauth
     build: 
       context: ./storage/
     ports:
       - 50006:50006
-    # working_dir: ./storage/core/app/
-    # entrypoint: ./main.exe
 
     
   # auth:
@@ -69,62 +62,87 @@ services:
   #     - auth-db
   #   image: openjdk:11-jre-slim
   #   build: 
-  #     context: .
-  #   # volumes:
-  #   #   - ${AUTH_INIT_DIR_PATH}/preEntrypoint.sh ${AUTH_DOCKER_DIR_PATH}/
-  #   #   - ${AUTH_CORE_DIR_PATH}${AUTH_SOURCE_JAR} ${AUTH_DOCKER_DIR_PATH}/msAuthApp.jar
+  #     context: ./auth/
+  #   volumes:
+  #     - ${AUTH_INIT_DIR_PATH}/preEntrypoint.sh ${AUTH_DOCKER_DIR_PATH}/
+  #     - ${AUTH_CORE_DIR_PATH}${AUTH_SOURCE_JAR} ${AUTH_DOCKER_DIR_PATH}/msAuthApp.jar
   #   working_dir: ${AUTH_DOCKER_DIR_PATH}/
+  #   env_file:
+  #     - ./auth/variables.env
   #   entrypoint:
   #    - ./preEntrypoint.sh
   #    - java
   #    - -jar
   #    - ./msAuthApp.jar
 
-  # cache:
-  #   depends_on:
-  #     - auth-db
-  #     # - storage
-  #   image: python:3.10-bullseye
-  #   volumes:
-  #     - "./cache/core/:/core/"
-  #   command: >
-  #     bash -c "python3 -m venv /core/ 
-  #     && source /core/bin/activate 
-  #     && pip install -r /core/requirements.txt
-  #     && cd /core
-  #     && python3 /core/app/main.py"
+  cache:
+    depends_on:
+      - auth-db
+      - storage
+    networks:
+      - msauth
+    build: 
+      context: ./cache/
+    ports:
+      - 50003:50003
     
-  # client:
-  #   depends_on:
-  #     - auth-db
-  #     - storage
+  client:
+    depends_on:
+      - auth-db
+      - storage
+    networks:
+      - msauth
+    build: 
+      context: ./client/
+    ports:
+      - 50009:50009
 
   # config:
   #   depends_on:
   #     - auth-db
 
-  # crawler:
-  #   depends_on:
-  #     - auth-db
+  crawler:
+    depends_on:
+      - auth-db
+      - storage
+      - rabbitmq
+    networks:
+      - msauth
+    restart: on-failure
+    build: 
+      context: ./crawler/
+    ports:
+      - 50002:50002
 
-  # exporter:
-  #   depends_on:
-  #     - auth-db
-  #   build: ./exporter/core/exporter/
+  exporter:
+    depends_on:
+      - auth-db
+    build: ./exporter/core/exporter/
 
 
   # notification:
   #   depends_on:
   #     - auth-db
 
-  # parser:
-  #   depends_on:
-  #     - auth-db
+  
 
-  # statistics:
-  #   depends_on:
-  #     - auth-db
-  #   build: ./statistics/core/statistics/
+  parser:
+    depends_on:
+      - auth-db
+      - storage
+      - rabbitmq
+    networks:
+      - msauth
+    restart: on-failure
+    build: 
+      context: ./parser/
+    ports:
+      - 50005:50005
+
+  statistics:
+    depends_on:
+      - auth-db
+    build: ./statistics/core/statistics/
 
 networks:
   msauth:
