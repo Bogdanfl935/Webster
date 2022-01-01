@@ -5,10 +5,12 @@ services:
     image: postgres
     environment:
       - CREATE_USER_INTERACTIVE=off
+      - POSTGRES_USER=${AUTH_DB_DATABASE}
+      - POSTGRES_PASSWORD=${AUTH_DB_PASS}
     volumes:
       - ./auth-db/init/:/docker-entrypoint-initdb.d/
 
-  postgres:
+  postgres_storage:
     container_name: pg_storage_ms
     image: postgres:latest
     networks:
@@ -30,6 +32,27 @@ services:
       - ./storage/init/sql:/docker-entrypoint-initdb.d
     command: -p ${STORAGE_DB_PORT}
 
+  postgres_config:
+    container_name: pg_config_ms
+    image: postgres:latest
+    networks:
+      - msauth
+    restart: always
+    environment:
+      - POSTGRES_USER=${CONFIG_DB_USERNAME}
+      - POSTGRES_PASSWORD=${CONFIG_DB_PASSWORD}
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    # network_mode: "host"
+    ports:
+      - '${CONFIG_DB_PORT}:${CONFIG_DB_PORT}'
+    volumes: 
+      #- ./postgres-data:/var/lib/postgresql/data
+      - ./config/init/sql:/docker-entrypoint-initdb.d
+    command: -p ${CONFIG_DB_PORT}
+
   rabbitmq:
     depends_on:
       - auth-db
@@ -48,7 +71,7 @@ services:
   storage:
     depends_on:
       - auth-db
-      - postgres
+      - postgres_storage
     networks:
       - msauth
     build: 
@@ -57,23 +80,23 @@ services:
       - 50006:50006
 
     
-  # auth:
-  #   depends_on:
-  #     - auth-db
-  #   image: openjdk:11-jre-slim
-  #   build: 
-  #     context: ./auth/
-  #   volumes:
-  #     - ${AUTH_INIT_DIR_PATH}/preEntrypoint.sh ${AUTH_DOCKER_DIR_PATH}/
-  #     - ${AUTH_CORE_DIR_PATH}${AUTH_SOURCE_JAR} ${AUTH_DOCKER_DIR_PATH}/msAuthApp.jar
-  #   working_dir: ${AUTH_DOCKER_DIR_PATH}/
-  #   env_file:
-  #     - ./auth/variables.env
-  #   entrypoint:
-  #    - ./preEntrypoint.sh
-  #    - java
-  #    - -jar
-  #    - ./msAuthApp.jar
+  auth:
+    depends_on:
+      - auth-db
+    image: openjdk:11-jre-slim
+    build: 
+      context: ./auth/
+    # volumes:
+    #   - ${AUTH_INIT_DIR_PATH}/preEntrypoint.sh ${AUTH_DOCKER_DIR_PATH}/
+    #   - ${AUTH_CORE_DIR_PATH}${AUTH_SOURCE_JAR} ${AUTH_DOCKER_DIR_PATH}/msAuthApp.jar
+    working_dir: ${AUTH_DOCKER_DIR_PATH}/
+    env_file:
+      - ./auth/variables.env
+    entrypoint:
+     - ./preEntrypoint.sh
+     - java
+     - -jar
+     - ./msAuthApp.jar
 
   cache:
     depends_on:
@@ -97,9 +120,16 @@ services:
     ports:
       - 50009:50009
 
-  # config:
-  #   depends_on:
-  #     - auth-db
+  config:
+    depends_on:
+      - auth-db
+      - postgres_config
+    networks:
+      - msauth
+    build: 
+      context: ./storage/
+    ports:
+      - 50004:50004
 
   crawler:
     depends_on:
