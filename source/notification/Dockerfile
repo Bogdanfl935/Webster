@@ -1,5 +1,7 @@
 FROM openjdk:11-jre-slim
 
+EXPOSE 5551
+
 ARG CORE_DIR_PATH=core
 ARG INIT_DIR_PATH=init
 ARG SOURCE_JAR=${CORE_DIR_PATH}/target/*.jar
