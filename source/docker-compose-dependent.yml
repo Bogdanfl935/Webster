@@ -1,0 +1,166 @@
+version: '3.8'
+
+services:
+  postgres_storage:
+    container_name: pg-storage-ms
+    image: postgres:latest
+    networks:
+      - msauth
+    restart: always
+    env_file: ./storage/init/.env
+    environment:
+      - POSTGRES_USER=${STORAGE_DB_USERNAME}
+      - POSTGRES_PASSWORD=${STORAGE_DB_PASSWORD}
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    # network_mode: "host"
+    ports:
+      - '${STORAGE_DB_PORT}:${STORAGE_DB_PORT}'
+    volumes: 
+      #- ./postgres-data:/var/lib/postgresql/data
+      - ./storage/init/sql:/docker-entrypoint-initdb.d
+    command: -p ${STORAGE_DB_PORT}
+
+  postgres_config:
+    container_name: pg-config-ms
+    image: postgres:latest
+    networks:
+      - msauth
+    restart: always
+    environment:
+      - POSTGRES_USER=${CONFIG_DB_USERNAME}
+      - POSTGRES_PASSWORD=${CONFIG_DB_PASSWORD}
+    env_file: ./config/init/.env
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    # network_mode: "host"
+    ports:
+      - '${CONFIG_DB_PORT}:${CONFIG_DB_PORT}'
+    volumes: 
+      #- ./postgres-data:/var/lib/postgresql/data
+      - ./config/init/sql:/docker-entrypoint-initdb.d
+    command: -p ${CONFIG_DB_PORT}
+
+  storage:
+    container_name: storage-ms
+    depends_on:
+      - postgres_storage
+    networks:
+      - msauth
+    build: 
+      context: ./storage/
+    ports:
+      - 50006:50006
+
+    
+  auth:
+    container_name: auth-ms
+    image: openjdk:11-jre-slim
+    build: 
+      context: ./auth/
+    # volumes:
+    #   - ${AUTH_INIT_DIR_PATH}/preEntrypoint.sh ${AUTH_DOCKER_DIR_PATH}/
+    #   - ${AUTH_CORE_DIR_PATH}${AUTH_SOURCE_JAR} ${AUTH_DOCKER_DIR_PATH}/msAuthApp.jar
+    working_dir: ${AUTH_DOCKER_DIR_PATH}/
+    env_file:
+      - ./auth/variables.env
+    entrypoint:
+     - ./preEntrypoint.sh
+     - java
+     - -jar
+     - ./msAuthApp.jar
+    networks:
+      - msauth
+    ports:
+      - 5550:5550
+
+  cache:
+    container_name: cache-ms
+    depends_on:
+      - storage
+    networks:
+      - msauth
+    build: 
+      context: ./cache/
+    ports:
+      - 50003:50003
+    
+  client:
+    container_name: client-ms
+    depends_on:
+      - storage
+    networks:
+      - msauth
+    build: 
+      context: ./client/
+    ports:
+      - 50009:50009
+
+  config:
+    container_name: config-ms
+    depends_on:
+      - postgres_config
+    networks:
+      - msauth
+    build: 
+      context: ./config/
+    ports:
+      - 50004:50004
+
+  crawler:
+    container_name: crawler-ms
+    depends_on:
+      - storage
+    networks:
+      - msauth
+    restart: on-failure
+    build: 
+      context: ./crawler/
+    ports:
+      - 50002:50002
+
+  exporter:
+    container_name: exporter-ms
+    networks:
+      - msauth
+    build: ./exporter/core/exporter/
+
+
+  notification:
+    container_name: notification-ms
+    env_file: ./notification/init/.env
+    build: 
+      context: ./notification/
+    networks:
+      - msauth
+    ports:
+      - 5551:5551
+
+  
+
+  parser:
+    container_name: parser-ms
+    depends_on:
+      - storage
+    networks:
+      - msauth
+    restart: on-failure
+    build: 
+      context: ./parser/
+    ports:
+      - 50005:50005
+
+  statistics:
+    container_name: statistics-ms
+    networks:
+      - msauth
+    build: ./statistics/core/statistics/
+
+networks:
+  msauth:
+    external: true
+    name: msauth
