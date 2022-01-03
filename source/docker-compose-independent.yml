@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  auth-db:
+    container_name: pg-auth-ms
+    image: postgres
+    environment:
+      - CREATE_USER_INTERACTIVE=off
+      - POSTGRES_USER=${AUTH_DB_USER}
+      - POSTGRES_PASSWORD=${AUTH_DB_PASS}
+      - POSTGRES_DB=${AUTH_DB_DATABASE}
+    volumes:
+      - ./auth-db/init/:/docker-entrypoint-initdb.d/
+    networks:
+      - msauth
+    ports:
+      - ${AUTH_DB_PORT}:${AUTH_DB_PORT}
+
+  redis_auth_ms:
+    container_name: redis-auth-ms
+    image: redis    
+    networks:
+      - msauth
+    ports:
+      - ${AUTH_JEDIS_PORT}:${AUTH_JEDIS_PORT}
+    command: >
+      --requirepass ${AUTH_JEDIS_PASS}
+      --port ${AUTH_JEDIS_PORT}
+
+  redis_cache_ms:
+    container_name: redis-cache-ms
+    image: redis    
+    networks:
+      - msauth
+    ports:
+      - ${CACHE_REDIS_PORT}:${CACHE_REDIS_PORT}
+    command: >
+      --requirepass ${CACHE_REDIS_PASSWORD}
+      --port ${CACHE_REDIS_PORT}
+  
+  rabbitmq:
+    depends_on:
+      - auth-db
+    container_name: rabbitmq-ms
+    hostname: rabbitmq
+    networks:
+      - msauth
+    image:
+      rabbitmq:latest
+    environment:
+      - RABBIT_HOST_IP=0.0.0.0
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+networks:
+  msauth:
+    external: true
+    name: msauth
