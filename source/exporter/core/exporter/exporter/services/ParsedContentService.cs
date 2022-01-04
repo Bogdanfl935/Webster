@@ -14,26 +14,28 @@
     {
 
         internal void ExportContent(string username)
-        { 
+        {
             var nonce = 0;
 
             var client = new RestClient(AppConstants.appURL + ":" + EndpointConstants.storagePort);
 
 
             var requestParsedContent = new RestRequest(EndpointConstants.parsedContentEndpoint, Method.GET);
+            requestParsedContent.AddParameter("username", username);
             requestParsedContent.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var responseParsedContent = client.Execute(requestParsedContent);
             var contentParsedContent = responseParsedContent.Content;
 
-            List<Dictionary<string, string>>? listOfDict = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(contentParsedContent);
+            ExportedContentDto parsedContent = (ExportedContentDto)JsonConvert.DeserializeObject(contentParsedContent, typeof(ExportedContentDto));
+            List<ParsedContentDataDto> listOfParsedData = parsedContent.parsedContent;
 
-            if (listOfDict != null)
+            if (listOfParsedData != null)
             {
-                foreach (var dict in listOfDict)
+                foreach (var element in listOfParsedData)
                 {
                     string filename;
 
-                    byte[] valueByte = Convert.FromBase64String(dict[StorageResponseConstants.contentKey]);
+                    byte[] valueByte = Convert.FromBase64String(element.content);
 
                     using (MemoryStream ms = new MemoryStream(valueByte))
                     {
