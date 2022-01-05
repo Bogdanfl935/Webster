@@ -1,3 +1,5 @@
+from app.config import env_config
+
 # Own endpoints
 CRAWLER_START = "/crawler-start"
 CRAWLER_STOP = "/crawler-stop"
@@ -17,6 +19,6 @@ CONCURRENT_CONTINUATION_READING = "/crawler-continuation-reading"
 CONCURRENT_CONTINUATION_WRITING = "/crawler-continuation-writing"
 LAST_URL = "/last-url"
 
-CACHE_MS_URL = "http://cache-ms:50003"
-STORAGE_MS_URL = "http://storage-ms:50006"
-CONFIG_MS_URL = "http://config-ms:50004"
+CACHE_MS_URL = f"http://{env_config.CACHE_CONTAINER_NAME}:{env_config.CACHE_PORT}"
+STORAGE_MS_URL = f"http://{env_config.STORAGE_CONTAINER_NAME}:{env_config.STORAGE_PORT}"
+CONFIG_MS_URL = f"http://{env_config.CONFIG_CONTAINER_NAME}:{env_config.CONFIG_PORT}"

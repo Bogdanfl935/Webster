@@ -1,5 +1,6 @@
 from app.service.validation_service import ValidationTarget, validate_with_schema
-from app.constants import endpoint_constants, app_constants
+from app.constants import endpoint_constants
+from app.config.env_config import APP_HOST, APP_PORT
 from flask import jsonify, make_response, request, Response
 from werkzeug.exceptions import HTTPException
 from app.dto.error_handler import ErrorHandler
@@ -48,5 +49,5 @@ def handle_generic_error(exception) -> Response:
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, filename="logfile", filemode="a+",
                         format="%(asctime)-15s %(levelname)-8s %(message)s")
-    app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
+    app.run(host=APP_HOST, port=APP_PORT, debug=True)
     executor_service.shutdown()

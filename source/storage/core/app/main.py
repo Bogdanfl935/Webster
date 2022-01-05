@@ -1,7 +1,8 @@
 from flask import request, jsonify, Response, make_response
-from app.constants import app_constants, endpoint_constants
+from app.constants import endpoint_constants
 from app.services import storage_access_service
 from app.config.app_config import flask_app
+from app.config.env_config import APP_HOST, APP_PORT
 from werkzeug.exceptions import HTTPException
 from app.dto.error_handler import ErrorHandler
 from app.services.validation_service import validate_with_schema, ValidationTarget
@@ -42,4 +43,4 @@ def handle_generic_error(exception) -> Response:
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, filename="logfile", filemode="a+",
                         format="%(asctime)-15s %(levelname)-8s %(message)s")
-    flask_app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
+    flask_app.run(host=APP_HOST, port=APP_PORT, debug=True)

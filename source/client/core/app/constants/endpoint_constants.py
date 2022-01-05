@@ -1,3 +1,4 @@
+from app.config import env_config
 # Own Endpoints
 # GET Endpoints
 
@@ -33,9 +34,8 @@ CRAWLER_START = "/crawler-start"
 CRAWLER_STOP = "/crawler-stop"
 CRAWLER_CONFIGURATION = "/crawler-configuration"
 
-AUTH_MS_URL="http://auth-ms:5550"
-NOTIFICATION_MS_URL="http://notification-ms:5551"
-
-CRAWLER_MS_URL="http://crawler-ms:50003"
-CONFIG_MS_URL= "http://config-ms:50004"
-PARSER_MS_URL= "http://parser-ms:50005"
+AUTH_MS_URL = f"http://{env_config.AUTH_CONTAINER_NAME}:{env_config.AUTH_PORT}"
+NOTIFICATION_MS_URL = f"http://{env_config.NOTIFICATION_CONTAINER_NAME}:{env_config.NOTIFICATION_PORT}"
+CRAWLER_MS_URL = f"http://{env_config.CRAWLER_CONTAINER_NAME}:{env_config.CRAWLER_PORT}"
+CONFIG_MS_URL = f"http://{env_config.CONFIG_CONTAINER_NAME}:{env_config.CONFIG_PORT}"
+PARSER_MS_URL = f"http://{env_config.PARSER_CONTAINER_NAME}:{env_config.PARSER_PORT}"

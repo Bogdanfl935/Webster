@@ -1,5 +1,5 @@
 from flask import request, Response, make_response, jsonify
-from app.constants import app_constants
+from app.config.env_config import APP_HOST, APP_PORT
 from app.config.app_config import flask_app
 from werkzeug.exceptions import HTTPException
 from app.dto.error_handler import ErrorHandler
@@ -30,4 +30,4 @@ def handle_generic_error(exception) -> Response:
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, filename="logfile", filemode="a+",
                         format="%(asctime)-15s %(levelname)-8s %(message)s")
-    flask_app.run(host=app_constants.APP_HOST, port=app_constants.APP_PORT, debug=True)
+    flask_app.run(host=APP_HOST, port=APP_PORT, debug=True)
