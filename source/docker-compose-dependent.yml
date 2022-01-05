@@ -2,163 +2,189 @@ version: '3.8'
 
 services:
   postgres_storage:
-    container_name: pg-storage-ms
+    container_name: ${STORAGE_POSTGRES_CONTAINER_NAME}
     image: postgres:latest
     networks:
       - msauth
     restart: always
-    env_file: ./storage/init/.env
+    env_file: .env/container_config_common.env
     environment:
-      - POSTGRES_USER=${STORAGE_DB_USERNAME}
-      - POSTGRES_PASSWORD=${STORAGE_DB_PASSWORD}
+      - POSTGRES_USER=${STORAGE_POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${STORAGE_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${STORAGE_POSTGRES_DATABASE}
     logging:
       options:
         max-size: 10m
         max-file: "3"
-    # network_mode: "host"
     ports:
-      - '${STORAGE_DB_PORT}:${STORAGE_DB_PORT}'
+      - '${STORAGE_POSTGRES_PORT}:${STORAGE_POSTGRES_PORT}'
     volumes: 
-      #- ./postgres-data:/var/lib/postgresql/data
       - ./storage/init/sql:/docker-entrypoint-initdb.d
-    command: -p ${STORAGE_DB_PORT}
+    command: -p ${STORAGE_POSTGRES_PORT}
 
   postgres_config:
-    container_name: pg-config-ms
+    container_name: ${CONFIG_POSTGRES_CONTAINER_NAME}
     image: postgres:latest
     networks:
       - msauth
     restart: always
     environment:
-      - POSTGRES_USER=${CONFIG_DB_USERNAME}
-      - POSTGRES_PASSWORD=${CONFIG_DB_PASSWORD}
-    env_file: ./config/init/.env
+      - POSTGRES_USER=${CONFIG_POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${CONFIG_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${CONFIG_POSTGRES_DATABASE}
+    env_file: .env/container_config_common.env
     logging:
       options:
         max-size: 10m
         max-file: "3"
-    # network_mode: "host"
     ports:
-      - '${CONFIG_DB_PORT}:${CONFIG_DB_PORT}'
+      - '${CONFIG_POSTGRES_PORT}:${CONFIG_POSTGRES_PORT}'
     volumes: 
-      #- ./postgres-data:/var/lib/postgresql/data
       - ./config/init/sql:/docker-entrypoint-initdb.d
-    command: -p ${CONFIG_DB_PORT}
+    command: -p ${CONFIG_POSTGRES_PORT}
 
   storage:
-    container_name: storage-ms
+    container_name: ${STORAGE_CONTAINER_NAME}
     depends_on:
       - postgres_storage
+    env_file: .env/container_config_common.env
+    environment:
+      - REMOTE_DB_HOST=${AUTH_POSTGRES_CONTAINER_NAME}
+      - REMOTE_DB_PORT=${AUTH_POSTGRES_PORT}
+      - REMOTE_DB_DATABASE=${AUTH_POSTGRES_DATABASE}
+      - REMOTE_DB_TABLENAME=${AUTH_REMOTE_TABLENAME}
+      - REMOTE_DB_USERNAME=${AUTH_POSTGRES_USERNAME}
+      - REMOTE_DB_PASSWORD=${AUTH_POSTGRES_PASSWORD}
     networks:
       - msauth
     build: 
       context: ./storage/
     ports:
-      - 50006:50006
+      - ${STORAGE_PORT}:${STORAGE_PORT}
 
     
   auth:
-    container_name: auth-ms
+    container_name: ${AUTH_CONTAINER_NAME}
     image: openjdk:11-jre-slim
     build: 
       context: ./auth/
-    # volumes:
-    #   - ${AUTH_INIT_DIR_PATH}/preEntrypoint.sh ${AUTH_DOCKER_DIR_PATH}/
-    #   - ${AUTH_CORE_DIR_PATH}${AUTH_SOURCE_JAR} ${AUTH_DOCKER_DIR_PATH}/msAuthApp.jar
-    working_dir: ${AUTH_DOCKER_DIR_PATH}/
-    env_file:
-      - ./auth/variables.env
-    entrypoint:
-     - ./preEntrypoint.sh
-     - java
-     - -jar
-     - ./msAuthApp.jar
+    env_file: .env/container_config_common.env
+    environment:
+      - SERVER_PORT=${AUTH_PORT}
+      - JEDIS_HOSTNAME=${AUTH_REDIS_CONTAINER_NAME}
+      - JEDIS_PORT=${AUTH_REDIS_PORT}
+      - JEDIS_PASS=${AUTH_REDIS_PASSWORD}
+      - JWT_ISSUER=${AUTH_JWT_ISSUER}
+      - JEDIS_DATABASE=${AUTH_JEDIS_DATABASE}
+      - DB_HOSTNAME=${AUTH_POSTGRES_CONTAINER_NAME}
+      - DB_PORT=${AUTH_POSTGRES_PORT}
+      - DB_DATABASE=${AUTH_POSTGRES_DATABASE}
+      - DB_USER=${AUTH_POSTGRES_USERNAME}
+      - DB_PASS=${AUTH_POSTGRES_PASSWORD}
     networks:
       - msauth
     ports:
-      - 5550:5550
+      - ${AUTH_PORT}:${AUTH_PORT}
 
   cache:
-    container_name: cache-ms
-    depends_on:
-      - storage
+    container_name: ${CACHE_CONTAINER_NAME}
     networks:
       - msauth
     build: 
       context: ./cache/
+    env_file: .env/container_config_common.env
     ports:
-      - 50003:50003
+      - ${CACHE_PORT}:${CACHE_PORT}
     
   client:
-    container_name: client-ms
-    depends_on:
-      - storage
+    container_name: ${CLIENT_CONTAINER_NAME}
     networks:
       - msauth
     build: 
       context: ./client/
+    env_file: .env/container_config_common.env
     ports:
-      - 50009:50009
+      - ${CLIENT_PORT}:${CLIENT_PORT}
 
   config:
-    container_name: config-ms
+    container_name: ${CONFIG_CONTAINER_NAME}
     depends_on:
       - postgres_config
+    environment:
+      - REMOTE_DB_HOST=${AUTH_POSTGRES_CONTAINER_NAME}
+      - REMOTE_DB_PORT=${AUTH_POSTGRES_PORT}
+      - REMOTE_DB_DATABASE=${AUTH_POSTGRES_DATABASE}
+      - REMOTE_DB_TABLENAME=${AUTH_REMOTE_TABLENAME}
+      - REMOTE_DB_USERNAME=${AUTH_POSTGRES_USERNAME}
+      - REMOTE_DB_PASSWORD=${AUTH_POSTGRES_PASSWORD}
     networks:
       - msauth
     build: 
       context: ./config/
+    env_file: .env/container_config_common.env
     ports:
-      - 50004:50004
+      - ${CONFIG_PORT}:${CONFIG_PORT}
 
   crawler:
-    container_name: crawler-ms
-    depends_on:
-      - storage
+    container_name: ${CRAWLER_CONTAINER_NAME}
     networks:
       - msauth
     restart: on-failure
     build: 
       context: ./crawler/
+    env_file: .env/container_config_common.env
     ports:
-      - 50002:50002
+      - ${CRAWLER_PORT}:${CRAWLER_PORT}
 
-  exporter:
-    container_name: exporter-ms
-    networks:
-      - msauth
-    build: ./exporter/core/exporter/
+  # exporter:
+  #   container_name: ${EXPORTER_CONTAINER_NAME}
+  #   networks:
+  #     - msauth
+  #   build: ./exporter/core/exporter/
+  #   env_file: .env/container_config_common.env
+  #   ports:
+  #     - ${EXPORTER_PORT}:${EXPORTER_PORT}
 
 
   notification:
-    container_name: notification-ms
-    env_file: ./notification/init/.env
+    container_name: ${NOTIFICATION_CONTAINER_NAME}
+    env_file: .env/container_config_common.env
+    environment:
+      - SERVER_PORT=${NOTIFICATION_PORT}
+      - SESSION_HOST=${NOTIFICATION_SESSION_HOST}
+      - SESSION_PASS=${NOTIFICATION_SESSION_PASSWORD}
+      - SESSION_PORT=${NOTIFICATION_SESSION_PORT}
+      - SESSION_USER=${NOTIFICATION_SESSION_USERNAME}
     build: 
       context: ./notification/
     networks:
       - msauth
     ports:
-      - 5551:5551
+      - ${NOTIFICATION_PORT}:${NOTIFICATION_PORT}
 
   
 
   parser:
-    container_name: parser-ms
+    container_name: ${PARSER_CONTAINER_NAME}
     depends_on:
       - storage
+    env_file: .env/container_config_common.env
     networks:
       - msauth
     restart: on-failure
     build: 
       context: ./parser/
     ports:
-      - 50005:50005
+      - ${PARSER_PORT}:${PARSER_PORT}
 
-  statistics:
-    container_name: statistics-ms
-    networks:
-      - msauth
-    build: ./statistics/core/statistics/
+  # statistics:
+  #   container_name: ${STATISTICS_CONTAINER_NAME}
+  #   env_file: .env/container_config_common.env
+  #   networks:
+  #     - msauth
+  #   build: ./statistics/core/statistics/
+  #   ports:
+  #     - ${STATISTICS_PORT}:${STATISTICS_PORT}
 
 networks:
   msauth:
