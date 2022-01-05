@@ -36,12 +36,13 @@
                     string filename;
 
                     byte[] valueByte = Convert.FromBase64String(element.content);
+                    
 
                     using (MemoryStream ms = new MemoryStream(valueByte))
                     {
                         using (FileStream zipFile = File.Open(username + "_content.zip", FileMode.OpenOrCreate))
                         {
-                            filename = "content_" + nonce.ToString();
+                            filename = element.tag + "_" + element.id;
                             nonce++;
 
                             using (ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Update))
@@ -51,8 +52,7 @@
                                 using (var entryStream = readmeEntry.Open())
                                 using (var streamWriter = new StreamWriter(entryStream))
                                 {
-                                    streamWriter.Write(ms);
-
+                                    streamWriter.BaseStream.Write(valueByte, 0, valueByte.Length);
                                 }
                             }
                         }
