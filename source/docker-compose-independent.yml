@@ -1,34 +1,35 @@
 version: '3.8'
 
 services:
-  auth-db:
-    container_name: pg-auth-ms
+  postgres_auth:
+    container_name: ${AUTH_POSTGRES_CONTAINER_NAME}
     image: postgres
     environment:
       - CREATE_USER_INTERACTIVE=off
-      - POSTGRES_USER=${AUTH_DB_USER}
-      - POSTGRES_PASSWORD=${AUTH_DB_PASS}
-      - POSTGRES_DB=${AUTH_DB_DATABASE}
+      - POSTGRES_USER=${AUTH_POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${AUTH_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${AUTH_POSTGRES_DATABASE}
     volumes:
-      - ./auth-db/init/:/docker-entrypoint-initdb.d/
+      - ./auth/init/sql:/docker-entrypoint-initdb.d
     networks:
       - msauth
     ports:
-      - ${AUTH_DB_PORT}:${AUTH_DB_PORT}
+      - ${AUTH_POSTGRES_PORT}:${AUTH_POSTGRES_PORT}
+    command: -p ${AUTH_POSTGRES_PORT}
 
-  redis_auth_ms:
-    container_name: redis-auth-ms
+  redis_auth:
+    container_name: ${AUTH_REDIS_CONTAINER_NAME}
     image: redis    
     networks:
       - msauth
     ports:
-      - ${AUTH_JEDIS_PORT}:${AUTH_JEDIS_PORT}
+      - ${AUTH_REDIS_PORT}:${AUTH_REDIS_PORT}
     command: >
-      --requirepass ${AUTH_JEDIS_PASS}
-      --port ${AUTH_JEDIS_PORT}
+      --requirepass ${AUTH_REDIS_PASSWORD}
+      --port ${AUTH_REDIS_PORT}
 
-  redis_cache_ms:
-    container_name: redis-cache-ms
+  redis_cache:
+    container_name: ${CACHE_REDIS_CONTAINER_NAME}
     image: redis    
     networks:
       - msauth
@@ -39,19 +40,20 @@ services:
       --port ${CACHE_REDIS_PORT}
   
   rabbitmq:
-    depends_on:
-      - auth-db
-    container_name: rabbitmq-ms
-    hostname: rabbitmq
+    container_name: ${AMQP_CONTAINER_NAME}
+    #hostname: rabbitmq
     networks:
       - msauth
     image:
       rabbitmq:latest
     environment:
-      - RABBIT_HOST_IP=0.0.0.0
+      - RABBITMQ_DEFAULT_USER=${AMQP_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${AMQP_PASSWORD}
+      - RABBITMQ_NODE_PORT=${AMQP_PORT}
+      - RABBIT_HOST_IP=${AMQP_HOST}
     ports:
       - 15672:15672
-      - 5672:5672
+      - ${AMQP_PORT}:${AMQP_PORT}
 
 networks:
   msauth:

@@ -1,7 +1,8 @@
 from flask import render_template
-from app.constants import app_constants, template_constants, static_constants
+from app.constants import template_constants, static_constants
 from werkzeug.exceptions import HTTPException
 from app.config.app_config import app
+from app.config.env_config import APP_HOST, APP_PORT
 import logging
 
 
@@ -35,5 +36,4 @@ def handle_generic_error(exception) -> str:
 
 
 if __name__ == '__main__':
-    app.run(host=app_constants.APP_HOST,
-            port=app_constants.APP_PORT, debug=True)
+    app.run(host=APP_HOST, port=APP_PORT, debug=True)
