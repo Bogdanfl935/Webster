@@ -10,10 +10,13 @@
     using System.Net;
     using System.Drawing.Imaging;
     using System.IO.Compression;
+    using Microsoft.AspNetCore.Mvc;
+
     public class ParsedContentService
     {
 
-        internal void ExportContent(string username)
+        //internal Microsoft.AspNetCore.Mvc.FileContentResult ExportContent(string username)
+        internal byte[] ExportContent(string username)
         {
             var nonce = 0;
 
@@ -26,31 +29,34 @@
             var responseParsedContent = client.Execute(requestParsedContent);
             var contentParsedContent = responseParsedContent.Content;
 
-            ExportedContentDto parsedContent = (ExportedContentDto)JsonConvert.DeserializeObject(contentParsedContent, typeof(ExportedContentDto));
+            ParsedContentDto parsedContent = (ParsedContentDto)JsonConvert.DeserializeObject(contentParsedContent, typeof(ParsedContentDto));
             List<ParsedContentDataDto> listOfParsedData = parsedContent.parsedContent;
+
+            string archiveName = username + "_content.zip";
 
             if (listOfParsedData != null)
             {
-                foreach (var element in listOfParsedData)
+                for (var i = 0;i <= Math.Min(listOfParsedData.Count, 15); i ++)
                 {
+                    var element = listOfParsedData[i];
                     string filename;
 
                     byte[] valueByte = Convert.FromBase64String(element.content);
-                    
+
 
                     using (MemoryStream ms = new MemoryStream(valueByte))
                     {
-                        using (FileStream zipFile = File.Open(username + "_content.zip", FileMode.OpenOrCreate))
+                        using (FileStream zipFile = File.Open(archiveName, FileMode.OpenOrCreate))
                         {
-                            filename = element.tag + "_" + element.id;
-                            nonce++;
+                            filename = element.tag + "_" + element.id + ".txt";
 
                             using (ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Update))
                             {
-                                ZipArchiveEntry readmeEntry = archive.CreateEntry(filename);
+                                string source = element.source.Replace("/", "-");
+                                ZipArchiveEntry readmeEntry = archive.CreateEntry(source + "/" + element.tag + "/" + filename);
 
                                 using (var entryStream = readmeEntry.Open())
-                                using (var streamWriter = new StreamWriter(entryStream))
+                                using (var streamWriter = new StreamWriter(entryStream, Encoding.UTF8))
                                 {
                                     streamWriter.BaseStream.Write(valueByte, 0, valueByte.Length);
                                 }
@@ -59,6 +65,9 @@
                     }
                 }
             }
+            var myfile = System.IO.File.ReadAllBytes(archiveName);
+            return new ExporterContentDto(new FileContentResult(myfile, "application/zip")).encodedFile;
+            //return new ExporterContentDto(myfile).encodedFile;
         }
     }
 }

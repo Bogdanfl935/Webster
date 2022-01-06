@@ -10,5 +10,7 @@ namespace exporter.dto
         public int id { get; set; }
         [JsonProperty("tag")]
         public string tag { get; set; }
+        [JsonProperty("source")]
+        public string source { get; set; }
     }
 }
