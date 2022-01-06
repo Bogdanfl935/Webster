@@ -2,7 +2,7 @@ from app.constants import parsing_constants
 from app.service import url_parsing_service, executor_service, generic_parsing_service, cache_service, storage_service
 from urllib.parse import urlparse, urlunparse
 from mimetypes import guess_extension
-import base64, requests, itertools
+import base64, requests, itertools, logging, traceback
 from bs4.element import ResultSet
 
 def process_images(authenticated_user: str, content_iterable: ResultSet, memory_limit, referrer: str):
@@ -20,7 +20,7 @@ def process_images(authenticated_user: str, content_iterable: ResultSet, memory_
             memory_usage = sum(itertools.starmap(lambda _, content: len(content), tag_content_binaries))
             cache_service.make_memory_usage_post(authenticated_user, memory_usage)
             cache_service.make_last_parsed_post(authenticated_user, parsing_constants.IMAGE_TAG, referrer, memory_usage)
-            storage_service.make_parsed_images_post(authenticated_user, tag_content_binaries)
+            storage_service.make_parsed_images_post(authenticated_user, tag_content_binaries, referrer)
     finally:
         executor_service.release_user_lock(authenticated_user) # Exit critical section
 
@@ -31,7 +31,7 @@ def _process_image_by_source(source, referrer):
     else:
         # Append scheme and netloc to image sources if needed
         image_url_href = url_parsing_service._prepend_anchor_url_content(urlparse(source), referrer)
-        image_binary = _href_to_binary(urlunparse(image_url_href))
+        image_binary = _href_to_binary(image_url_href)
     return image_binary
     
 

@@ -19,7 +19,7 @@ def process_generic_tag(authenticated_user: str, content_iterable: ResultSet, me
             memory_usage = sum(map(len, tag_content_binaries))
             cache_service.make_memory_usage_post(authenticated_user, memory_usage)
             cache_service.make_last_parsed_post(authenticated_user, tag, referrer, memory_usage)
-            storage_service.make_parsed_content_post(authenticated_user, tag_content_binaries, tag)
+            storage_service.make_parsed_content_post(authenticated_user, tag_content_binaries, tag, referrer)
     finally:
         executor_service.release_user_lock(authenticated_user) # Exit critical section
 

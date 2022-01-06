@@ -28,6 +28,7 @@ class ParsedContentInsertionSchema(Schema):
     username = fields.Email(required=True)
     tag = fields.String(required=True)
     content = fields.String(required=True)
+    source = fields.Url(required=True)
     unknown = INCLUDE
 
 
@@ -35,6 +36,7 @@ class ParsedImageInsertionSchema(Schema):
     username = fields.Email(required=True)
     extension = fields.String(required=True)
     content = fields.String(required=True)
+    source = fields.Url(required=True)
     unknown = INCLUDE
 
 

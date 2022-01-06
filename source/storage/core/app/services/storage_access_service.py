@@ -1,6 +1,6 @@
 from app.constants import serialization_constants, sql_models
 from app.services import persistence_service
-from app.services.user_mapping_service import fetch_user_id
+from app.services.foreign_key_mapping_service import fetch_user_id
 from flask import request, make_response, jsonify
 from http import HTTPStatus
 

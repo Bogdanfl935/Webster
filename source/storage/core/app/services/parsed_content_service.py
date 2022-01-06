@@ -1,6 +1,6 @@
 from app.constants import serialization_constants, sql_models
 from app.services import persistence_service
-from app.services.user_mapping_service import fetch_user_id
+from app.services.foreign_key_mapping_service import fetch_user_id, fetch_source_id
 from flask import request, Response, make_response, jsonify
 from http import HTTPStatus
 import base64
@@ -8,9 +8,10 @@ import base64
 
 def add_content():
     user_id = fetch_user_id(request.json.get(serialization_constants.USERNAME_KEY))
+    source_id = fetch_source_id(user_id, request.json.get(serialization_constants.SOURCE_KEY))
     tag = request.json.get(serialization_constants.TAG_KEY)
     content = base64.b64decode(request.json.get(serialization_constants.CONTENT_KEY).encode('ascii'))
-    record = sql_models.ParsedContent(user_id=user_id, tag=tag, content=content)
+    record = sql_models.ParsedContent(user_id=user_id, tag=tag, content=content, source_id=source_id)
 
     persistence_service.add(record, commit=True)
     return Response(status=HTTPStatus.OK)
@@ -29,9 +30,10 @@ def delete_content():
 
 def get_content():
     user_id = fetch_user_id(request.args.get(serialization_constants.USERNAME_KEY))
-    query_func = lambda session: session.query(sql_models.ParsedContent).filter(
+    query_func = lambda session: session.query(sql_models.ParsedContent).join(sql_models.ParsedUrl).filter(
         sql_models.ParsedContent.user_id == user_id).values(
-        sql_models.ParsedContent.id, sql_models.ParsedContent.tag, sql_models.ParsedContent.content)
+        sql_models.ParsedContent.id, sql_models.ParsedContent.tag,
+        sql_models.ParsedContent.content, sql_models.ParsedUrl.url.label(serialization_constants.SOURCE_KEY))
     records = persistence_service.query(query_func)
     response = {serialization_constants.PARSED_CONTENT_KEY: [
             {key: base64.b64encode(value).decode("utf-8") if key == serialization_constants.CONTENT_KEY else value 

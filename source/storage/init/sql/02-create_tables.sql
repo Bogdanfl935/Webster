@@ -33,7 +33,8 @@ CREATE TABLE parsed_content (
   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id BIGINT NOT NULL,
   tag VARCHAR(:TAG_MAX_LENGTH) NOT NULL,
-  content bytea NOT NULL
+  content bytea NOT NULL,
+  source_id BIGINT NOT NULL REFERENCES parsed_url
 );
 
 -- Creation of parsed image table
@@ -41,5 +42,6 @@ CREATE TABLE parsed_image (
   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id BIGINT NOT NULL,
   extension VARCHAR(:EXTENSION_MAX_LENGTH) NOT NULL,
-  content bytea NOT NULL
+  content bytea NOT NULL,
+  source_id BIGINT NOT NULL REFERENCES parsed_url
 );
