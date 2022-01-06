@@ -3,7 +3,7 @@ from app.service import executor_service, configuration_service
 from flask import abort, make_response, request, Response
 from app.constants import serialization_constants
 from http import HTTPStatus
-import requests
+import requests, logging, traceback
 
 
 def start_crawling() -> Response:
@@ -69,12 +69,8 @@ def _crawl(authenticated_user: str, memory_limit: int, urls: list):
     try:
         while len(urls) > 0 and current_memory_usage < memory_limit and continue_crawling is True:
             page_url = urls.pop()
-            page_response = requests.get(page_url)
+            __process_page(authenticated_user, page_url)
             visited_urls.append(page_url)
-
-            if page_response.status_code == HTTPStatus.OK:
-                cache_service.make_last_url_post(authenticated_user, page_url)
-                queue_publisher_service.dispatch_message(authenticated_user, page_response.text, page_url)
 
             if len(urls) == 0:
                 if len(visited_urls) > 0: # Mark visited urls as visited
@@ -92,3 +88,14 @@ def _crawl(authenticated_user: str, memory_limit: int, urls: list):
                 storage_service.make_pending_url_put(authenticated_user, url_list, visited_bool)
     finally:
         cache_service.make_status_writing_post(authenticated_user, active=False)
+
+def __process_page(authenticated_user: str, page_url: str):
+    try:
+        page_response = requests.get(page_url)
+    except requests.exceptions.RequestException:
+        logging.log(level=logging.DEBUG, msg=traceback.format_exc())
+        page_response = None
+
+    if page_response is not None and page_response.status_code == HTTPStatus.OK:
+        cache_service.make_last_url_post(authenticated_user, page_url)
+        queue_publisher_service.dispatch_message(authenticated_user, page_response.text, page_url)
