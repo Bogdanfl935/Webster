@@ -1,4 +1,5 @@
 from app.constants import sql_ddl_constants
+from sqlalchemy import ForeignKey
 from app.config.persistence_config import db
 import enum
 
@@ -29,6 +30,7 @@ class ParsedContent(db.Model):
     user_id = db.Column(db.BigInteger, nullable=False)
     tag = db.Column(db.String, nullable=False)
     content = db.Column(db.LargeBinary, nullable=False)
+    source_id = db.Column(db.BigInteger, ForeignKey(f"{ParsedUrl.__tablename__}.id"), nullable=False)
 
 class ParsedImage(db.Model):
     __tablename__ = sql_ddl_constants.PARSED_IMAGE
@@ -37,6 +39,7 @@ class ParsedImage(db.Model):
     user_id = db.Column(db.BigInteger, nullable=False)
     extension = db.Column(db.String, nullable=False)
     content = db.Column(db.LargeBinary, nullable=False)
+    source_id = db.Column(db.BigInteger, ForeignKey(f"{ParsedUrl.__tablename__}.id"), nullable=False)
 
 class MemoryLimit(db.Model):
     __tablename__ = sql_ddl_constants.MEMORY_LIMIT
