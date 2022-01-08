@@ -25,7 +25,7 @@ def handle_crawler_stop_post():
 @app.route(endpoint_constants.CRAWLER_STATUS, methods=['GET'])
 @validate_with_schema(validation_schema.UsernameAccessSchema, target=ValidationTarget.NAMED_URL_PARAMETERS)
 def handle_crawler_status_get():
-    return crawling_service.get_last_crawled_url()
+    return crawling_service.get_crawler_status()
 
 @app.errorhandler(HTTPStatus.BAD_REQUEST)
 def handle_bad_request_error(exception: HTTPException) -> Response:
