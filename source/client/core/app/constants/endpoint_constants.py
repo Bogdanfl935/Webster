@@ -13,6 +13,7 @@ ARCHIVE = "/archive"
 # JSON response
 CRAWLER_STATUS = "/crawler-status"
 PARSER_STATUS = "/parser-status"
+MEMORY_LIMIT = "/memory-limit"
 
 # POST Endpoints
 REGISTRATION = "/registration"
@@ -39,3 +40,4 @@ NOTIFICATION_MS_URL = f"http://{env_config.NOTIFICATION_CONTAINER_NAME}:{env_con
 CRAWLER_MS_URL = f"http://{env_config.CRAWLER_CONTAINER_NAME}:{env_config.CRAWLER_PORT}"
 CONFIG_MS_URL = f"http://{env_config.CONFIG_CONTAINER_NAME}:{env_config.CONFIG_PORT}"
 PARSER_MS_URL = f"http://{env_config.PARSER_CONTAINER_NAME}:{env_config.PARSER_PORT}"
+STORAGE_MS_URL = f"http://{env_config.STORAGE_CONTAINER_NAME}:{env_config.STORAGE_PORT}"
