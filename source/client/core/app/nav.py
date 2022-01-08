@@ -1,6 +1,6 @@
 from flask import render_template, Response, Blueprint
 from app.constants import endpoint_constants, template_constants, nav_endpoint_handler_constants
-from app.service import activity_service
+from app.service import activity_service, config_service
 from app.service.authorization_service import require_access_token
 import random
 
@@ -36,48 +36,7 @@ def handle_activity_get(response_object: Response, authenticated_user: str) -> R
 @nav.route(endpoint_constants.CONFIGURATION, methods=['GET'])
 @require_access_token
 def handle_config_get(response_object: Response, authenticated_user: str) -> str:
-    response_object.set_data(
-        render_template(
-            template_constants.SECTION_CONFIGURATION_PATH,
-            authenticated_user=authenticated_user,
-            crawler_config=[
-                dict(
-                    title="Stay on the same domain",
-                    fieldName="stayOnDomain",
-                    active=True
-                ),
-                dict(
-                    title="Only visit new domains",
-                    fieldName="onlyNewDomain",
-                    active=False
-                ),
-                dict(
-                    title="Do some stuff",
-                    fieldName="stuff1",
-                    active=False
-                ),
-                dict(
-                    title="Do some other stuff",
-                    fieldName="stuff2",
-                    active=True
-                ),
-                dict(
-                    title="Do some other stuff",
-                    fieldName="stuff3",
-                    active=True
-                )
-            ],
-            parser_config = [
-                dict(tag="p"),
-                dict(tag="div"),
-                dict(tag="img"),
-                dict(tag="span"),
-                dict(tag="input"),
-                dict(tag="rocket")
-            ]
-        )
-    )
-    return response_object
+    return config_service.render_configuration(response_object, authenticated_user)
 
 @nav.route(endpoint_constants.ARCHIVE, methods=['GET'])
 @require_access_token
