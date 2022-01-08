@@ -1,0 +1,6 @@
+ACTIVE_KEY = "active"
+LAST_URL_KEY = "lastUrl"
+MEMORY_USAGE_KEY = "memoryUsage"
+MEMORY_LIMIT_KEY = "memoryLimit"
+USERNAME_KEY = "username"
+DOMAIN_KEY = "domain"
