@@ -10,53 +10,64 @@
     using System.Net;
     using System.Drawing.Imaging;
     using System.IO.Compression;
+    using Microsoft.AspNetCore.Mvc;
+
     public class ParsedContentService
     {
 
-        internal void ExportContent(string username)
-        { 
+        //internal Microsoft.AspNetCore.Mvc.FileContentResult ExportContent(string username)
+        internal byte[] ExportContent(string username)
+        {
             var nonce = 0;
 
             var client = new RestClient(AppConstants.appURL + ":" + EndpointConstants.storagePort);
 
 
             var requestParsedContent = new RestRequest(EndpointConstants.parsedContentEndpoint, Method.GET);
+            requestParsedContent.AddParameter("username", username);
             requestParsedContent.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var responseParsedContent = client.Execute(requestParsedContent);
             var contentParsedContent = responseParsedContent.Content;
 
-            List<Dictionary<string, string>>? listOfDict = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(contentParsedContent);
+            ParsedContentDto parsedContent = (ParsedContentDto)JsonConvert.DeserializeObject(contentParsedContent, typeof(ParsedContentDto));
+            List<ParsedContentDataDto> listOfParsedData = parsedContent.parsedContent;
 
-            if (listOfDict != null)
+            string archiveName = username + "_content.zip";
+
+            if (listOfParsedData != null)
             {
-                foreach (var dict in listOfDict)
+                for (var i = 0;i <= Math.Min(listOfParsedData.Count, 15); i ++)
                 {
+                    var element = listOfParsedData[i];
                     string filename;
 
-                    byte[] valueByte = Convert.FromBase64String(dict[StorageResponseConstants.contentKey]);
+                    byte[] valueByte = Convert.FromBase64String(element.content);
+
 
                     using (MemoryStream ms = new MemoryStream(valueByte))
                     {
-                        using (FileStream zipFile = File.Open(username + "_content.zip", FileMode.OpenOrCreate))
+                        using (FileStream zipFile = File.Open(archiveName, FileMode.OpenOrCreate))
                         {
-                            filename = "content_" + nonce.ToString();
-                            nonce++;
+                            filename = element.tag + "_" + element.id + ".txt";
 
                             using (ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Update))
                             {
-                                ZipArchiveEntry readmeEntry = archive.CreateEntry(filename);
+                                string source = element.source.Replace("/", "-");
+                                ZipArchiveEntry readmeEntry = archive.CreateEntry(source + "/" + element.tag + "/" + filename);
 
                                 using (var entryStream = readmeEntry.Open())
-                                using (var streamWriter = new StreamWriter(entryStream))
+                                using (var streamWriter = new StreamWriter(entryStream, Encoding.UTF8))
                                 {
-                                    streamWriter.Write(ms);
-
+                                    streamWriter.BaseStream.Write(valueByte, 0, valueByte.Length);
                                 }
                             }
                         }
                     }
                 }
             }
+            var myfile = System.IO.File.ReadAllBytes(archiveName);
+            return new ExporterContentDto(new FileContentResult(myfile, "application/zip")).encodedFile;
+            //return new ExporterContentDto(myfile).encodedFile;
         }
     }
 }

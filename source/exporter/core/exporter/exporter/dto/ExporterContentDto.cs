@@ -2,12 +2,11 @@
 {
     public class ExporterContentDto
     {
-        public long numberNextUrls { get; set; }
-        public long numberVisitedUrls { get; set; }
-        public ExporterContentDto(long numberNextUrls, long numberVisitedUrls)
+        public byte[] encodedFile { get; set; }
+        public ExporterContentDto(Microsoft.AspNetCore.Mvc.FileContentResult fileRez)
         {
-            this.numberNextUrls = numberNextUrls;
-            this.numberVisitedUrls = numberVisitedUrls;
+            //this.encodedFile = System.Text.Encoding.UTF8.GetString(fileArray, 0, fileArray.Length);
+            this.encodedFile = fileRez.FileContents;
         }
     }
 }

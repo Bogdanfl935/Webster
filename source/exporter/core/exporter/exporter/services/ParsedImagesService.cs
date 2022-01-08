@@ -10,10 +10,11 @@
     using System.Net;
     using System.Drawing.Imaging;
     using System.IO.Compression;
+    using Microsoft.AspNetCore.Mvc;
 
     public class ParsedImagesService
     {
-        internal void ExportImages(string username)
+        internal byte[] ExportImages(string username)
         {
             var dictExtensions = new Dictionary<string, ImageFormat>()
             {
@@ -34,33 +35,37 @@
 
 
             var requestParsedImages = new RestRequest(EndpointConstants.parsedImageEndpoint, Method.GET);
+            requestParsedImages.AddParameter("username", username);
             requestParsedImages.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var responseParsedImages = client.Execute(requestParsedImages);
             var contentParsedImages = responseParsedImages.Content;
 
-            List<Dictionary<string, string>>? listOfDict = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(contentParsedImages);
+            ParsedImagesDto parsedImages = (ParsedImagesDto)JsonConvert.DeserializeObject(contentParsedImages, typeof(ParsedImagesDto));
+            List<ParsedImagesDataDto> listOfParsedData = parsedImages.parsedImages;
 
-            if (listOfDict != null)
+            string archiveName = username + "_images.zip";
+
+            if (listOfParsedData != null)
             {
-                foreach (var dict in listOfDict)
+                foreach (var element in listOfParsedData)
                 {
 
-                    string extension = dict[StorageResponseConstants.extensionKey];
+                    string extension = element.extension;
                     string filename;
 
-                    byte[] valueByte = Convert.FromBase64String(dict[StorageResponseConstants.contentKey]);
+                    byte[] valueByte = Convert.FromBase64String(element.content);
 
                     using (MemoryStream ms = new MemoryStream(valueByte))
                     {
-                        using (FileStream zipFile = File.Open(username + "_images.zip", FileMode.OpenOrCreate))
+                        using (FileStream zipFile = File.Open(archiveName, FileMode.OpenOrCreate))
                         {
                             Image image = Image.FromStream(ms);
-                            filename = "image_" + nonce.ToString() + "." + extension;
-                            nonce++;
+                            filename = "image_" + element.id + "." + extension;
 
                             using (ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Update))
                             {
-                                ZipArchiveEntry readmeEntry = archive.CreateEntry(filename);
+                                string source = element.source.Replace("/", "-");
+                                ZipArchiveEntry readmeEntry = archive.CreateEntry(source + "/img/" + filename);
 
                                 using (var entryStream = readmeEntry.Open())
                                 using (var streamWriter = new StreamWriter(entryStream))
@@ -68,17 +73,15 @@
                                 {
                                     image.Save(imageStream, dictExtensions[extension]);
                                     streamWriter.Write(imageStream);
-
                                 }
                             }
                         }
                     }
                 }
             }
+            var myfile = System.IO.File.ReadAllBytes(archiveName);
+            return new ExporterContentDto(new FileContentResult(myfile, "application/zip")).encodedFile;
+            //return myfile.ToArray();
         }
-
-        //var results = new ExporterDto(long.Parse(contentNextUrls), long.Parse(contentVisitedUrls));
-
-        //return null;
     }
 }

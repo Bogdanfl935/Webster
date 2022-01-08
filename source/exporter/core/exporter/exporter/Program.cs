@@ -16,10 +16,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapGet("/export-content", (string username) =>
+app.MapGet("/export-content/{username}", (string username) =>
 {
     var contentExporter = new ParsedContentService();
-    contentExporter.ExportContent(username);
+    return contentExporter.ExportContent(username);
 })
     .WithName("GetExportContent");
 
