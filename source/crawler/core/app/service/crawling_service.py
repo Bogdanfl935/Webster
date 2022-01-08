@@ -16,14 +16,15 @@ def start_crawling() -> Response:
         
     return Response(status = HTTPStatus.OK)
         
-def get_last_crawled_url() -> Response:
+def get_crawler_status() -> Response:
     authenticated_user = request.args.get(serialization_constants.USERNAME_KEY)
-    message, status = cache_service.make_last_url_get(authenticated_user)
+    status_response, _ = cache_service.make_status_get(authenticated_user)
+    last_url_response, _ = cache_service.make_last_url_get(authenticated_user)
+    memory_usage_response, _ = cache_service.make_memory_usage_get(authenticated_user)
 
-    if status != HTTPStatus.OK:
-        abort(status, message)
+    response_content = status_response | last_url_response | memory_usage_response
 
-    return make_response(message, status)
+    return make_response(response_content, HTTPStatus.OK)
 
 
 def stop_crawling() -> Response:
@@ -48,7 +49,7 @@ def _init_crawling(authenticated_user: str, start_url: str):
         crawler_active = crawler_status_response.get(serialization_constants.ACTIVE_KEY)
         if not crawler_active:
             # Status reading flips activity flag to True, no subsequent writes are required
-            executor_service.submit_task(lambda: _crawl(authenticated_user, memory_limit, [start_url]))
+            executor_service.submit_task(lambda: _crawl(authenticated_user, memory_limit, start_url))
         else:
             message, response_status = "Crawler is already active", HTTPStatus.CONFLICT
     else:
@@ -57,7 +58,13 @@ def _init_crawling(authenticated_user: str, start_url: str):
     return message, response_status
     
 
-def _crawl(authenticated_user: str, memory_limit: int, urls: list):
+def _crawl(authenticated_user: str, memory_limit: int, start_url: str):
+    try:
+        __crawl_wrapped(authenticated_user, memory_limit, [start_url])
+    finally:
+        cache_service.make_status_writing_post(authenticated_user, active=False)
+
+def __crawl_wrapped(authenticated_user: str, memory_limit: int, urls: list):
     memory_usage_response, _ = cache_service.make_memory_usage_get(authenticated_user)
     crawling_continuation_response, _ = cache_service.make_continuation_reading_post(authenticated_user)
     crawler_configuration_response, _ = configuration_service.make_configuration_get(authenticated_user)
@@ -66,12 +73,13 @@ def _crawl(authenticated_user: str, memory_limit: int, urls: list):
     configuration_options = crawler_configuration_response.get(serialization_constants.OPTIONS_KEY)
     # TODO Take into account crawler configuration options
     visited_urls = list()
-    try:
-        while len(urls) > 0 and current_memory_usage < memory_limit and continue_crawling is True:
+
+    while len(urls) > 0 and current_memory_usage < memory_limit and continue_crawling is True:
             page_url = urls.pop()
             __process_page(authenticated_user, page_url)
             visited_urls.append(page_url)
-
+            # Sporadic deadlock issue check
+            logging.log(level=logging.WARNING, msg="==================PASSED QUEUE===================")
             if len(urls) == 0:
                 if len(visited_urls) > 0: # Mark visited urls as visited
                     storage_service.make_pending_url_put(authenticated_user, visited_urls, visited=True)
@@ -83,11 +91,10 @@ def _crawl(authenticated_user: str, memory_limit: int, urls: list):
             current_memory_usage = memory_usage_response.get(serialization_constants.MEMORY_USAGE_KEY)
             continue_crawling = crawling_continuation_response.get(serialization_constants.CONTINUATION_KEY)
 
-        for visited_bool, url_list in {True: visited_urls, False: urls}.items():
-            if len(url_list) > 0: # Set visited urls as visited, set leftover urls as not visited
-                storage_service.make_pending_url_put(authenticated_user, url_list, visited_bool)
-    finally:
-        cache_service.make_status_writing_post(authenticated_user, active=False)
+    for visited_bool, url_list in {True: visited_urls, False: urls}.items():
+        if len(url_list) > 0: # Set visited urls as visited, set leftover urls as not visited
+            storage_service.make_pending_url_put(authenticated_user, url_list, visited_bool)
+    
 
 def __process_page(authenticated_user: str, page_url: str):
     try:

@@ -4,7 +4,7 @@ import pika, logging
 logging.getLogger("pika").propagate = False
 
 __credentials = pika.PlainCredentials(AMQP_USERNAME, AMQP_PASSWORD)
-__parameters = pika.ConnectionParameters(AMQP_CONTAINER_NAME, AMQP_PORT, '/', __credentials)
+__parameters = pika.ConnectionParameters(AMQP_CONTAINER_NAME, AMQP_PORT, '/', __credentials, heartbeat=0)
 __connection = pika.BlockingConnection(__parameters)
 
 channel = __connection.channel()

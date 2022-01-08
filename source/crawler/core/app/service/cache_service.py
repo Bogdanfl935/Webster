@@ -10,6 +10,12 @@ def make_memory_usage_get(authenticated_user):
     response = requests.get(parameterized_url)
     return unpack_response(response)
 
+def make_status_get(authenticated_user):
+    target_url = url_joiner.urljoin(endpoint_constants.CACHE_MS_URL, endpoint_constants.CRAWLER_STATUS)
+    parameterized_url = url_joiner.construct_parameterized_url(target_url, parameters=dict(username=authenticated_user))
+    response = requests.get(parameterized_url)
+    return unpack_response(response)
+
 def make_status_reading_post(authenticated_user):
     target_url = url_joiner.urljoin(endpoint_constants.CACHE_MS_URL, endpoint_constants.CONCURRENT_STATUS_READING)
     response = requests.post(target_url, json=dict(username=authenticated_user))

@@ -1,21 +1,23 @@
 from flask import render_template, Response
-from app.constants import template_constants
-from app.service import crawler_service, parser_service, config_service
+from app.constants import template_constants, serialization_constants
+from app.service import crawler_service, parser_service, storage_service
+from urllib.parse import urlparse
 import json
 
 def get_crawler_activity(response_object: Response, authenticated_user: str) -> Response:
     crawler_latest_status, _ = crawler_service.make_status_get(authenticated_user)
-    crawler_config, _ = config_service.make_crawler_config_get(authenticated_user)
+    memory_limit_response, _ = storage_service.make_memory_limit_get(authenticated_user)
     
-    if crawler_latest_status["active"] is True:
-        parser_latest_status = parser_service.make_status_get(authenticated_user)
+    if crawler_latest_status.get(serialization_constants.ACTIVE_KEY) is True:
+        parser_latest_status_response = parser_service.make_status_get(authenticated_user)
+        domain_dict = {serialization_constants.DOMAIN_KEY: urlparse(serialization_constants.LAST_URL_KEY).netloc}
         response_object.set_data(
             render_template(
                 template_constants.SECTION_ACTIVITY_ACTIVE_PATH,
                 authenticated_user = authenticated_user,
-                crawler_status = crawler_latest_status,
-                parser_status = parser_latest_status,
-                memory_limit = int(crawler_config["memoryLimit"]) # To be fixed later
+                crawler_status = crawler_latest_status | domain_dict,
+                parser_status = parser_latest_status_response,
+                memory_limit = memory_limit_response.get(serialization_constants.MEMORY_LIMIT_KEY)
             )
         )
     else:
@@ -24,7 +26,7 @@ def get_crawler_activity(response_object: Response, authenticated_user: str) -> 
                 template_constants.SECTION_ACTIVITY_INACTIVE_PATH,
                 authenticated_user = authenticated_user,
                 crawler_status = crawler_latest_status,
-                memory_limit = int(crawler_config["memoryLimit"]) # To be fixed later
+                memory_limit = memory_limit_response.get(serialization_constants.MEMORY_LIMIT_KEY)
             )
         )
         
