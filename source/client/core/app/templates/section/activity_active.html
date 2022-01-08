@@ -29,7 +29,7 @@
                     </div>
                     <input type="text" class="form-control" placeholder="Source" name="startUrl" disabled>
                     <div class="input-group-append">
-                        <form method="POST", action="{{ url_for(crawler_stop_endpoint) }}">
+                        <form id="crawlerStopForm" method="POST", action="{{ url_for(crawler_stop_endpoint) }}">
                             <button class="btn btn-outline-danger" type="submit">Stop crawling</button>
                         </form>
                     </div>
@@ -59,7 +59,7 @@
                     <div class="row my-2">
                         <span class="lead my-1 col-12">Currently crawling:</span>
                         <span class="py-2 px-3 mx-2 col-auto badge badge-info" role='button' data-toggle="tooltip" id="crawlerCurrentCrawl"
-                            data-placement="bottom" title="{{ crawler_status.url }}">{{ crawler_status.domain }}</span>
+                            data-placement="bottom" title="{{ crawler_status.lastUrl }}"></span>
                     </div>
                 </div>
             </div>
@@ -83,24 +83,7 @@
                                 <th scope="col" class="col-4 overflow-hidden">Domain</th>
                             </tr>
                         </thead>
-                        <tbody id="parserStatusTable">
-                            {% for entry in parser_status.content %}
-                            <tr>
-                                <th class="overflow-hidden" scope="row">{{loop.index0}}</th>
-                                <td class="overflow-hidden"><span class="badge badge-dark">&lt;{{ entry.tag }}&gt;</span></td>
-                                <td class="overflow-hidden">
-                                    <span class="badge badge-danger">
-                                    {{ "%.2fkB"|format(entry.size|float / 1024) }}
-                                    </span>
-                                </td>
-                                <td class="overflow-hidden"><span class="badge badge-info" role='button' data-toggle="tooltip"
-                                        data-placement="bottom" title="{{ parser_status.url }}">
-                                        {{ parser_status.domain }}
-                                    </span>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
+                        <tbody id="parserStatusTable"></tbody>
                     </table>
                 </div>
             </div>
