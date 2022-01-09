@@ -30,9 +30,16 @@ def delete_image():
 
 def get_images():
     user_id = fetch_user_id(request.args.get(serialization_constants.USERNAME_KEY))
+    source = request.args.get(serialization_constants.SOURCE_KEY, None)
+
+    if source is not None:
+        source_id = fetch_source_id(user_id, source)
+        auxiliary_condition = sql_models.ParsedContent.source_id == source_id
+    else:
+        auxiliary_condition = True
 
     query_func = lambda session: session.query(sql_models.ParsedImage).join(sql_models.ParsedUrl).filter(
-        sql_models.ParsedImage.user_id == user_id).values(
+        sql_models.ParsedImage.user_id == user_id, auxiliary_condition).values(
         sql_models.ParsedImage.id, sql_models.ParsedImage.extension, 
         sql_models.ParsedImage.content, sql_models.ParsedUrl.url.label(serialization_constants.SOURCE_KEY))
     records = persistence_service.query(query_func)
