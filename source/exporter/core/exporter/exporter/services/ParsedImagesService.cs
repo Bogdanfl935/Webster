@@ -8,31 +8,18 @@
     using System.Drawing;
     using System.IO;
     using System.Net;
-    using System.Drawing.Imaging;
+    //using System.Drawing.Imaging;
+    using SixLabors.ImageSharp;
     using System.IO.Compression;
     using Microsoft.AspNetCore.Mvc;
+    using SixLabors.ImageSharp.PixelFormats;
 
     public class ParsedImagesService
     {
         internal byte[] ExportImages(string username)
         {
-            var dictExtensions = new Dictionary<string, ImageFormat>()
-            {
-                {"jpeg", ImageFormat.Jpeg},
-                {"jpg", ImageFormat.Jpeg },
-                {"png", ImageFormat.Png},
-                {"gif", ImageFormat.Gif},
-                {"bmp", ImageFormat.Bmp},
-                {"ico", ImageFormat.Icon},
-                {"exif", ImageFormat.Exif},
-                {"tiff", ImageFormat.Tiff},
-                {"wmf", ImageFormat.Wmf},
-            };
-
-            var nonce = 0;
-
-            var client = new RestClient(AppConstants.appURL + ":" + EndpointConstants.storagePort);
-
+            var client = new RestClient("http://" + Environment.GetEnvironmentVariable("STORAGE_CONTAINER_NAME") + ":" + EndpointConstants.storagePort);
+            //var client = new RestClient("http://127.0.0.1:" + EndpointConstants.storagePort);
 
             var requestParsedImages = new RestRequest(EndpointConstants.parsedImageEndpoint, Method.GET);
             requestParsedImages.AddParameter("username", username);
@@ -45,10 +32,11 @@
 
             string archiveName = username + "_images.zip";
 
-            if (listOfParsedData != null)
+            if (listOfParsedData != null && listOfParsedData.Count > 0)
             {
-                foreach (var element in listOfParsedData)
+                for (var j = 0; j < Math.Min(listOfParsedData.Count, 15); j++)
                 {
+                    var element = listOfParsedData[j];
 
                     string extension = element.extension;
                     string filename;
@@ -59,8 +47,10 @@
                     {
                         using (FileStream zipFile = File.Open(archiveName, FileMode.OpenOrCreate))
                         {
-                            Image image = Image.FromStream(ms);
-                            filename = "image_" + element.id + "." + extension;
+                            SixLabors.ImageSharp.Formats.IImageFormat format = SixLabors.ImageSharp.Image.DetectFormat(valueByte);
+                            SixLabors.ImageSharp.Image image = SixLabors.ImageSharp.Image.Load(valueByte, out format);
+
+                            filename = "image_" + element.id + extension;
 
                             using (ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Update))
                             {
@@ -71,8 +61,8 @@
                                 using (var streamWriter = new StreamWriter(entryStream))
                                 using (MemoryStream imageStream = new MemoryStream())
                                 {
-                                    image.Save(imageStream, dictExtensions[extension]);
-                                    streamWriter.Write(imageStream);
+                                    image.Save(imageStream, format);
+                                    streamWriter.BaseStream.Write(imageStream.ToArray());
                                 }
                             }
                         }
