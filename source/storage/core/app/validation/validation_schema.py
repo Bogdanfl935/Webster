@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, INCLUDE
+from marshmallow import Schema, fields, validate, INCLUDE
 
 
 class UrlInsertionSchema(Schema):
@@ -39,8 +39,12 @@ class ParsedImageInsertionSchema(Schema):
     source = fields.Url(required=True)
     unknown = INCLUDE
 
-
 class ParsedDataDeletionSchema(Schema):
     username = fields.Email(required=True)
     id = fields.Integer(required=True)
+    unknown = INCLUDE
+
+class MemoryUsageSchema(Schema):
+    username = fields.Email(required=True)
+    memoryUsage = fields.Integer(required=True, validate=validate.Range(min=1))
     unknown = INCLUDE

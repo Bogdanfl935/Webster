@@ -19,7 +19,15 @@ from datetime import datetime
 def handle_memory_limit_get() -> Response:
     return storage_access_service.get_memory_limit()
 
-# TODO Memory Usage endpoint
+@flask_app.route(endpoint_constants.MEMORY_USAGE, methods=['GET'])
+@validate_with_schema(validation_schema.UsernameAccessSchema, target=ValidationTarget.NAMED_URL_PARAMETERS)
+def handle_memory_usage_get() -> Response:
+    return storage_access_service.get_memory_usage()
+
+@flask_app.route(endpoint_constants.MEMORY_USAGE, methods=['PUT'])
+@validate_with_schema(validation_schema.MemoryUsageSchema)
+def handle_memory_usage_put() -> Response:
+    return storage_access_service.update_memory_usage()
 
 @flask_app.errorhandler(HTTPStatus.BAD_REQUEST)
 def handle_bad_request_error(exception: HTTPException) -> Response:

@@ -46,3 +46,10 @@ class MemoryLimit(db.Model):
 
     singleton_key = db.Column(db.Boolean, primary_key=True)
     capacity = db.Column(db.BigInteger, nullable=False)
+
+class MemoryUsage(db.Model):
+    __tablename__ = sql_ddl_constants.MEMORY_USAGE
+
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.BigInteger, nullable=False)
+    usage = db.Column(db.BigInteger, nullable=False)
