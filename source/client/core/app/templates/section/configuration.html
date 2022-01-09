@@ -24,11 +24,11 @@
                     </div>
                     <div class="mdl-cell--2-col-desktop mdl-cell--3-col-tablet mdl-cell--2-col-phone">
                         <div class="mx-1 row d-flex flex-nowrap">
-                            <input type="radio" class="btn-check" name="{{config.fieldName}}" id="success-outlined-{{loop.index0}}" 
+                            <input type="radio" class="btn-check" name="{{ config.keyword }}" id="success-outlined-{{loop.index0}}" 
                             {% if config.active %} checked {% endif %}
                             autocomplete="off">
                             <label class="btn btn-outline-success col-6 rounded-left px-1" for="success-outlined-{{loop.index0}}">Yes</label>
-                            <input type="radio" class="btn-check" name="{{config.fieldName}}" id="danger-outlined-{{loop.index0}}"
+                            <input type="radio" class="btn-check" name="{{ config.keyword }}" id="danger-outlined-{{loop.index0}}"
                             {% if not config.active %} checked {% endif %}
                             autocomplete="off">
                             <label class="btn btn-outline-danger col-6 rounded-right px-1" for="danger-outlined-{{loop.index0}}">No</label>
