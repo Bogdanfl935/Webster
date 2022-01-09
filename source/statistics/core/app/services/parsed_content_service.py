@@ -32,48 +32,44 @@ def get_content_public():
     return jsonify(response)
 
 
-def get_most_tags_private():
+def get_mem_usage_private():
     user_id = fetch_user_id(request.args.get(serialization_constants.USERNAME_KEY))
 
-    query_func = lambda session: session.query(func.count(sql_models.ParsedContent.tag), sql_models.ParsedUrl.url) \
-        .join(sql_models.ParsedUrl).filter(sql_models.ParsedContent.user_id == user_id).group_by(
-        sql_models.ParsedUrl.url).order_by(func.count(sql_models.ParsedContent.tag).desc()).limit(10)
+    query_func = lambda session: session.query(func.sum(sql_models.MemoryUsage.usage)) \
+        .filter(sql_models.MemoryUsage.user_id == user_id).scalar()
 
     records = persistence_service.query(query_func)
 
-    return records[0][0]
+    return int(records)
 
 
-def get_most_tags_public():
-    query_func = lambda session: session.query(func.count(sql_models.ParsedContent.tag), sql_models.ParsedUrl.url) \
-        .join(sql_models.ParsedUrl).group_by(sql_models.ParsedUrl.url).order_by(
-        func.count(sql_models.ParsedContent.tag).desc()).limit(10)
+def get_mem_usage_public():
+    query_func = lambda session: session.query(func.sum(sql_models.MemoryUsage.usage)) \
+        .scalar()
 
     records = persistence_service.query(query_func)
 
-    return records[0][0]
+    return int(records)
 
 
-def get_most_tags_source_private():
+def get_visited_urls_private():
     user_id = fetch_user_id(request.args.get(serialization_constants.USERNAME_KEY))
 
-    query_func = lambda session: session.query(func.count(sql_models.ParsedContent.tag), sql_models.ParsedUrl.url) \
-        .join(sql_models.ParsedUrl).filter(sql_models.ParsedContent.user_id == user_id).group_by(
-        sql_models.ParsedUrl.url).order_by(func.count(sql_models.ParsedContent.tag).desc()).limit(10)
+    query_func = lambda session: session.query(func.count(sql_models.ParsedUrl.url)) \
+        .filter(sql_models.ParsedUrl.user_id == user_id, sql_models.ParsedUrl.state == "VISITED").scalar()
 
     records = persistence_service.query(query_func)
 
-    return records[0][1]
+    return records
 
 
-def get_most_tags_source_public():
-    query_func = lambda session: session.query(func.count(sql_models.ParsedContent.tag), sql_models.ParsedUrl.url) \
-        .join(sql_models.ParsedUrl).group_by(sql_models.ParsedUrl.url).order_by(
-        func.count(sql_models.ParsedContent.tag).desc()).limit(10)
+def get_visited_urls_public():
+    query_func = lambda session: session.query(func.count(sql_models.ParsedUrl.url)) \
+        .filter(sql_models.ParsedUrl.state == "VISITED").scalar()
 
     records = persistence_service.query(query_func)
 
-    return records[0][1]
+    return records
 
 
 def get_total_parsed_urls_private():

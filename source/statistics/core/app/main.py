@@ -24,21 +24,21 @@ def handle_private_stats_chart_get():
 
 @app.route(endpoint_constants.STATISTICS_PUBLIC, methods=['GET'])
 def handle_public_stats_get():
-    most_tags_on_page = parsed_content_service.get_most_tags_public()
-    page_with_most_tags = parsed_content_service.get_most_tags_source_public()
+    mem_usage = parsed_content_service.get_mem_usage_public()
+    visited_urls = parsed_content_service.get_visited_urls_public()
     total_parsed_urls = parsed_content_service.get_total_parsed_urls_public()
 
-    return jsonify(mostTagsOnPage=most_tags_on_page, pageWithMostTags=page_with_most_tags, totalParsedUrls=total_parsed_urls)
+    return jsonify(memoryUsage=mem_usage, visitedUrls=visited_urls, totalParsedUrls=total_parsed_urls)
 
 
 @app.route(endpoint_constants.STATISTICS_PRIVATE, methods=['GET'])
 @validate_with_schema(validation_schema.UsernameAccessSchema, target=ValidationTarget.NAMED_URL_PARAMETERS)
 def handle_private_stats_get():
-    most_tags_on_page = parsed_content_service.get_most_tags_private()
-    page_with_most_tags = parsed_content_service.get_most_tags_source_private()
+    mem_usage = parsed_content_service.get_mem_usage_private()
+    visited_urls = parsed_content_service.get_visited_urls_private()
     total_parsed_urls = parsed_content_service.get_total_parsed_urls_private()
 
-    return jsonify(mostTagsOnPage=most_tags_on_page, pageWithMostTags=page_with_most_tags, totalParsedUrls=total_parsed_urls)
+    return jsonify(memoryUsage=mem_usage, visitedUrls=visited_urls, totalParsedUrls=total_parsed_urls)
 
 
 
@@ -48,15 +48,15 @@ def handle_unauthorized_error(exception: HTTPException) -> str:
     return rendered_template, exception.code
 
 
-@app.errorhandler(Exception)
-def handle_generic_error(exception) -> str:
-    error_code = exception.code if isinstance(exception, HTTPException) else HTTPStatus.INTERNAL_SERVER_ERROR
-    exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
-                                 error=HTTPStatus(error_code).phrase,
-                                 message=str(exception), path=request.path)
-    if error_code == HTTPStatus.INTERNAL_SERVER_ERROR:
-        logging.log(level=logging.DEBUG, msg=traceback.format_exc())
-    return make_response(jsonify(exception_dto.__dict__), error_code)
+# @app.errorhandler(Exception)
+# def handle_generic_error(exception) -> str:
+#     error_code = exception.code if isinstance(exception, HTTPException) else HTTPStatus.INTERNAL_SERVER_ERROR
+#     exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
+#                                  error=HTTPStatus(error_code).phrase,
+#                                  message=str(exception), path=request.path)
+#     if error_code == HTTPStatus.INTERNAL_SERVER_ERROR:
+#         logging.log(level=logging.DEBUG, msg=traceback.format_exc())
+#     return make_response(jsonify(exception_dto.__dict__), error_code)
 
 
 if __name__ == '__main__':
