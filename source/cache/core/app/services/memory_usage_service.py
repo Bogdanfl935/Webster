@@ -8,7 +8,14 @@ from flask import request, make_response, jsonify, Response
 def increase_memory_usage():
     username = request.json.get(serialization_constants.USERNAME_KEY)
     memory_usage = request.json.get(serialization_constants.MEMORY_USAGE_KEY)
-    
+
+    memory_usage_response, _ = storage_service.make_memory_usage_get(username)
+    stored_memory_usage = memory_usage_response.get(serialization_constants.MEMORY_USAGE_KEY)
+    cached_memory_usage = int(redis_memory_usage.get(username)) if redis_memory_usage.exists(username) != 0 else 0
+
+    if stored_memory_usage > cached_memory_usage: # Resynchronize memory usage
+        redis_memory_usage.incr(username, stored_memory_usage)
+
     redis_memory_usage.incr(username, memory_usage)
     return Response(status=HTTPStatus.OK)
 

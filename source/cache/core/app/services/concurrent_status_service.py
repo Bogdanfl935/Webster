@@ -34,7 +34,10 @@ def get_and_set_crawler_active_status():
             'utf-8')) if redis_crawler_status.exists(username) != 0 else False
         if active is False:  # Read and set active to True in an atomic operation, update memory usage
             memory_usage_response, _ = storage_service.make_memory_usage_get(username)
-            redis_memory_usage.set(username, memory_usage_response.get(serialization_constants.MEMORY_USAGE_KEY))
+            stored_memory_usage = memory_usage_response.get(serialization_constants.MEMORY_USAGE_KEY)
+            cached_memory_usage = int(redis_memory_usage.get(username)) if redis_memory_usage.exists(username) != 0 else 0
+            if stored_memory_usage > cached_memory_usage:
+                redis_memory_usage.incr(username, stored_memory_usage)
             redis_crawler_status.set(username, bytes(True))
     finally:
         release_lock(LockType.CRAWLER_STATUS_LOCK)  # Exit critical section
