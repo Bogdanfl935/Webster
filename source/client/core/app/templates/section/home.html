@@ -6,113 +6,68 @@
 <!-- Own include files -->
 <link rel="stylesheet" type="text/css"
       href="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.STYLES_HOME_PATH) }}">
-
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 {% endblock %}
 
 {% block content %}
 <div class="page-content">
     <section class="section--center mdl-grid">
-        <div
-                class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--4-col-desktop mdl-cell--6-col-tablet mdl-cell--6-col-phone ">
-            <div class="mdl-card__media">
-
-            </div>
+        <div class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--4-col-desktop 
+            mdl-cell--6-col-tablet mdl-cell--6-col-phone ">
+            <div class="mdl-card__media"></div>
             <div class="mdl-card__title">
-                <h3 class="mdl-card__title-text"> Total visits </h3>
+                <h3 class="mdl-card__title-text"> Cumulated memory usage </h3>
             </div>
             <div class="mdl-card__supporting-text">
                 <div class="mdl-card__supporting-text">
-                    <h3 class="h3-right">12</h3>
+                    <h3 class="statistics-container h3-right"><span>0.0000</span> MB</h3>
                 </div>
-
             </div>
-
         </div>
-
-        <div
-                class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--4-col-desktop mdl-cell--6-col-tablet mdl-cell--6-col-phone ">
-            <div class="mdl-card__media">
-
-            </div>
+        <div class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--4-col-desktop
+            mdl-cell--6-col-tablet mdl-cell--6-col-phone ">
+            <div class="mdl-card__media"></div>
             <div class="mdl-card__title">
-                <h3 class="mdl-card__title-text"> Total resources retrieved </h3>
+                <h3 class="mdl-card__title-text"> Total anchors extracted </h3>
             </div>
             <div class="mdl-card__supporting-text">
                 <div class="mdl-card__supporting-text">
-                    <h3 class="h3-right">3223</h3>
+                    <h3 class="statistics-container h3-right"><span>0</span></h3>
                 </div>
             </div>
-
         </div>
-
-        <div
-                class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--4-col-desktop mdl-cell--6-col-tablet mdl-cell--6-col-phone">
-            <div class="mdl-card__media">
-            </div>
+        <div class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--4-col-desktop
+            mdl-cell--6-col-tablet mdl-cell--6-col-phone">
+            <div class="mdl-card__media"></div>
             <div class="mdl-card__title">
-                <h3 class="mdl-card__title-text"> Time taken </h3>
+                <h3 class="mdl-card__title-text"> Total crawled web pages </h3>
             </div>
             <div class="mdl-card__supporting-text">
-                <h3 class="h3-right">21 sec</h3>
+                <h3 class="statistics-container h3-right"><span>0</span></h3>
             </div>
-
         </div>
-
-        <div
-                class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--6-col-phone ">
-
+        <div class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop
+            mdl-cell--6-col-tablet mdl-cell--6-col-phone ">
             <div class="mdl-card__title">
-                <h3 class="mdl-card__title-text"> Grafic </h3>
+                <h3 class="mdl-card__title-text"> Highest tag yield by page </h3>
             </div>
-            <div class="mdl-card__media">
-                <img src="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.IMAGES_GRAPH_PATH) }}"
-                     width="100%" border="0">
-            </div>
-            <div class="mdl-card__supporting-text">
-
+            <div class="mdl-card mdl-cell--12-col-desktop 
+            mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+                <div id="chartContainer" style="height: 500px; width: 100%;"></div>
             </div>
         </div>
-
-        <div
-                class="mdl-card mdl-shadow--8dp mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--6-col-phone ">
-            <div class="mdl-card__title">
-                <h3 class="mdl-card__title-text"> Despre proiect </h3>
-            </div>
-            <div class="mdl-card__media">
-                <table class="mdl-data-table mdl-js-data-table mdl-data-table mdl-shadow--2dp" width="100%">
-                    <thead>
-                    <tr>
-                        <th class="mdl-data-table__cell--non-numeric">Page name</th>
-                        <th>Time taken</th>
-                        <th>Found</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td class="mdl-data-table__cell--non-numeric">Page1</td>
-                        <td>25s</td>
-                        <td>2</td>
-                    </tr>
-                    <tr>
-                        <td class="mdl-data-table__cell--non-numeric">Page2</td>
-                        <td>50s</td>
-                        <td>15</td>
-                    </tr>
-                    <tr>
-                        <td class="mdl-data-table__cell--non-numeric">Page3</td>
-                        <td>10s</td>
-                        <td>235</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="mdl-card__supporting-text">
-
-            </div>
-        </div>
-
-
+        {% if authenticated_user %}
+            <form id="statisticsForm" method="GET", action="{{ url_for(auth_statistics_chart_endpoint) }}"
+            alternative-action="{{ url_for(auth_statistics_endpoint) }}"></form>
+        {% else %}
+            <form id="statisticsForm" method="GET", action="{{ url_for(public_statistics_chart_endpoint) }}"
+            alternative-action="{{ url_for(public_statistics_endpoint) }}"></form>
+        {% endif %}
     </section>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.SCRIPTS_HOME_CONTROLS_PATH) }}"></script>
 {% endblock %}

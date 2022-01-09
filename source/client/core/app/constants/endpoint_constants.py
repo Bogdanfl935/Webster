@@ -15,6 +15,11 @@ CRAWLER_STATUS = "/crawler-status"
 PARSER_STATUS = "/parser-status"
 MEMORY_LIMIT = "/memory-limit"
 
+STATISTICS_PUBLIC_CHART = "/public-stats-chart"
+STATISTICS_PRIVATE_CHART = "/auth-stats-chart"
+STATISTICS_PUBLIC = "/public-stats"
+STATISTICS_PRIVATE = "/auth-stats"
+
 # POST Endpoints
 REGISTRATION = "/registration"
 AUTHENTICATION = "/authentication"
@@ -46,3 +51,4 @@ CRAWLER_MS_URL = f"http://{env_config.CRAWLER_CONTAINER_NAME}:{env_config.CRAWLE
 CONFIG_MS_URL = f"http://{env_config.CONFIG_CONTAINER_NAME}:{env_config.CONFIG_PORT}"
 PARSER_MS_URL = f"http://{env_config.PARSER_CONTAINER_NAME}:{env_config.PARSER_PORT}"
 STORAGE_MS_URL = f"http://{env_config.STORAGE_CONTAINER_NAME}:{env_config.STORAGE_PORT}"
+STATISTICS_MS_URL = f"http://{env_config.STATISTICS_CONTAINER_NAME}:{env_config.STATISTICS_PORT}"
