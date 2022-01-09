@@ -16,7 +16,7 @@
     {
 
         //internal Microsoft.AspNetCore.Mvc.FileContentResult ExportContent(string username)
-        internal byte[] ExportContent(string username)
+        internal byte[] ExportContent(string username, string url)
         {
             var nonce = 0;
 
@@ -26,6 +26,7 @@
 
             var requestParsedContent = new RestRequest(EndpointConstants.parsedContentEndpoint, Method.GET);
             requestParsedContent.AddParameter("username", username);
+            requestParsedContent.AddParameter("url", url);
             requestParsedContent.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var responseParsedContent = client.Execute(requestParsedContent);
             var contentParsedContent = responseParsedContent.Content;

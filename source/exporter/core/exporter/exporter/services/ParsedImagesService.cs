@@ -16,13 +16,14 @@
 
     public class ParsedImagesService
     {
-        internal byte[] ExportImages(string username)
+        internal byte[] ExportImages(string username, string url)
         {
             var client = new RestClient("http://" + Environment.GetEnvironmentVariable("STORAGE_CONTAINER_NAME") + ":" + EndpointConstants.storagePort);
             //var client = new RestClient("http://127.0.0.1:" + EndpointConstants.storagePort);
 
             var requestParsedImages = new RestRequest(EndpointConstants.parsedImageEndpoint, Method.GET);
             requestParsedImages.AddParameter("username", username);
+            requestParsedImages.AddParameter("url", url);
             requestParsedImages.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var responseParsedImages = client.Execute(requestParsedImages);
             var contentParsedImages = responseParsedImages.Content;
