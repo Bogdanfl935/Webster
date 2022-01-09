@@ -34,58 +34,55 @@ def get_content_public():
 
 def get_mem_usage_private():
     user_id = fetch_user_id(request.args.get(serialization_constants.USERNAME_KEY))
-
     query_func = lambda session: session.query(func.sum(sql_models.MemoryUsage.usage)) \
         .filter(sql_models.MemoryUsage.user_id == user_id).scalar()
-
     records = persistence_service.query(query_func)
+    response = int(records) if records is not None else 0
 
-    return int(records)
+    return response
 
 
 def get_mem_usage_public():
     query_func = lambda session: session.query(func.sum(sql_models.MemoryUsage.usage)) \
         .scalar()
-
     records = persistence_service.query(query_func)
+    response = int(records) if records is not None else 0
 
-    return int(records)
+    return response
 
 
 def get_visited_urls_private():
     user_id = fetch_user_id(request.args.get(serialization_constants.USERNAME_KEY))
-
     query_func = lambda session: session.query(func.count(sql_models.ParsedUrl.url)) \
         .filter(sql_models.ParsedUrl.user_id == user_id, sql_models.ParsedUrl.state == "VISITED").scalar()
-
     records = persistence_service.query(query_func)
+    response = int(records) if records is not None else 0
 
-    return records
+    return response
 
 
 def get_visited_urls_public():
     query_func = lambda session: session.query(func.count(sql_models.ParsedUrl.url)) \
         .filter(sql_models.ParsedUrl.state == "VISITED").scalar()
-
     records = persistence_service.query(query_func)
+    response = int(records) if records is not None else 0
 
-    return records
+    return response
 
 
 def get_total_parsed_urls_private():
     user_id = fetch_user_id(request.args.get(serialization_constants.USERNAME_KEY))
-
     query_func = lambda session: session.query(func.count(sql_models.ParsedUrl.url)). \
         filter(sql_models.ParsedUrl.user_id == user_id).scalar()
-
     records = persistence_service.query(query_func)
+    response = int(records) if records is not None else 0
 
-    return records
+    return response
 
 
 def get_total_parsed_urls_public():
     query_func = lambda session: session.query(func.count(sql_models.ParsedUrl.url)).scalar()
-
     records = persistence_service.query(query_func)
+    response = int(records) if records is not None else 0
 
-    return records
+    return response

@@ -50,15 +50,15 @@ def handle_bad_request_error(exception: HTTPException) -> Response:
     return make_response(jsonify(exception_dto.__dict__), exception.code)
 
 
-# @app.errorhandler(Exception)
-# def handle_generic_error(exception) -> str:
-#     error_code = exception.code if isinstance(exception, HTTPException) else HTTPStatus.INTERNAL_SERVER_ERROR
-#     exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
-#                                  error=HTTPStatus(error_code).phrase,
-#                                  message=str(exception), path=request.path)
-#     if error_code == HTTPStatus.INTERNAL_SERVER_ERROR:
-#         logging.log(level=logging.DEBUG, msg=traceback.format_exc())
-#     return make_response(jsonify(exception_dto.__dict__), error_code)
+@app.errorhandler(Exception)
+def handle_generic_error(exception) -> str:
+    error_code = exception.code if isinstance(exception, HTTPException) else HTTPStatus.INTERNAL_SERVER_ERROR
+    exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=error_code,
+                                 error=HTTPStatus(error_code).phrase,
+                                 message=str(exception), path=request.path)
+    if error_code == HTTPStatus.INTERNAL_SERVER_ERROR:
+        logging.log(level=logging.DEBUG, msg=traceback.format_exc())
+    return make_response(jsonify(exception_dto.__dict__), error_code)
 
 
 if __name__ == '__main__':
