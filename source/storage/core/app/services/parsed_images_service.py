@@ -34,7 +34,7 @@ def get_images():
 
     if source is not None:
         source_id = fetch_source_id(user_id, source)
-        auxiliary_condition = sql_models.ParsedContent.source_id == source_id
+        auxiliary_condition = sql_models.ParsedImage.source_id == source_id
     else:
         auxiliary_condition = True
 

@@ -49,3 +49,24 @@ def get_content():
         for record in records]
     }
     return make_response(jsonify(response), HTTPStatus.OK)
+
+def get_content_source():
+    user_id = fetch_user_id(request.args.get(serialization_constants.USERNAME_KEY))
+    parsed_content_query_func = lambda session: session.query(sql_models.ParsedContent).join(
+        sql_models.ParsedUrl).filter(sql_models.ParsedContent.user_id == user_id).values(
+            sql_models.ParsedContent.id,
+            sql_models.ParsedUrl.url.label(serialization_constants.SOURCE_KEY))
+    parsed_content_records = persistence_service.query(parsed_content_query_func)
+    parsed_content_sources = {serialization_constants.SOURCES_KEY: [record[1] for record in parsed_content_records]}
+
+    parsed_image_query_func = lambda session: session.query(sql_models.ParsedImage).join(
+        sql_models.ParsedUrl).filter(sql_models.ParsedImage.user_id == user_id).values(
+            sql_models.ParsedContent.id,
+            sql_models.ParsedUrl.url.label(serialization_constants.SOURCE_KEY))
+    parsed_image_records = persistence_service.query(parsed_image_query_func)
+    parsed_image_sources = {serialization_constants.SOURCES_KEY: [record[1] for record in parsed_image_records]}
+
+    response = {serialization_constants.SOURCES_KEY: list(set(
+        parsed_content_sources.get(serialization_constants.SOURCES_KEY) + \
+            parsed_image_sources.get(serialization_constants.SOURCES_KEY)))}
+    return make_response(jsonify(response), HTTPStatus.OK)
