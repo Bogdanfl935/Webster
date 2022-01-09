@@ -5,27 +5,22 @@
     using exporter.dto;
     using System.Text;
     using Newtonsoft.Json;
-    using System.Drawing;
     using System.IO;
-    using System.Net;
-    using System.Drawing.Imaging;
     using System.IO.Compression;
     using Microsoft.AspNetCore.Mvc;
+    using SixLabors.ImageSharp;
 
     public class ParsedContentService
     {
-
-        //internal Microsoft.AspNetCore.Mvc.FileContentResult ExportContent(string username)
-        internal byte[] ExportContent(string username)
+        internal byte[] ExportContent(string username, string url)
         {
-            var nonce = 0;
-
             var client = new RestClient("http://" + Environment.GetEnvironmentVariable("STORAGE_CONTAINER_NAME") + ":" + EndpointConstants.storagePort);
             //var client = new RestClient("http://127.0.0.1:" + EndpointConstants.storagePort);
 
 
             var requestParsedContent = new RestRequest(EndpointConstants.parsedContentEndpoint, Method.GET);
             requestParsedContent.AddParameter("username", username);
+            requestParsedContent.AddParameter("source", url);
             requestParsedContent.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var responseParsedContent = client.Execute(requestParsedContent);
             var contentParsedContent = responseParsedContent.Content;
@@ -37,7 +32,7 @@
 
             if (listOfParsedData != null && listOfParsedData.Count > 0)
             {
-                for (var i = 0;i < Math.Min(listOfParsedData.Count, 15); i ++)
+                for (var i = 0;i < listOfParsedData.Count; i ++)
                 {
                     var element = listOfParsedData[i];
                     string filename;
@@ -66,6 +61,21 @@
                     }
                 }
             }
+
+
+            var requestParsedImages = new RestRequest(EndpointConstants.parsedImageEndpoint, Method.GET);
+            requestParsedImages.AddParameter("username", username);
+            requestParsedImages.AddParameter("source", url);
+            requestParsedImages.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            var responseParsedImages = client.Execute(requestParsedImages);
+            var contentParsedImages = responseParsedImages.Content;
+
+            ParsedImagesDto parsedImages = (ParsedImagesDto)JsonConvert.DeserializeObject(contentParsedImages, typeof(ParsedImagesDto));
+            List<ParsedImagesDataDto> listOfParsedImagesData = parsedImages.parsedImages;
+
+            var imageWriter = new ParsedImagesService();
+            imageWriter.ExportImages(listOfParsedImagesData, archiveName);
+
             var myfile = System.IO.File.ReadAllBytes(archiveName);
             return new ExporterContentDto(new FileContentResult(myfile, "application/zip")).encodedFile;
             //return new ExporterContentDto(myfile).encodedFile;
