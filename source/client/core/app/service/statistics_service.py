@@ -18,14 +18,16 @@ def make_statistics_private_chart_get(response_object: Response, authenticated_u
     target_url = urljoin(endpoint_constants.STATISTICS_MS_URL, endpoint_constants.STATISTICS_PRIVATE_CHART)
     parameterized_url = construct_parameterized_url(target_url, {serialization_constants.USERNAME_KEY: authenticated_user})
     response = requests.get(parameterized_url)
-    response_object.set_data(json.dumps(unpack_response(response)).encode('utf-8'))
+    data, status = unpack_response(response)
+    response_object.set_data(json.dumps(data).encode('utf-8'))
     response_object.mimetype = 'application/json'
-    return response_object
+    return response_object, status
 
 def make_statistics_private_get(response_object: Response, authenticated_user: str):
     target_url = urljoin(endpoint_constants.STATISTICS_MS_URL, endpoint_constants.STATISTICS_PRIVATE)
     parameterized_url = construct_parameterized_url(target_url, {serialization_constants.USERNAME_KEY: authenticated_user})
     response = requests.get(parameterized_url)
-    response_object.set_data(json.dumps(unpack_response(response)).encode('utf-8'))
+    data, status = unpack_response(response)
+    response_object.set_data(json.dumps(data).encode('utf-8'))
     response_object.mimetype = 'application/json'
-    return response_object
+    return response_object, status

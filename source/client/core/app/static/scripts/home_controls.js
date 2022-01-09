@@ -17,6 +17,7 @@ function renderStatistics(){
 
 function submitFormByAction(form, action, callback){
     $(form).attr("action", action);
+    $(form).off('submit'); /* Unbind previous submit event handler */
     form.on('submit', (event) => {
         event.preventDefault();
         formSubmitHandler(
@@ -61,14 +62,32 @@ function unpackChartSettings(data){
 }
 
 function constructChart(data){
-    const chartSettings = unpackChartSettings(data);
-    new CanvasJS.Chart("chartContainer", chartSettings).render();
+    if(data.length > 0){
+        const chartSettings = unpackChartSettings(data);
+        new CanvasJS.Chart("chartContainer", chartSettings).render();
+    }
+    else{
+        const displayContent = renderNoDataToDisplay();
+        $("#chartContainer").html(displayContent);
+        $("#chartContainer").height(100);
+    }
 }
 
 function renderCardParameters(data){
-    $("h3[class='h3-right']").each((index, elem)=>{
-        $(elem).val(data[index]);
+    const convertedMemoryUsage = (parseFloat(data.memoryUsage)/(1024*1024)).toFixed(4).toString();
+    const dataMapping = [convertedMemoryUsage, data.totalParsedUrls, data.visitedUrls];
+    $("h3[class*='statistics-container'] span").each((index, elem)=>{
+        $(elem).text(dataMapping[index]);
     });
+}
+
+function renderNoDataToDisplay(){
+    return `
+    <div class="mdl-card__supporting-text">
+        <div class="row py-2 px-3">
+            <span class="lead">No statistics available. Start crawler to update activity</span>
+        </div>
+    </div>`
 }
 
 function _getHostName(url){
