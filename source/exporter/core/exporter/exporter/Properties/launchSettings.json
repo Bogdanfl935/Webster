@@ -11,10 +11,9 @@
   "profiles": {
     "exporter": {
       "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "STORAGE_CONTAINER_NAME": "http://127.0.0.1"
       },
       "applicationUrl": "http://localhost:50008",
       "dotnetRunMessages": true

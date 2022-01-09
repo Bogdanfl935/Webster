@@ -11,9 +11,12 @@ RUN dotnet restore
 COPY exporter/. ./exporter/
 RUN dotnet publish -c Release -o published
 
-# # final stage/image
-# FROM mcr.microsoft.com/dotnet/aspnet:6.0
-# COPY  published/. ./published
-# WORKDIR /published
-# ENTRYPOINT ["dotnet", "exporter.dll"]
-ENTRYPOINT [ "sleep", "infinity" ]
+# final stage/image
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
+EXPOSE 50008
+# ENV ASPNETCORE_URLS=http://127.0.0.1
+# ENV ASPNETCORE_ENVIRONMENT=Development
+COPY --from=build  published/. ./published
+WORKDIR /published
+ENTRYPOINT ["dotnet", "exporter.dll", "--no-launch-profile" ]
+# ENTRYPOINT [ "sleep", "infinity" ]

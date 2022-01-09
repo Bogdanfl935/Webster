@@ -138,8 +138,13 @@ services:
     container_name: ${EXPORTER_CONTAINER_NAME}
     networks:
       - msauth
-    build: ./exporter/core/exporter/
+    build:
+      context: ./exporter/core/exporter/
     env_file: .env/container_config_common.env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - STORAGE_CONTAINER_NAME=${STORAGE_CONTAINER_NAME}
+      - ASPNETCORE_URLS=http://0.0.0.0:50008
     ports:
       - ${EXPORTER_PORT}:${EXPORTER_PORT}
 

@@ -20,7 +20,7 @@
         {
             var nonce = 0;
 
-            var client = new RestClient(AppConstants.appURL + ":" + EndpointConstants.storagePort);
+            var client = new RestClient(Environment.GetEnvironmentVariable("STORAGE_CONTAINER_NAME") + ":" + EndpointConstants.storagePort);
 
 
             var requestParsedContent = new RestRequest(EndpointConstants.parsedContentEndpoint, Method.GET);

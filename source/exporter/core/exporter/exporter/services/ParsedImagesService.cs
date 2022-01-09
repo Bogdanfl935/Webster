@@ -31,8 +31,9 @@
 
             var nonce = 0;
 
-            var client = new RestClient(AppConstants.appURL + ":" + EndpointConstants.storagePort);
-
+            var client = new RestClient("http://" + Environment.GetEnvironmentVariable("STORAGE_CONTAINER_NAME") + ":" + EndpointConstants.storagePort);
+            //var client = new RestClient("http://127.0.0.1:" + EndpointConstants.storagePort);
+            //var client = new RestClient("storage-ms:" + EndpointConstants.storagePort);
 
             var requestParsedImages = new RestRequest(EndpointConstants.parsedImageEndpoint, Method.GET);
             requestParsedImages.AddParameter("username", username);
