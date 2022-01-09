@@ -48,3 +48,8 @@ class MemoryUsageSchema(Schema):
     username = fields.Email(required=True)
     memoryUsage = fields.Integer(required=True, validate=validate.Range(min=1))
     unknown = INCLUDE
+
+class ContentAccessSchema(Schema):
+    username = fields.Email(required=True)
+    source = fields.Url(default=None)
+    unknown = INCLUDE
