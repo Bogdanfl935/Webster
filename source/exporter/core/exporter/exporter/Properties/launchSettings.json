@@ -12,8 +12,7 @@
     "exporter": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "STORAGE_CONTAINER_NAME": "http://127.0.0.1"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:50008",
       "dotnetRunMessages": true
