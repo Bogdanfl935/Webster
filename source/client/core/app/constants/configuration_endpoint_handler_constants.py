@@ -1,0 +1,4 @@
+# Scanned bound route handlers for configuration:
+HANDLE_CRAWLER_CONFIGURATION_PUT = 'configuration.handle_crawler_configuration_put'
+HANDLE_PARSER_CONFIGURATION_POST = 'configuration.handle_parser_configuration_post'
+HANDLE_PARSER_CONFIGURATION_DELETE = 'configuration.handle_parser_configuration_delete'

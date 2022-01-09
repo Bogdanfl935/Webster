@@ -33,7 +33,12 @@ EMAIL_PASSWORD_RESET = "/email-password-reset"
 
 CRAWLER_START = "/crawler-start"
 CRAWLER_STOP = "/crawler-stop"
+
 CRAWLER_CONFIGURATION = "/crawler-configuration"
+PARSER_CONFIGURATION = "/parser-configuration"
+PARSER_CONFIGURATION_INSERTION = "/parser-configuration-insertion"
+PARSER_CONFIGURATION_DELETION = "/parser-configuration-deletion"
+CRAWLER_CONFIGURATION_OPTION = "/crawler-configuration-option"
 
 AUTH_MS_URL = f"http://{env_config.AUTH_CONTAINER_NAME}:{env_config.AUTH_PORT}"
 NOTIFICATION_MS_URL = f"http://{env_config.NOTIFICATION_CONTAINER_NAME}:{env_config.NOTIFICATION_PORT}"

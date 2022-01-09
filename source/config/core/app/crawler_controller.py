@@ -18,7 +18,7 @@ def handle_crawler_configuration_get() -> Response:
     return crawler_configuration_service.get_configuration()
 
 
-@crawler.route(endpoint_constants.CRAWLER_CONFIGURATION, methods=['POST'])
+@crawler.route(endpoint_constants.CRAWLER_CONFIGURATION, methods=['PUT'])
 @validate_with_schema(validation_schema.CrawlerConfigurationSchema)
 def handle_crawler_configuration_post() -> Response:
     return crawler_configuration_service.set_configuration()
