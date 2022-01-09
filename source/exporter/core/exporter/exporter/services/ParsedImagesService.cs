@@ -18,15 +18,15 @@
         {
             var dictExtensions = new Dictionary<string, ImageFormat>()
             {
-                {"jpeg", ImageFormat.Jpeg},
-                {"jpg", ImageFormat.Jpeg },
-                {"png", ImageFormat.Png},
-                {"gif", ImageFormat.Gif},
-                {"bmp", ImageFormat.Bmp},
-                {"ico", ImageFormat.Icon},
-                {"exif", ImageFormat.Exif},
-                {"tiff", ImageFormat.Tiff},
-                {"wmf", ImageFormat.Wmf},
+                {".jpeg", ImageFormat.Jpeg},
+                {".jpg", ImageFormat.Jpeg },
+                {".png", ImageFormat.Png},
+                {".gif", ImageFormat.Gif},
+                {".bmp", ImageFormat.Bmp},
+                {".ico", ImageFormat.Icon},
+                {".exif", ImageFormat.Exif},
+                {".tiff", ImageFormat.Tiff},
+                {".wmf", ImageFormat.Wmf},
             };
 
             var nonce = 0;
@@ -60,7 +60,7 @@
                         using (FileStream zipFile = File.Open(archiveName, FileMode.OpenOrCreate))
                         {
                             Image image = Image.FromStream(ms);
-                            filename = "image_" + element.id + "." + extension;
+                            filename = "image_" + element.id + extension;
 
                             using (ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Update))
                             {
@@ -72,7 +72,7 @@
                                 using (MemoryStream imageStream = new MemoryStream())
                                 {
                                     image.Save(imageStream, dictExtensions[extension]);
-                                    streamWriter.Write(imageStream);
+                                    streamWriter.BaseStream.Write(imageStream.ToArray());
                                 }
                             }
                         }

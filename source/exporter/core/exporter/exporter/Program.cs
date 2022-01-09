@@ -16,7 +16,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapGet("/export-content/{username}", (string username) =>
+app.MapGet("/export-content", (string username) =>
 {
     var contentExporter = new ParsedContentService();
     return contentExporter.ExportContent(username);
@@ -26,7 +26,7 @@ app.MapGet("/export-content/{username}", (string username) =>
 app.MapGet("/export-images", (string username) =>
 {
     var imageExporter = new ParsedImagesService();
-    imageExporter.ExportImages(username);
+    return imageExporter.ExportImages(username);
 })
     .WithName("GetExportImages");
 
