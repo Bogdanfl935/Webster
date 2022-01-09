@@ -20,7 +20,7 @@
 
             var requestParsedContent = new RestRequest(EndpointConstants.parsedContentEndpoint, Method.GET);
             requestParsedContent.AddParameter("username", username);
-            requestParsedContent.AddParameter("url", url);
+            requestParsedContent.AddParameter("source", url);
             requestParsedContent.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var responseParsedContent = client.Execute(requestParsedContent);
             var contentParsedContent = responseParsedContent.Content;
@@ -32,7 +32,7 @@
 
             if (listOfParsedData != null && listOfParsedData.Count > 0)
             {
-                for (var i = 0;i < Math.Min(listOfParsedData.Count, 15); i ++)
+                for (var i = 0;i < listOfParsedData.Count; i ++)
                 {
                     var element = listOfParsedData[i];
                     string filename;
@@ -65,7 +65,7 @@
 
             var requestParsedImages = new RestRequest(EndpointConstants.parsedImageEndpoint, Method.GET);
             requestParsedImages.AddParameter("username", username);
-            requestParsedImages.AddParameter("url", url);
+            requestParsedImages.AddParameter("source", url);
             requestParsedImages.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var responseParsedImages = client.Execute(requestParsedImages);
             var contentParsedImages = responseParsedImages.Content;
@@ -74,7 +74,7 @@
             List<ParsedImagesDataDto> listOfParsedImagesData = parsedImages.parsedImages;
 
             var imageWriter = new ParsedImagesService();
-            imageWriter.ExportImages(listOfParsedImagesData, archiveName); 
+            imageWriter.ExportImages(listOfParsedImagesData, archiveName);
 
             var myfile = System.IO.File.ReadAllBytes(archiveName);
             return new ExporterContentDto(new FileContentResult(myfile, "application/zip")).encodedFile;

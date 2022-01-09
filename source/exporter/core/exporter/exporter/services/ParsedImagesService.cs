@@ -20,7 +20,7 @@
         {
             if (listOfParsedData != null && listOfParsedData.Count > 0)
             {
-                for (var j = 0; j < Math.Min(listOfParsedData.Count, 15); j++)
+                for (var j = 0; j < listOfParsedData.Count; j++)
                 {
                     var element = listOfParsedData[j];
 
