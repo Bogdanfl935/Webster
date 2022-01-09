@@ -66,7 +66,6 @@ services:
       context: ./storage/
     ports:
       - ${STORAGE_PORT}:${STORAGE_PORT}
-
     
   auth:
     container_name: ${AUTH_CONTAINER_NAME}
@@ -143,7 +142,6 @@ services:
   #   ports:
   #     - ${EXPORTER_PORT}:${EXPORTER_PORT}
 
-
   notification:
     container_name: ${NOTIFICATION_CONTAINER_NAME}
     env_file: .env/container_config_common.env
@@ -160,8 +158,6 @@ services:
     ports:
       - ${NOTIFICATION_PORT}:${NOTIFICATION_PORT}
 
-  
-
   parser:
     container_name: ${PARSER_CONTAINER_NAME}
     depends_on:
@@ -175,14 +171,17 @@ services:
     ports:
       - ${PARSER_PORT}:${PARSER_PORT}
 
-  # statistics:
-  #   container_name: ${STATISTICS_CONTAINER_NAME}
-  #   env_file: .env/container_config_common.env
-  #   networks:
-  #     - msauth
-  #   build: ./statistics/core/statistics/
-  #   ports:
-  #     - ${STATISTICS_PORT}:${STATISTICS_PORT}
+  statistics:
+    container_name: ${STATISTICS_CONTAINER_NAME}
+    depends_on:
+      - postgres_storage
+    env_file: .env/container_config_common.env
+    networks:
+      - msauth
+    build: 
+      context: ./statistics/
+    ports:
+      - ${STATISTICS_PORT}:${STATISTICS_PORT}
 
 networks:
   msauth:

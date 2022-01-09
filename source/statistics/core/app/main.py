@@ -1,11 +1,11 @@
-from flask import render_template, request, make_response, jsonify
+from flask import Response, request, make_response, jsonify
 from app.constants import endpoint_constants
 from app.services.validation_service import validate_with_schema, ValidationTarget
 from app.validation import validation_schema
 from werkzeug.exceptions import HTTPException
 from app.config.app_config import app
 from app.config.env_config import APP_HOST, APP_PORT
-import logging, time, traceback, requests
+import logging, time, traceback
 from datetime import datetime
 from http import HTTPStatus
 from app.dto.error_handler import ErrorHandler
@@ -42,10 +42,12 @@ def handle_private_stats_get():
 
 
 
-@app.errorhandler(401)
-def handle_unauthorized_error(exception: HTTPException) -> str:
-    rendered_template = render_template(template_constants.SECTION_HOME_PATH)
-    return rendered_template, exception.code
+@app.errorhandler(HTTPStatus.BAD_REQUEST)
+def handle_bad_request_error(exception: HTTPException) -> Response:
+    exception_dto = ErrorHandler(timestamp=datetime.fromtimestamp(time.time()), status=exception.code,
+                            error=HTTPStatus(exception.code).phrase,
+                            errors=exception.description, path=request.path)
+    return make_response(jsonify(exception_dto.__dict__), exception.code)
 
 
 # @app.errorhandler(Exception)

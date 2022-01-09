@@ -1,4 +1,3 @@
-from app.config import env_config
 # Own Endpoints
 
 STATISTICS_PUBLIC_CHART = "/public-stats-chart"
