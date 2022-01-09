@@ -16,23 +16,8 @@
 
     public class ParsedImagesService
     {
-        internal byte[] ExportImages(string username, string url)
+        internal void ExportImages(List<ParsedImagesDataDto> listOfParsedData, string archiveName)
         {
-            var client = new RestClient("http://" + Environment.GetEnvironmentVariable("STORAGE_CONTAINER_NAME") + ":" + EndpointConstants.storagePort);
-            //var client = new RestClient("http://127.0.0.1:" + EndpointConstants.storagePort);
-
-            var requestParsedImages = new RestRequest(EndpointConstants.parsedImageEndpoint, Method.GET);
-            requestParsedImages.AddParameter("username", username);
-            requestParsedImages.AddParameter("url", url);
-            requestParsedImages.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-            var responseParsedImages = client.Execute(requestParsedImages);
-            var contentParsedImages = responseParsedImages.Content;
-
-            ParsedImagesDto parsedImages = (ParsedImagesDto)JsonConvert.DeserializeObject(contentParsedImages, typeof(ParsedImagesDto));
-            List<ParsedImagesDataDto> listOfParsedData = parsedImages.parsedImages;
-
-            string archiveName = username + "_images.zip";
-
             if (listOfParsedData != null && listOfParsedData.Count > 0)
             {
                 for (var j = 0; j < Math.Min(listOfParsedData.Count, 15); j++)
@@ -70,9 +55,6 @@
                     }
                 }
             }
-            var myfile = System.IO.File.ReadAllBytes(archiveName);
-            return new ExporterContentDto(new FileContentResult(myfile, "application/zip")).encodedFile;
-            //return myfile.ToArray();
         }
     }
 }
