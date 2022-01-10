@@ -53,3 +53,8 @@ class ContentAccessSchema(Schema):
     username = fields.Email(required=True)
     source = fields.Url(default=None)
     unknown = INCLUDE
+
+class ContentDeletionSchema(Schema):
+    username = fields.Email(required=True)
+    source = fields.Url(required=True)
+    unknown = INCLUDE
