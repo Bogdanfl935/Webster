@@ -77,6 +77,7 @@
             imageWriter.ExportImages(listOfParsedImagesData, archiveName);
 
             var myfile = System.IO.File.ReadAllBytes(archiveName);
+            File.Delete(archiveName);
             return new ExporterContentDto(new FileContentResult(myfile, "application/zip")).encodedFile;
             //return new ExporterContentDto(myfile).encodedFile;
         }
