@@ -6,7 +6,6 @@
 <!-- Own include files -->
 <link rel="stylesheet" type="text/css"
       href="{{ url_for(static_constants.ROOT_DIR, filename=static_constants.STYLES_ARCHIVE_PATH) }}">
-
 {% endblock %}
 
 {% block content %}
@@ -36,18 +35,24 @@
                             {% for source in content_sources %}
                             <tr>
                                 <td class="mdl-data-table__cell--non-numeric">
-                                    <span class="py-2 px-3 mx-2 col-auto badge badge-dark" role='button' 
-                                    data-toggle="tooltip" id="crawlerCurrentCrawl" data-placement="bottom"
+                                    <span class="parsed-content-data py-2 px-3 mx-2 col-auto badge badge-dark" role='button' 
+                                    data-toggle="tooltip" data-placement="bottom"
                                     title="{{ source }}">{{ get_hostname(source) }}</span>
                                 </td>
                                 <td>
-                                    <a class="download-crawled mr-2" href=""><i class="fas fa-download"></i></a>
-                                    <a class="delete-crawled " href=""><i class="fas fa-trash-alt"></i></a>
+                                    <span role="button" class="download-crawled mr-2">
+                                        <i class="fas fa-download"></i>
+                                    </span>
+                                    <span role="button" class="delete-crawled">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </span>
                                 </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                    <form id="contentControlForm" action="{{ url_for(export_content_endpoint) }}"
+                    alternative-action="{{ url_for(content_source_endpoint) }}"></form>
                 </div>
                 {% endif %}
         </div>
