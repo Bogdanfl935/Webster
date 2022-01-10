@@ -12,7 +12,7 @@
 
     public class ParsedContentService
     {
-        internal byte[] ExportContent(string username, string url)
+        internal Dictionary<string, string> ExportContent(string username, string url)
         {
             var client = new RestClient("http://" + Environment.GetEnvironmentVariable("STORAGE_CONTAINER_NAME") + ":" + EndpointConstants.storagePort);
             //var client = new RestClient("http://127.0.0.1:" + EndpointConstants.storagePort);
