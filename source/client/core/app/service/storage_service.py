@@ -9,3 +9,18 @@ def make_memory_limit_get(authenticated_user: str):
         target_url, parameters={serialization_constants.USERNAME_KEY: authenticated_user})
     response = requests.get(parameterized_url)
     return unpack_response(response)
+
+def make_content_source_get(authenticated_user: str):
+    target_url = url_joiner.urljoin(endpoint_constants.STORAGE_MS_URL, endpoint_constants.CONTENT_SOURCE)
+    parameterized_url = url_joiner.construct_parameterized_url(
+        target_url, parameters={serialization_constants.USERNAME_KEY: authenticated_user})
+    response = requests.get(parameterized_url)
+    return unpack_response(response)
+
+def make_content_source_delete(authenticated_user: str, source: str):
+    target_url = url_joiner.urljoin(endpoint_constants.STORAGE_MS_URL, endpoint_constants.CONTENT_SOURCE)
+    response = requests.delete(target_url, json={
+        serialization_constants.USERNAME_KEY: authenticated_user,
+        serialization_constants.SOURCE_KEY: source,
+    })
+    return unpack_response(response)

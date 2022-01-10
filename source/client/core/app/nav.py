@@ -1,8 +1,7 @@
 from flask import render_template, Response, Blueprint
 from app.constants import endpoint_constants, template_constants, nav_endpoint_handler_constants
-from app.service import activity_service, config_service
+from app.service import activity_service, config_service, archive_service
 from app.service.authorization_service import require_access_token
-import random
 
 nav = Blueprint('nav', __name__)
 
@@ -41,20 +40,4 @@ def handle_config_get(response_object: Response, authenticated_user: str) -> str
 @nav.route(endpoint_constants.ARCHIVE, methods=['GET'])
 @require_access_token
 def handle_archive_get(response_object: Response, authenticated_user: str) -> str:
-    content_list = list()
-    hosts = ("Github", "Google", "Wikipedia",
-             "Youtube", "Jira", "Facebook", "Instagram")
-    for i in range(0, 15):
-        content_list.append({
-            "page_host": random.choice(hosts),
-            "time_taken": random.randint(1, 30),
-            "quantity_found": random.randint(1, 100),
-        })
-    response_object.set_data(
-        render_template(
-            template_constants.SECTION_ARCHIVE_PATH,
-            authenticated_user=authenticated_user,
-            crawled_content_list=content_list
-        )
-    )
-    return response_object
+    return archive_service.render_archive(response_object, authenticated_user)

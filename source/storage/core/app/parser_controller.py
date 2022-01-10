@@ -42,3 +42,8 @@ def handle_parsed_image_get() -> Response:
 @validate_with_schema(validation_schema.UsernameAccessSchema, target=ValidationTarget.NAMED_URL_PARAMETERS)
 def handle_content_source_get() -> Response:
     return parsed_content_service.get_content_source()
+
+@parser.route(endpoint_constants.CONTENT_SOURCE, methods=['DELETE'])
+@validate_with_schema(validation_schema.ContentAccessSchema)
+def handle_content_source_delete() -> Response:
+    return parsed_content_service.delete_content_source()

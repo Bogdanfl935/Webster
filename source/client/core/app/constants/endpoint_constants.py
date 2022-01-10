@@ -45,6 +45,11 @@ PARSER_CONFIGURATION_INSERTION = "/parser-configuration-insertion"
 PARSER_CONFIGURATION_DELETION = "/parser-configuration-deletion"
 CRAWLER_CONFIGURATION_OPTION = "/crawler-configuration-option"
 
+EXPORT_CONTENT = "/export-content"
+PARSED_CONTENT = "/parsed-content"
+PARSED_IMAGE = "/parsed-image"
+CONTENT_SOURCE = "/content-source"
+
 AUTH_MS_URL = f"http://{env_config.AUTH_CONTAINER_NAME}:{env_config.AUTH_PORT}"
 NOTIFICATION_MS_URL = f"http://{env_config.NOTIFICATION_CONTAINER_NAME}:{env_config.NOTIFICATION_PORT}"
 CRAWLER_MS_URL = f"http://{env_config.CRAWLER_CONTAINER_NAME}:{env_config.CRAWLER_PORT}"
@@ -52,3 +57,4 @@ CONFIG_MS_URL = f"http://{env_config.CONFIG_CONTAINER_NAME}:{env_config.CONFIG_P
 PARSER_MS_URL = f"http://{env_config.PARSER_CONTAINER_NAME}:{env_config.PARSER_PORT}"
 STORAGE_MS_URL = f"http://{env_config.STORAGE_CONTAINER_NAME}:{env_config.STORAGE_PORT}"
 STATISTICS_MS_URL = f"http://{env_config.STATISTICS_CONTAINER_NAME}:{env_config.STATISTICS_PORT}"
+EXPORTER_MS_URL = f"http://{env_config.EXPORTER_CONTAINER_NAME}:{env_config.EXPORTER_PORT}"

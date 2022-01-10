@@ -70,3 +70,19 @@ def get_content_source():
         parsed_content_sources.get(serialization_constants.SOURCES_KEY) + \
             parsed_image_sources.get(serialization_constants.SOURCES_KEY)))}
     return make_response(jsonify(response), HTTPStatus.OK)
+
+def delete_content_source():
+    user_id = fetch_user_id(request.json.get(serialization_constants.USERNAME_KEY))
+    source_id = fetch_source_id(user_id, request.json.get(serialization_constants.SOURCE_KEY))
+    parsed_content_query_func = lambda session: session.query(sql_models.ParsedContent).filter(
+        sql_models.ParsedContent.user_id == user_id,
+        sql_models.ParsedContent.source_id == source_id).delete()
+    persistence_service.query(parsed_content_query_func)
+
+    parsed_image_query_func = lambda session: session.query(sql_models.ParsedImage).filter(
+        sql_models.ParsedImage.user_id == user_id,
+        sql_models.ParsedImage.source_id == source_id).delete()
+    persistence_service.query(parsed_image_query_func)
+
+    persistence_service.commit_session()
+    return Response(status=HTTPStatus.OK)
